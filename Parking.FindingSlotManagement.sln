@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33502.453
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parking.FindingSlotManagement.Api", "Parking.FindingSlotManagement.Api\Parking.FindingSlotManagement.Api.csproj", "{2989B519-A7AC-4821-991F-6ADB64B7BECC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parking.FindingSlotManagement.Application", "Parking.FindingSlotManagement.Application\Parking.FindingSlotManagement.Application.csproj", "{CE308C7F-36A8-48DF-AB0E-9F98149EC5AC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parking.FindingSlotManagement.Domain", "Parking.FindingSlotManagement.Domain\Parking.FindingSlotManagement.Domain.csproj", "{2DFEED4C-F60D-4307-9E47-983798582AAA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parking.FindingSlotManagement.Infrastructure", "Parking.FindingSlotManagement.Infrastructure\Parking.FindingSlotManagement.Infrastructure.csproj", "{1151229A-18EF-4985-89EF-28DD287F6176}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parking.FindingSlotManagement.Application.UnitTests", "Parking.FindingSlotManagement.Application.UnitTests\Parking.FindingSlotManagement.Application.UnitTests.csproj", "{BDDF0A6D-C76E-4010-9155-34FA4D20715C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2989B519-A7AC-4821-991F-6ADB64B7BECC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2989B519-A7AC-4821-991F-6ADB64B7BECC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2989B519-A7AC-4821-991F-6ADB64B7BECC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2989B519-A7AC-4821-991F-6ADB64B7BECC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE308C7F-36A8-48DF-AB0E-9F98149EC5AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE308C7F-36A8-48DF-AB0E-9F98149EC5AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE308C7F-36A8-48DF-AB0E-9F98149EC5AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE308C7F-36A8-48DF-AB0E-9F98149EC5AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DFEED4C-F60D-4307-9E47-983798582AAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DFEED4C-F60D-4307-9E47-983798582AAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DFEED4C-F60D-4307-9E47-983798582AAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DFEED4C-F60D-4307-9E47-983798582AAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1151229A-18EF-4985-89EF-28DD287F6176}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1151229A-18EF-4985-89EF-28DD287F6176}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1151229A-18EF-4985-89EF-28DD287F6176}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1151229A-18EF-4985-89EF-28DD287F6176}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDDF0A6D-C76E-4010-9155-34FA4D20715C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDDF0A6D-C76E-4010-9155-34FA4D20715C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDDF0A6D-C76E-4010-9155-34FA4D20715C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDDF0A6D-C76E-4010-9155-34FA4D20715C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1F913885-58CC-451A-9150-912BA8E577E4}
+	EndGlobalSection
+EndGlobal
