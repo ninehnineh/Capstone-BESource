@@ -1,4 +1,12 @@
+using Parking.FindingSlotManagement.Application;
+using Parking.FindingSlotManagement.Application.Behaviours;
+using Parking.FindingSlotManagement.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
+
+//Register the IServiceCollection
+builder.Services.AddApplicationServices();
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
 // Add services to the container.
 
@@ -25,6 +33,10 @@ app.UseSwaggerUI(c =>
 app.UseHttpsRedirection();
 
 app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+app.UseRouting();
+
+app.UseMiddleware<LogMiddleware>();
+
 
 app.UseAuthentication();
 
