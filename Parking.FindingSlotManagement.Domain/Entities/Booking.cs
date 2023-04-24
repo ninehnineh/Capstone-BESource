@@ -1,4 +1,4 @@
-﻿using Firebase.Auth;
+using Firebase.Auth;
 using FirebaseAdmin.Messaging;
 using System;
 using System.Collections.Generic;
@@ -25,15 +25,12 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public decimal? TotalPrice { get; set; }
         public string? PaymentMethod { get; set; }
         public string? TmnCodeVnPay { get; set; }
-
-
-
+        
         public int? UserId { get; set; }
         public virtual User? User { get; set; }
         public int? VehicleInforId { get; set; }
         public virtual VehicleInfor? VehicleInfor { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
-
         public virtual ICollection<ParkingSlot> ParkingSlots { get; set; }
     }
 }
