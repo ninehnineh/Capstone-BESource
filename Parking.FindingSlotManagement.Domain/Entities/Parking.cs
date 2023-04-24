@@ -1,20 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
+namespace Parking.FindingSlotManagement.Domain.Entities
 {
-    public partial class Parking
+    public class Parking
     {
-        public Parking()
-        {
-            Floors = new HashSet<Floor>();
-            ParkingHasPrices = new HashSet<ParkingHasPrice>();
-            ParkingSlots = new HashSet<ParkingSlot>();
-            ParkingSpotImages = new HashSet<ParkingSpotImage>();
-            StaffParkings = new HashSet<StaffParking>();
-        }
-
-        public int Id { get; set; }
+        public int ParkingId { get; set; }
         public string? Code { get; set; }
         public string? Name { get; set; }
         public string? Address { get; set; }

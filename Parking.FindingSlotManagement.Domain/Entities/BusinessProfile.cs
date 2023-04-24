@@ -1,11 +1,15 @@
-﻿using System;
+﻿using Firebase.Auth;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
+namespace Parking.FindingSlotManagement.Domain.Entities
 {
-    public partial class BusinessProfile
+    public class BusinessProfile
     {
-        public int Id { get; set; }
+        public int BusinessProfileId { get; set; }
         public string? Name { get; set; }
         public string? Address { get; set; }
         public string? FrontIdentification { get; set; }

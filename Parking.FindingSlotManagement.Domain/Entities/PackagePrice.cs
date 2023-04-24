@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
+namespace Parking.FindingSlotManagement.Domain.Entities
 {
-    public partial class PackagePrice
+    public class PackagePrice
     {
-        public PackagePrice()
-        {
-            ParkingHasPrices = new HashSet<ParkingHasPrice>();
-        }
-
-        public int Id { get; set; }
+        public int PackagePriceId { get; set; }
         public string? Name { get; set; }
         public decimal? Price { get; set; }
         public string? Description { get; set; }
@@ -23,8 +21,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
         public bool? HasPenaltyPrice { get; set; }
         public decimal? PenaltyPrice { get; set; }
         public float? PenaltyPriceStepTime { get; set; }
-        public int? TrafficId { get; set; }
 
+        public int? TrafficId { get; set; }
         public virtual Traffic? Traffic { get; set; }
         public virtual ICollection<ParkingHasPrice> ParkingHasPrices { get; set; }
     }

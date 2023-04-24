@@ -33,8 +33,4 @@
     <ProjectReference Include="..\Parking.FindingSlotManagement.Application\Parking.FindingSlotManagement.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Persistences\" />
-  </ItemGroup>
-
 </Project>

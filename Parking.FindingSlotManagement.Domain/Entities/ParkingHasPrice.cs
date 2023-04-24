@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
+namespace Parking.FindingSlotManagement.Domain.Entities
 {
-    public partial class ParkingHasPrice
+    public class ParkingHasPrice
     {
-        public int Id { get; set; }
+        public int ParkingHasPriceId { get; set; }
         public int? ParkingId { get; set; }
         public int? ParkingPriceId { get; set; }
 
