@@ -1,7 +1,10 @@
-﻿using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+﻿using Microsoft.EntityFrameworkCore;
+using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Infrastructure.Persistences.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,54 +12,94 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        public Task<int> CountAll(System.Linq.Expressions.Expression<Func<T, bool>> expression = null)
+        private readonly db_a98253_parkzdbContext _dbContext;
+
+        public GenericRepository(db_a98253_parkzdbContext dbContext)
         {
-            throw new NotImplementedException();
+            _dbContext = dbContext;
+        }
+        public async Task<int> CountAll(Expression<Func<T, bool>> expression = null)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
+            if (expression != null) query = query.Where(expression);
+            return await query.CountAsync();
         }
 
-        public Task Delete(T obj)
+        public async Task Delete(T obj)
         {
-            throw new NotImplementedException();
+            _dbContext.Set<T>().Remove(obj);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public Task<IEnumerable<T>> GetAllItemWithCondition(System.Linq.Expressions.Expression<Func<T, bool>> expression = null, List<System.Linq.Expressions.Expression<Func<T, object>>> includes = null, System.Linq.Expressions.Expression<Func<T, int>> orderBy = null, bool disableTracking = true)
+        public async Task<IEnumerable<T>> GetAllItemWithCondition(Expression<Func<T, bool>> expression = null, List<Expression<Func<T, object>>> includes = null, Expression<Func<T, int>> orderBy = null, bool disableTracking = true)
         {
-            throw new NotImplementedException();
+            IQueryable<T> query = _dbContext.Set<T>();
+            if (disableTracking) query = query.AsNoTracking();
+            if (includes != null) query = includes.Aggregate(query, (current, include) => current.Include(include));
+            if (expression != null) query = query.Where(expression);
+            if (orderBy != null)
+                return await query.OrderByDescending(orderBy).ToListAsync();
+            return await query.ToListAsync();
         }
 
-        public Task<IEnumerable<T>> GetAllItemWithConditionByNoInclude(System.Linq.Expressions.Expression<Func<T, bool>> expression)
+        public async Task<IEnumerable<T>> GetAllItemWithConditionByNoInclude(Expression<Func<T, bool>> expression)
         {
-            throw new NotImplementedException();
+            var lst = await _dbContext.Set<T>().Where(expression).ToListAsync();
+            if (lst.Count <= 0)
+            {
+                return null;
+            }
+            return lst;
         }
 
-        public Task<IEnumerable<T>> GetAllItemWithPagination(System.Linq.Expressions.Expression<Func<T, bool>> expression = null, List<System.Linq.Expressions.Expression<Func<T, object>>> includes = null, System.Linq.Expressions.Expression<Func<T, int>> orderBy = null, bool disableTracking = true, int? page = null, int? pageSize = null)
+        public async Task<IEnumerable<T>> GetAllItemWithPagination(Expression<Func<T, bool>> expression = null, List<Expression<Func<T, object>>> includes = null, Expression<Func<T, int>> orderBy = null, bool disableTracking = true, int? page = null, int? pageSize = null)
         {
-            throw new NotImplementedException();
+            IQueryable<T> query = _dbContext.Set<T>();
+            if (disableTracking) query = query.AsNoTracking();
+            if (includes != null) query = includes.Aggregate(query, (current, include) => current.Include(include));
+            if (expression != null) query = query.Where(expression);
+            if (orderBy != null)
+                return await query.OrderByDescending(orderBy).Skip(((int)page - 1) * (int)pageSize)
+                        .Take((int)pageSize).ToListAsync();
+            return await query.Skip(((int)page - 1) * (int)pageSize)
+                        .Take((int)pageSize).ToListAsync();
         }
 
-        public Task<T> GetById(object id)
+        public async Task<T> GetById(object id)
         {
-            throw new NotImplementedException();
+            var rs = await _dbContext.Set<T>().FindAsync(id);
+            if (rs == null)
+            {
+                return null;
+            }
+            return rs;
         }
 
-        public Task<T> GetItemWithCondition(System.Linq.Expressions.Expression<Func<T, bool>> expression = null, List<System.Linq.Expressions.Expression<Func<T, object>>> includes = null, bool disableTracking = true)
+        public async Task<T> GetItemWithCondition(Expression<Func<T, bool>> expression = null, List<Expression<Func<T, object>>> includes = null, bool disableTracking = true)
         {
-            throw new NotImplementedException();
+            IQueryable<T> query = _dbContext.Set<T>();
+            if (disableTracking) query = query.AsNoTracking();
+            if (includes != null) query = includes.Aggregate(query, (current, include) => current.Include(include));
+            if (expression != null) query = query.Where(expression);
+            return await query.FirstOrDefaultAsync();
         }
 
-        public Task Insert(T obj)
+        public async Task Insert(T obj)
         {
-            throw new NotImplementedException();
+            _dbContext.Set<T>().Add(obj);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public Task Save()
+        public async Task Save()
         {
-            throw new NotImplementedException();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public Task Update(T obj)
+        public async Task Update(T obj)
         {
-            throw new NotImplementedException();
+            _dbContext.ChangeTracker.Clear();
+            _dbContext.Set<T>().Update(obj);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
