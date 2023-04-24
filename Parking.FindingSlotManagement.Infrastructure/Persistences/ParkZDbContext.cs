@@ -1,48 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.Configuration;
+using Parking.FindingSlotManagement.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
+namespace Parking.FindingSlotManagement.Infrastructure.Persistences
 {
-    public partial class db_a98253_parkzdbContext : DbContext
+    public class ParkZDbContext : DbContext
     {
-        public db_a98253_parkzdbContext()
-        {
-        }
-
-        public db_a98253_parkzdbContext(DbContextOptions<db_a98253_parkzdbContext> options)
+        public ParkZDbContext(DbContextOptions<ParkZDbContext> options)
             : base(options)
         {
         }
 
-        public virtual DbSet<Booking> Bookings { get; set; } = null!;
-        public virtual DbSet<BusinessProfile> BusinessProfiles { get; set; } = null!;
-        public virtual DbSet<FavoriteAddress> FavoriteAddresses { get; set; } = null!;
-        public virtual DbSet<Floor> Floors { get; set; } = null!;
-        public virtual DbSet<Notification> Notifications { get; set; } = null!;
-        public virtual DbSet<PackagePrice> PackagePrices { get; set; } = null!;
-        public virtual DbSet<Parking> Parkings { get; set; } = null!;
-        public virtual DbSet<ParkingHasPrice> ParkingHasPrices { get; set; } = null!;
-        public virtual DbSet<ParkingSlot> ParkingSlots { get; set; } = null!;
-        public virtual DbSet<ParkingSpotImage> ParkingSpotImages { get; set; } = null!;
-        public virtual DbSet<PayPal> PayPals { get; set; } = null!;
-        public virtual DbSet<Role> Roles { get; set; } = null!;
-        public virtual DbSet<StaffParking> StaffParkings { get; set; } = null!;
-        public virtual DbSet<Traffic> Traffics { get; set; } = null!;
-        public virtual DbSet<User> Users { get; set; } = null!;
-        public virtual DbSet<VehicleInfor> VehicleInfors { get; set; } = null!;
-        public virtual DbSet<VnPay> VnPays { get; set; } = null!;
+        public DbSet<Booking> Bookings { get; set; } = null!;
+        public DbSet<BusinessProfile> BusinessProfiles { get; set; } = null!;
+        public DbSet<FavoriteAddress> FavoriteAddresses { get; set; } = null!;
+        public DbSet<Floor> Floors { get; set; } = null!;
+        public DbSet<Notification> Notifications { get; set; } = null!;
+        public DbSet<PackagePrice> PackagePrices { get; set; } = null!;
+        public DbSet<Domain.Entities.Parking> Parkings { get; set; } = null!;
+        public DbSet<ParkingHasPrice> ParkingHasPrices { get; set; } = null!;
+        public DbSet<ParkingSlot> ParkingSlots { get; set; } = null!;
+        public DbSet<ParkingSpotImage> ParkingSpotImages { get; set; } = null!;
+        public DbSet<PayPal> PayPals { get; set; } = null!;
+        public DbSet<Role> Roles { get; set; } = null!;
+        public DbSet<StaffParking> StaffParkings { get; set; } = null!;
+        public DbSet<Traffic> Traffics { get; set; } = null!;
+        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<VehicleInfor> VehicleInfors { get; set; } = null!;
+        public DbSet<VnPay> VnPays { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var builder = new ConfigurationBuilder()
-                            .SetBasePath(Directory.GetCurrentDirectory())
-                            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            //var builder = new ConfigurationBuilder()
+            //                .SetBasePath(Directory.GetCurrentDirectory())
+            //                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
-            IConfigurationRoot configuration = builder.Build();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+            //IConfigurationRoot configuration = builder.Build();
+            //optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -54,7 +54,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
 
                 entity.ToTable("Booking");
 
-                entity.HasIndex(e => e.Id, "UQ__Booking__3214EC2628BBAE14")
+                entity.HasIndex(e => e.BookingId, "UQ__Booking__3214EC2628BBAE14")
                     .IsUnique();
 
                 entity.Property(e => e.ParkingSlotId).HasColumnName("ParkingSlotID");
@@ -70,9 +70,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
                     .IsUnicode(false)
                     .IsFixedLength();
 
-                entity.Property(e => e.Id)
+                entity.Property(e => e.BookingId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("ID");
+                    .HasColumnName("BookingID");
 
                 entity.Property(e => e.PaymentMethod)
                     .HasMaxLength(225)
@@ -109,7 +109,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
                 entity.HasIndex(e => e.UserId, "UQ__Business__1788CCAD877AB68C")
                     .IsUnique();
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.BusinessProfileId).HasColumnName("BusinessProfileId");
 
                 entity.Property(e => e.Address).HasMaxLength(255);
 
@@ -139,7 +139,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
             {
                 entity.ToTable("FavoriteAddress");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.FavoriteAddressId).HasColumnName("FavoriteAddressId");
 
                 entity.Property(e => e.Address).HasMaxLength(255);
 
@@ -155,7 +155,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
 
             modelBuilder.Entity<Floor>(entity =>
             {
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.FloorId).HasColumnName("FloorId");
 
                 entity.Property(e => e.FloorName).HasMaxLength(50);
 
@@ -169,7 +169,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
 
             modelBuilder.Entity<Notification>(entity =>
             {
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.NotificationId).HasColumnName("NotificationId");
 
                 entity.Property(e => e.Body).HasMaxLength(225);
 
@@ -179,7 +179,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
 
                 entity.HasOne(d => d.Booking)
                     .WithMany(p => p.Notifications)
-                    .HasPrincipalKey(p => p.Id)
+                    .HasPrincipalKey(p => p.BookingId)
                     .HasForeignKey(d => d.BookingId)
                     .HasConstraintName("FK__Notificat__Booki__59063A47");
             });
@@ -188,7 +188,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
             {
                 entity.ToTable("PackagePrice");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.PackagePriceId).HasColumnName("PackagePriceId");
 
                 entity.Property(e => e.Description).HasMaxLength(255);
 
@@ -212,11 +212,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
                     .HasConstraintName("FK__PackagePr__Traff__412EB0B6");
             });
 
-            modelBuilder.Entity<Parking>(entity =>
+            modelBuilder.Entity<Domain.Entities.Parking>(entity =>
             {
                 entity.ToTable("Parking");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.ParkingId).HasColumnName("ParkingId");
 
                 entity.Property(e => e.Address).HasMaxLength(255);
 
@@ -240,7 +240,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
             {
                 entity.ToTable("ParkingHasPrice");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.ParkingHasPriceId).HasColumnName("ParkingHasPriceId");
 
                 entity.Property(e => e.ParkingId).HasColumnName("ParkingID");
 
@@ -259,7 +259,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
 
             modelBuilder.Entity<ParkingSlot>(entity =>
             {
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.ParkingSlotId).HasColumnName("ParkingSlotId");
 
                 entity.Property(e => e.BookingId).HasColumnName("BookingID");
 
@@ -280,7 +280,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
 
                 entity.HasOne(d => d.Booking)
                     .WithMany(p => p.ParkingSlots)
-                    .HasPrincipalKey(p => p.Id)
+                    .HasPrincipalKey(p => p.BookingId)
                     .HasForeignKey(d => d.BookingId)
                     .HasConstraintName("FK__ParkingSl__Booki__5629CD9C");
 
@@ -304,7 +304,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
             {
                 entity.ToTable("ParkingSpotImage");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.ParkingSpotImageId).HasColumnName("ParkingSpotImageId");
 
                 entity.Property(e => e.ImgPath)
                     .HasMaxLength(255)
@@ -322,7 +322,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
             {
                 entity.ToTable("PayPal");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.PayPalId).HasColumnName("PayPalId");
 
                 entity.Property(e => e.ClientId)
                     .HasMaxLength(255)
@@ -342,7 +342,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
 
             modelBuilder.Entity<Role>(entity =>
             {
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.RoleId).HasColumnName("RoleId");
 
                 entity.Property(e => e.Name).HasMaxLength(255);
             });
@@ -351,7 +351,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
             {
                 entity.ToTable("StaffParking");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.StaffParkingId).HasColumnName("StaffParkingId");
 
                 entity.Property(e => e.ParkingId).HasColumnName("ParkingID");
 
@@ -372,14 +372,14 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
             {
                 entity.ToTable("Traffic");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.TrafficId).HasColumnName("TrafficId");
 
                 entity.Property(e => e.Name).HasMaxLength(50);
             });
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.UserId).HasColumnName("UserId");
 
                 entity.Property(e => e.Avatar)
                     .HasMaxLength(255)
@@ -429,7 +429,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
             {
                 entity.ToTable("VehicleInfor");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.VehicleInforId).HasColumnName("VehicleInforId");
 
                 entity.Property(e => e.Color).HasMaxLength(225);
 
@@ -456,7 +456,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
             {
                 entity.ToTable("VnPay");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.VnPayId).HasColumnName("VnPayId");
 
                 entity.Property(e => e.HashSecret)
                     .HasMaxLength(255)
@@ -474,9 +474,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Models
                     .HasConstraintName("FK__VnPay__ManagerID__2A4B4B5E");
             });
 
-            OnModelCreatingPartial(modelBuilder);
+            //OnModelCreatingPartial(modelBuilder);
         }
-
-        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }

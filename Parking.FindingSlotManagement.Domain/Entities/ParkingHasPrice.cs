@@ -1,11 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Domain.Entities
 {
     public class ParkingHasPrice
     {
-        public int Id { get; set; }
+        public int ParkingHasPriceId { get; set; }
         public int? ParkingId { get; set; }
         public int? ParkingPriceId { get; set; }
 
