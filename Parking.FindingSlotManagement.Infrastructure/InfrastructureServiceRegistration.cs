@@ -21,6 +21,8 @@ namespace Parking.FindingSlotManagement.Infrastructure
 
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+
             return services;
         }
     }
