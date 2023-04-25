@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Behaviours;
 using Parking.FindingSlotManagement.Infrastructure;
+using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using System.Security.Claims;
 using System.Text;
 
@@ -59,7 +60,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddAuthentication(op =>
+/*builder.Services.AddAuthentication(op =>
 {
     op.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     op.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -76,7 +77,7 @@ builder.Services.AddAuthentication(op =>
         ValidAudience = builder.Configuration["JwtSettings:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]))
     };
-});
+});*/
 
 builder.Services.AddAuthorization(op =>
 {
@@ -91,10 +92,21 @@ builder.Services.AddLogging(config =>
     config.AddConsole();
     //etc
 });
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSignalR();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
@@ -124,6 +136,10 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHub<MessageHub>("/parkz");
+});
 
 app.Run();
