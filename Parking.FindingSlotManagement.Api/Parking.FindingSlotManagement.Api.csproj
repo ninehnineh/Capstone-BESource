@@ -18,6 +18,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.16" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.16" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.16">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -33,6 +34,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Parking.FindingSlotManagement.Application\Parking.FindingSlotManagement.Application.csproj" />
     <ProjectReference Include="..\Parking.FindingSlotManagement.Infrastructure\Parking.FindingSlotManagement.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\Manager\" />
+    <Folder Include="Controllers\Customer\" />
+    <Folder Include="Controllers\Staff\" />
   </ItemGroup>
 
 </Project>

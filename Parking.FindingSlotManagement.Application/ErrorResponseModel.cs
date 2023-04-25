@@ -15,5 +15,9 @@ namespace Parking.FindingSlotManagement.Application
             ResponseCode = responseCode;
             Message = message;
         }
+        public ErrorResponseModel(string message)
+        {
+            Message = message;
+        }
     }
 }

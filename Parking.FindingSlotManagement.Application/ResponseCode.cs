@@ -11,6 +11,7 @@ namespace Parking.FindingSlotManagement.Application
         OK = 200,
         Error = 500,
         UnAuthorize = 401,
-        Forbidden = 403
+        Forbidden = 403,
+        BadRequest = 400
     }
 }
