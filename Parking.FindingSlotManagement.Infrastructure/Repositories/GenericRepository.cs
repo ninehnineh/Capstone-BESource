@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
-using Parking.FindingSlotManagement.Infrastructure.Persistences.Models;
+using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +12,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        private readonly db_a98253_parkzdbContext _dbContext;
+        private readonly ParkZDbContext _dbContext;
 
-        public GenericRepository(db_a98253_parkzdbContext dbContext)
+        public GenericRepository(ParkZDbContext dbContext)
         {
             _dbContext = dbContext;
         }
