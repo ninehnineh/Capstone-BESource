@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Commands.CreateNewCensorshipManagerAccount
+namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Commands.CreateNewCensorshipManagerAccount
 {
     public class CreateNewCensorshipManagerAccountCommand : IRequest<ServiceResponse<int>>
     {

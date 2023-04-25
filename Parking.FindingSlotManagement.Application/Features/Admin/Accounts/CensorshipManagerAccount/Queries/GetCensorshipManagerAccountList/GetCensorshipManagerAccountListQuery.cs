@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Queries.GetCensorshipManagerAccountList
+namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Queries.GetCensorshipManagerAccountList
 {
     public class GetCensorshipManagerAccountListQuery : IRequest<ServiceResponse<IEnumerable<CensorshipManagerAccountResponse>>>
     {

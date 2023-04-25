@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Parking.FindingSlotManagement.Application;
-using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Commands.CreateNewCensorshipManagerAccount;
-using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Commands.DeleteCensorshipManagerAccount;
-using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Commands.UpdateCensorshipManagerAccount;
-using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Queries.GetCensorshipManagerAccountList;
+using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Commands.CreateNewCensorshipManagerAccount;
+using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Commands.DeleteCensorshipManagerAccount;
+using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Commands.UpdateCensorshipManagerAccount;
+using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Queries.GetCensorshipManagerAccountList;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using System.Net;
 
@@ -57,7 +57,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             {
                 var command = new DisableOrEnableManagerAccountCommand() { UserId = managerId };
                 var res = await _mediator.Send(command);
-                if (res.Message != "Successfully")
+                if (res.Message != "Thành công")
                 {
                     return StatusCode((int)res.StatusCode, res);
                 }
@@ -79,7 +79,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             try
             {
                 var res = await _mediator.Send(command);
-                if (res.Message != "Successfully")
+                if (res.Message != "Thành công")
                 {
                     return StatusCode((int)res.StatusCode, res);
                 }
@@ -108,7 +108,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             try
             {
                 var res = await _mediator.Send(command);
-                if (res.Message == "Successfully")
+                if (res.Message == "Thành công")
                 {
                     await _mesageHub.Clients.All.SendAsync("LoadCensorshipManagerAccounts");
                     return StatusCode((int)res.StatusCode, res);

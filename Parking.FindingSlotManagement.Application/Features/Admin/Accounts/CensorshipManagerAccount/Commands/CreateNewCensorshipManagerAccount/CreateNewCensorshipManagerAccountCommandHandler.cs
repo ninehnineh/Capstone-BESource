@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Commands.CreateNewCensorshipManagerAccount
+namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Commands.CreateNewCensorshipManagerAccount
 {
     public class CreateNewCensorshipManagerAccountCommandHandler : IRequestHandler<CreateNewCensorshipManagerAccountCommand, ServiceResponse<int>>
     {
@@ -35,7 +35,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Comm
                         StatusCode = 200,
                         Success = true,
                         Count = 0,
-                        Message = "The email has exist. Please enter new email!!!"
+                        Message = "Email đã tồn tại. Vui lòng nhập lại email!!!"
                     };
                 }
                 var _mapper = config.CreateMapper();
@@ -47,7 +47,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Comm
                     StatusCode = 201,
                     Success = true,
                     Count = 0,
-                    Message = "Successfully"
+                    Message = "Thành công"
                 };
             }
             catch (Exception ex)
