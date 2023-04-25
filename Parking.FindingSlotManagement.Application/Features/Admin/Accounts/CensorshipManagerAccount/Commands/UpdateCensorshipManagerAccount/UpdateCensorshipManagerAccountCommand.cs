@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Commands.UpdateCensorshipManagerAccount
+namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Commands.UpdateCensorshipManagerAccount
 {
     public class UpdateCensorshipManagerAccountCommand : IRequest<ServiceResponse<string>>
     {

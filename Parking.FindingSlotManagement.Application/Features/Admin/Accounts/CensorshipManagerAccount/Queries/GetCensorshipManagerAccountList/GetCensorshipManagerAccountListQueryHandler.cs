@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Queries.GetCensorshipManagerAccountList
+namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Queries.GetCensorshipManagerAccountList
 {
     public class GetCensorshipManagerAccountListQueryHandler : IRequestHandler<GetCensorshipManagerAccountListQuery, ServiceResponse<IEnumerable<CensorshipManagerAccountResponse>>>
     {
@@ -44,7 +44,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Quer
                     {
                         Success = true,
                         StatusCode = 200,
-                        Message = "No rows",
+                        Message = "Không tìm thấy",
                         Count = countFromList
                     };
                 }
@@ -53,7 +53,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Quer
                     Data = lstDto,
                     Success = true,
                     StatusCode = 200,
-                    Message = "Successfully",
+                    Message = "Thành công",
                     Count = countFromList
                 };
 

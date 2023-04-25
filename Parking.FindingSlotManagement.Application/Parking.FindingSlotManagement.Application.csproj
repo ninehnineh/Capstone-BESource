@@ -35,6 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features\Admin\Accounts\NonCensorshipManagerAccount\" />
     <Folder Include="Features\Customer\" />
     <Folder Include="Features\Manager\" />
     <Folder Include="Features\Staff\" />

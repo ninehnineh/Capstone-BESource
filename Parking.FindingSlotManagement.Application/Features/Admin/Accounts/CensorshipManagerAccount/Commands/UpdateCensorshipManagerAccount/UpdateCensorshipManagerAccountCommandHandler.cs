@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Commands.UpdateCensorshipManagerAccount
+namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Commands.UpdateCensorshipManagerAccount
 {
     public class UpdateCensorshipManagerAccountCommandHandler : IRequestHandler<UpdateCensorshipManagerAccountCommand, ServiceResponse<string>>
     {
@@ -31,7 +31,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Comm
                 {
                     return new ServiceResponse<string>
                     {
-                        Message = "Not found user.",
+                        Message = "Không tìm thấy tài khoản.",
                         StatusCode = 200,
                         Success = true,
                         Count = 0
@@ -51,7 +51,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Comm
                             StatusCode = 200,
                             Success = true,
                             Count = 0,
-                            Message = "The email has exist. Please enter new email!!!"
+                            Message = "Email đã tồn tại. Vui lòng nhập email khác!!!"
                         };
                     }
                     checkExist.Email = request.Email;
@@ -79,7 +79,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Comm
                 await _accountRepository.Update(checkExist);
                 return new ServiceResponse<string>
                 {
-                    Message = "Successfully",
+                    Message = "Thành công",
                     StatusCode = 204,
                     Success = true,
                     Count = 0

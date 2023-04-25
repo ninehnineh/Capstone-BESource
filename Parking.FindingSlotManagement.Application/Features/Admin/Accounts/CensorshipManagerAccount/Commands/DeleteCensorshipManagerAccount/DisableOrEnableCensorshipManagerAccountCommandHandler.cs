@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Commands.DeleteCensorshipManagerAccount
+namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Commands.DeleteCensorshipManagerAccount
 {
     public class DisableOrEnableCensorshipManagerAccountCommandHandler : IRequestHandler<DisableOrEnableManagerAccountCommand, ServiceResponse<string>>
     {
@@ -25,7 +25,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Comm
                 {
                     return new ServiceResponse<string>
                     {
-                        Message = "Not found manager",
+                        Message = "Không tìm thấy tài khoản",
                         Success = true,
                         StatusCode = 200,
                         Count = 0
@@ -42,7 +42,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Comm
                 await _accountRepository.Save();
                 return new ServiceResponse<string>
                 {
-                    Message = "Successfully",
+                    Message = "Thành công",
                     StatusCode = 204,
                     Success = true,
                     Count = 0
