@@ -4,7 +4,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Behaviours;
-using Parking.FindingSlotManagement.Application.Models.Authenticate;
 using Parking.FindingSlotManagement.Infrastructure;
 using System.Security.Claims;
 using System.Text;
@@ -20,7 +19,7 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+/*builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));*/
 
 builder.Services.AddSwaggerGen(c =>
 {
