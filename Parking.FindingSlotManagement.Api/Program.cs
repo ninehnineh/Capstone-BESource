@@ -7,6 +7,8 @@ using Parking.FindingSlotManagement.Application.Behaviours;
 using Parking.FindingSlotManagement.Application.Models;
 using Parking.FindingSlotManagement.Infrastructure;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
+using Swashbuckle.AspNetCore.Filters;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 
@@ -53,12 +55,10 @@ builder.Services.AddSwaggerGen(c =>
                 new List<string>()
             }
         });
-
-    c.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Version = "v1",
-        Title = "Final Project Api",
-    });
+    c.OperationFilter<SecurityRequirementsOperationFilter>();
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
 });
 
 builder.Services.AddAuthentication(op =>

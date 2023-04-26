@@ -29,6 +29,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             _mediator = mediator;
             _mesageHub = mesageHub;
         }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
         [HttpGet("censorship", Name = "GetCensorshipManagerAccountList")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -51,7 +54,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-        
+        /// <summary>
+        /// API For Admin
+        /// </summary>
         [HttpDelete("censorship/{managerId}", Name = "DisableOrEnableCensorshipManagerAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -75,6 +80,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
         [HttpPut("censorship/{managerId}", Name = "UpdateCensorshipManagerAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -104,6 +112,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 return StatusCode((int)ResponseCode.BadRequest, errorResponse);
             }
         }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
         [HttpPost("censorship", Name = "CreateNewCensorshipManagerAccountList")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
@@ -132,6 +143,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 return StatusCode((int)ResponseCode.BadRequest, errorResponse);
             }
         }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
         [HttpGet("request/register-censorship", Name = "GetRequestRegisterCensorshipManagerAccountList")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -154,6 +168,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
         [HttpPut("request/register-censorship/accept/{userId}", Name = "AcceptRequestRegisterAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -180,6 +197,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
         [HttpPut("request/register-censorship/decline/{userId}", Name = "DeclineRequestRegisterAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -206,6 +226,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
         [HttpGet("non-censorship", Name = "GetNonCensorshipManagerAccountList")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
