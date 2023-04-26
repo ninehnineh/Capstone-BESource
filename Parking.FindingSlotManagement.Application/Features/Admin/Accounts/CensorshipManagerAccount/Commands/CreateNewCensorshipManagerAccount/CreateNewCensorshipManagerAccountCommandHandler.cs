@@ -36,8 +36,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Cens
                 {
                     return new ServiceResponse<int>
                     {
-                        StatusCode = 200,
-                        Success = true,
+                        StatusCode = 400,
+                        Success = false,
                         Count = 0,
                         Message = "Email đã tồn tại. Vui lòng nhập lại email!!!"
                     };
