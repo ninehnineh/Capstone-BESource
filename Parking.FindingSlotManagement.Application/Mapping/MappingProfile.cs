@@ -11,6 +11,9 @@ using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficM
 using Parking.FindingSlotManagement.Application.Features.Customer.FavoriteAddress.FavoriteAddressManagement.Commands.CreateNewFavoriteAddress;
 using Parking.FindingSlotManagement.Application.Features.Customer.FavoriteAddress.FavoriteAddressManagement.Queries.GetFavoriteAddressById;
 using Parking.FindingSlotManagement.Application.Features.Customer.FavoriteAddress.FavoriteAddressManagement.Queries.GetFavoriteAddressByUserId;
+using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfo.VehicleInfoManagement.Commands.CreateNewVehicleInfo;
+using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfo.VehicleInfoManagement.Queries.GetListVehicleInforByUserId;
+using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfo.VehicleInfoManagement.Queries.GetVehicleInforById;
 using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Commands.CreateNewFloor;
 using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Queries.GetListFloor;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.CreateNewParking;
@@ -54,6 +57,11 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<FavoriteAddress, CreateNewFavoriteAddressCommand>().ReverseMap();
             CreateMap<FavoriteAddress, GetFavoriteAddressByIdResponse>().ReverseMap(); 
             CreateMap<FavoriteAddress, GetFavoriteAddressByUserIdResponse>().ReverseMap();
+            //For Vehicle Infor 
+            CreateMap<VehicleInfor, VehicleInfoCommand>().ReverseMap();
+            CreateMap<VehicleInfor, GetVehicleInforByIdResponse>().ReverseMap();
+            CreateMap<VehicleInfor, GetListVehicleInforByUserIdResponse>()
+                .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.Traffic.Name)).ReverseMap();
         }
     }
 }
