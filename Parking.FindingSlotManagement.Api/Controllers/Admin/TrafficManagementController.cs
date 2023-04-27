@@ -77,6 +77,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
+        /// <remarks>
+        /// SignalR: LoadTrafficInAdmin
+        /// </remarks>
         [HttpPost("traffic", Name = "CreateNewTraffic")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
@@ -108,6 +111,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
+        /// <remarks>
+        /// SignalR: LoadTrafficInAdmin
+        /// </remarks>
         [HttpDelete("traffic/{trafficId}", Name = "DisableOrEnableTraffic")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -134,6 +140,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
+        /// <remarks>
+        /// SignalR: LoadTrafficInAdmin
+        /// </remarks>
         [HttpPut("traffic/{trafficId}", Name = "UpdateTraffic")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]

@@ -57,6 +57,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
+        /// <remarks>
+        /// SignalR: LoadCensorshipManagerAccounts
+        /// </remarks>
         [HttpDelete("censorship/{managerId}", Name = "DisableOrEnableCensorshipManagerAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -83,6 +86,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
+        /// <remarks>
+        /// SignalR: LoadCensorshipManagerAccounts
+        /// </remarks>
         [HttpPut("censorship/{managerId}", Name = "UpdateCensorshipManagerAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -115,6 +121,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
+        /// <remarks>
+        /// SignalR: LoadCensorshipManagerAccounts
+        /// </remarks>
         [HttpPost("censorship", Name = "CreateNewCensorshipManagerAccountList")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
@@ -171,6 +180,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
+        /// <remarks>
+        /// SignalR: LoadRequestRegisterCensorshipManagerAccounts
+        /// </remarks>
         [HttpPut("request/register-censorship/accept/{userId}", Name = "AcceptRequestRegisterAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -200,6 +212,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
+        /// <remarks>
+        /// SignalR: LoadRequestRegisterCensorshipManagerAccounts
+        /// </remarks>
         [HttpPut("request/register-censorship/decline/{userId}", Name = "DeclineRequestRegisterAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]

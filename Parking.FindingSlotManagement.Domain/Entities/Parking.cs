@@ -25,10 +25,10 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public int? StarsCount { get; set; }
         public int? ManagerId { get; set; }
 
-        public virtual ICollection<Floor> Floors { get; set; }
-        public virtual ICollection<ParkingHasPrice> ParkingHasPrices { get; set; }
-        public virtual ICollection<ParkingSlot> ParkingSlots { get; set; }
-        public virtual ICollection<ParkingSpotImage> ParkingSpotImages { get; set; }
-        public virtual ICollection<StaffParking> StaffParkings { get; set; }
+        public virtual ICollection<Floor>? Floors { get; set; }
+        public virtual ICollection<ParkingHasPrice>? ParkingHasPrices { get; set; }
+        public virtual ICollection<ParkingSlot>? ParkingSlots { get; set; }
+        public virtual ICollection<ParkingSpotImage>? ParkingSpotImages { get; set; }
+        public virtual ICollection<StaffParking>? StaffParkings { get; set; }
     }
 }
