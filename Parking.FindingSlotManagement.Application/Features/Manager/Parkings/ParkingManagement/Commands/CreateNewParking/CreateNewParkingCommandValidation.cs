@@ -24,9 +24,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                 .NotNull()
                 .MaximumLength(250).WithMessage("{Mô tả} không được nhập quá 250 kí tự");
             RuleFor(p => p.MotoSpot)
-                .GreaterThanOrEqualTo(0).WithMessage("{Số slot xe máy} không phải lớn hơn bằng 0");
+                .GreaterThanOrEqualTo(0).WithMessage("{Số slot xe máy} phải lớn hơn bằng 0");
             RuleFor(p => p.CarSpot)
-                .GreaterThanOrEqualTo(0).WithMessage("{Số slot xe ô tô} không phải lớn hơn bằng 0");
+                .GreaterThanOrEqualTo(0).WithMessage("{Số slot xe ô tô} phải lớn hơn bằng 0");
             RuleFor(p => p.IsPrepayment)
                 .NotEmpty().WithMessage("Vui lòng chọn {Có thanh toán trả trước} hay không?")
                 .NotNull();
