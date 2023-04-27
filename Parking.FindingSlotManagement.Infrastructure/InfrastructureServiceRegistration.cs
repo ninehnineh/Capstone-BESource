@@ -27,6 +27,7 @@ namespace Parking.FindingSlotManagement.Infrastructure
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ITrafficRepository, TrafficRepository>();
             services.AddScoped<IParkingRepository, ParkingRepository>();
+            services.AddScoped<IStaffParkingRepository, StaffParkingRepository>();
             return services;
         }
     }
