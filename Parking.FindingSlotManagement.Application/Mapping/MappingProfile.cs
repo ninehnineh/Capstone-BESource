@@ -8,6 +8,8 @@ using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficM
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Commands.UpdateTraffic;
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Queries.GetListTraffic;
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Queries.GetTraffic;
+using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Commands.CreateNewFloor;
+using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Queries.GetListFloor;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.CreateNewParking;
 using Parking.FindingSlotManagement.Application.Features.Manager.StaffPakings.StaffParkingManagement.Commands.CreateNewStaffParking;
 using Parking.FindingSlotManagement.Domain.Entities;
@@ -40,6 +42,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<Domain.Entities.Parking, CreateNewParkingCommand>().ReverseMap();
             //For StaffParking
             CreateMap<StaffParking, CreateNewStaffParkingCommand>().ReverseMap();
+            //For Floor
+            CreateMap<Floor, CreateNewFloorCommand>().ReverseMap();
+            CreateMap<Floor, GetListFloorResponse>().ReverseMap();
             //Mapping For Staff
             //Mapping For Customer
         }
