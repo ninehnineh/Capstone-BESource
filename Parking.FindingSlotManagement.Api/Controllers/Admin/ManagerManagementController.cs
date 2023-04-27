@@ -22,12 +22,12 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
     public class ManagerManagementController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly IHubContext<MessageHub> _mesageHub;
+        private readonly IHubContext<MessageHub> _messageHub;
 
-        public ManagerManagementController(IMediator mediator, IHubContext<MessageHub> mesageHub)
+        public ManagerManagementController(IMediator mediator, IHubContext<MessageHub> messageHub)
         {
             _mediator = mediator;
-            _mesageHub = mesageHub;
+            _messageHub = messageHub;
         }
         /// <summary>
         /// API For Admin
@@ -74,7 +74,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 {
                     return StatusCode((int)res.StatusCode, res);
                 }
-                await _mesageHub.Clients.All.SendAsync("LoadCensorshipManagerAccounts");
+                await _messageHub.Clients.All.SendAsync("LoadCensorshipManagerAccounts");
                 return NoContent();
             }
             catch (Exception ex)
@@ -102,7 +102,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 {
                     return StatusCode((int)res.StatusCode, res);
                 }
-                await _mesageHub.Clients.All.SendAsync("LoadCensorshipManagerAccounts");
+                await _messageHub.Clients.All.SendAsync("LoadCensorshipManagerAccounts");
                 return NoContent();
             }
             catch (Exception ex)
@@ -135,7 +135,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 var res = await _mediator.Send(command);
                 if (res.Message == "Thành công")
                 {
-                    await _mesageHub.Clients.All.SendAsync("LoadCensorshipManagerAccounts");
+                    await _messageHub.Clients.All.SendAsync("LoadCensorshipManagerAccounts");
                     return StatusCode((int)res.StatusCode, res);
                 }
                 return BadRequest();
@@ -200,7 +200,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 {
                     return StatusCode((int)res.StatusCode, res);
                 }
-                await _mesageHub.Clients.All.SendAsync("LoadRequestRegisterCensorshipManagerAccounts");
+                await _messageHub.Clients.All.SendAsync("LoadRequestRegisterCensorshipManagerAccounts");
                 return NoContent();
             }
             catch (Exception ex)
@@ -232,7 +232,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 {
                     return StatusCode((int)res.StatusCode, res);
                 }
-                await _mesageHub.Clients.All.SendAsync("LoadRequestRegisterCensorshipManagerAccounts");
+                await _messageHub.Clients.All.SendAsync("LoadRequestRegisterCensorshipManagerAccounts");
                 return NoContent();
             }
             catch (Exception ex)
