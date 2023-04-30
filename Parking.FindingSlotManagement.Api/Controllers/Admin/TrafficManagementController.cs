@@ -94,7 +94,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                     await _messageHub.Clients.All.SendAsync("LoadTrafficInAdmin");
                     return StatusCode((int)res.StatusCode, res);
                 }
-                return StatusCode((int)res.StatusCode, res); ;
+                return StatusCode((int)res.StatusCode, res);
             }
             catch (Exception ex)
             {

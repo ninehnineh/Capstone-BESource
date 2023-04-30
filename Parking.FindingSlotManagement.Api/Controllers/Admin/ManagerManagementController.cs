@@ -138,7 +138,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                     await _messageHub.Clients.All.SendAsync("LoadCensorshipManagerAccounts");
                     return StatusCode((int)res.StatusCode, res);
                 }
-                return BadRequest();
+                return StatusCode((int)res.StatusCode, res);
             }
             catch (Exception ex)
             {
