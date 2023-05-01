@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using FluentValidation.TestHelper;
+using Moq;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Commands.UpdateCensorshipManagerAccount;
 using Parking.FindingSlotManagement.Domain.Entities;
@@ -16,11 +17,13 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
     {
         private readonly Mock<IAccountRepository> _accountRepositoryMock;
         private readonly UpdateCensorshipManagerAccountCommandHandler _handler;
+        private readonly UpdateCensorshipManagerAccountCommandValidation _validator;
 
         public UpdateCensorshipManagerAccountHandlerTests()
         {
             _accountRepositoryMock = new Mock<IAccountRepository>();
             _handler = new UpdateCensorshipManagerAccountCommandHandler(_accountRepositoryMock.Object);
+            _validator = new UpdateCensorshipManagerAccountCommandValidation();
         }
         [Fact]
         public async Task UpdateCensorshipManagerAccountCommandHandler_Should_Update_Account_Successfully()
@@ -132,6 +135,101 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             response.Count.ShouldBe(0);
             response.Message.ShouldBe("Email đã tồn tại. Vui lòng nhập email khác!!!");
             accountRepositoryMock.Verify(x => x.Update(It.IsAny<User>()), Times.Never);
+        }
+        [Fact]
+        public void Name_ShouldNotExceedMaximumLength()
+        {
+            var command = new UpdateCensorshipManagerAccountCommand
+            {
+                UserId = 10,
+                Name = "Nguyên Lê  lorem loremloremlorem lorem lorem lorem lorem lorem lorem lorem loremv lorem lorem lorem",
+                Email = "nle549220@gmail.com",
+                Password = "password",
+                Phone = "0123456789",
+                Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
+                DateOfBirth = DateTime.Parse("2000-01-10"),
+                Gender = "Female"
+            };
+
+            var result = _validator.TestValidate(command);
+
+            result.ShouldHaveValidationErrorFor(x => x.Name);
+        }
+        [Fact]
+        public void Email_ShouldNotExceedMaximumLength()
+        {
+            var command = new UpdateCensorshipManagerAccountCommand
+            {
+                UserId = 10,
+                Name = "Nguyên Lê",
+                Email = "loremmfsadmfdmsfifjdsnmnksdakfgsaosfojdksfjsdfsadkfsdklafkljsdjkf.oldslfldsaflsdalfldsflsdfldslfldsfdsfnsdjffvsdafjdsvjk@gmail.com",
+                Password = "password",
+                Phone = "0123456789",
+                Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
+                DateOfBirth = DateTime.Parse("2000-01-10"),
+                Gender = "Female"
+            };
+
+            var result = _validator.TestValidate(command);
+
+            result.ShouldHaveValidationErrorFor(x => x.Email);
+        }
+        [Fact]
+        public void Phone_ShouldNotExceedMaximumLength()
+        {
+            var command = new UpdateCensorshipManagerAccountCommand
+            {
+                UserId = 10,
+                Name = "Nguyên Lê",
+                Email = "nle549220@gmail.com",
+                Password = "password",
+                Phone = "0123456789113",
+                Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
+                DateOfBirth = DateTime.Parse("2000-01-10"),
+                Gender = "Female"
+            };
+
+            var result = _validator.TestValidate(command);
+
+            result.ShouldHaveValidationErrorFor(x => x.Phone);
+        }
+        [Fact]
+        public void DateOfBirth_MustLessThanCurrentDate()
+        {
+            var command = new UpdateCensorshipManagerAccountCommand
+            {
+                UserId = 10,
+                Name = "Nguyên Lê",
+                Email = "nle549220@gmail.com",
+                Password = "password",
+                Phone = "0123456789",
+                Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
+                DateOfBirth = DateTime.UtcNow.AddHours(7).AddDays(1),
+                Gender = "Female"
+            };
+
+            var result = _validator.TestValidate(command);
+
+            result.ShouldHaveValidationErrorFor(x => x.DateOfBirth);
+        }
+        [Fact]
+        public void Gender_ShouldNotExceedMaximumLength()
+        {
+            var command = new UpdateCensorshipManagerAccountCommand
+            {
+                UserId = 10,
+                Name = "Nguyên Lê",
+                Email = "nle549220@gmail.com",
+                Password = "password",
+                Phone = "0123456789",
+                Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
+                DateOfBirth = DateTime.Parse("2000-01-10"),
+                Gender = "Female lorem lorem lorem"
+            };
+
+            var result = _validator.TestValidate(command);
+
+            result.ShouldHaveValidationErrorFor(x => x.Gender);
         }
     }
 }
