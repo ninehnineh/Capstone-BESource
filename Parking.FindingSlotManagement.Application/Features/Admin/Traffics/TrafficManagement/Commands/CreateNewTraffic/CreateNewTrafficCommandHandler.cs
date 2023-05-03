@@ -27,7 +27,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Traffics.Traf
         {
             try
             {
-                var checkExist = await _trafficRepository.GetAllItemWithConditionByNoInclude(x => x.Name.Equals(request.Name));
+                var checkExist = await _trafficRepository.GetItemWithCondition(x => x.Name.Equals(request.Name), null, true);
                 if(checkExist != null)
                 {
                     return new ServiceResponse<int>

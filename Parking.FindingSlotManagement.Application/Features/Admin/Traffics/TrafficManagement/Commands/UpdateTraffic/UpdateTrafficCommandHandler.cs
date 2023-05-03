@@ -34,6 +34,16 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Traffics.Traf
                 }
                 if(!string.IsNullOrEmpty(request.Name))
                 {
+                    var checkNameExist = await _trafficRepository.GetItemWithCondition(x => x.Name.Equals(request.Name));
+                    if(checkNameExist != null)
+                    {
+                        return new ServiceResponse<string>
+                        {
+                            Message = "Tên phương tiện đã tồn tại. Hãy nhập tên khác!!!",
+                            StatusCode = 200,
+                            Success= true
+                        };
+                    }
                     checkExist.Name = request.Name;
                 }
                 await _trafficRepository.Update(checkExist);
