@@ -41,6 +41,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.VehicleInf
                 return new ServiceResponse<GetVehicleInforByIdResponse>
                 {
                     Data = vehicleInforDto,
+                    Message = "Thành công",
                     Success = true,
                     StatusCode = 200
                 };
