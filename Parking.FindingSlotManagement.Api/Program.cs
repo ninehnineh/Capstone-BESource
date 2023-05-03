@@ -84,7 +84,7 @@ builder.Services.AddAuthorization(op =>
 {
     op.AddPolicy("RequireAdminRole", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
 });
-//For MiddleWare
+//For Register MiddleWare
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, AuthorizationMiddlewareHandlerService>();
 
 builder.Services.AddLogging(config =>
