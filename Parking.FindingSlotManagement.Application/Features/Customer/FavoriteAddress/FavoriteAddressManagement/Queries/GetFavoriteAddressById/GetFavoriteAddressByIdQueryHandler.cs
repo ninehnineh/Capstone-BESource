@@ -31,7 +31,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.FavoriteAd
                 {
                     return new ServiceResponse<GetFavoriteAddressByIdResponse>
                     {
-                        Message = "Không tìm thấy",
+                        Message = "Không tìm thấy.",
                         Success = true,
                         StatusCode = 200
                     };
