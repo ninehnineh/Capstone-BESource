@@ -45,7 +45,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="HandlerTesting\Customer\" />
     <Folder Include="HandlerTesting\Manager\" />
     <Folder Include="HandlerTesting\Staff\" />
   </ItemGroup>
