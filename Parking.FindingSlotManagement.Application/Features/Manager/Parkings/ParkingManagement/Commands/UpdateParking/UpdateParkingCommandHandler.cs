@@ -33,7 +33,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                 }
                 if(!string.IsNullOrEmpty(request.Name))
                 {
-                    var checkExistByName = await _parkingRepository.GetAllItemWithConditionByNoInclude(x => x.Name.Equals(request.Name));
+                    var checkExistByName = await _parkingRepository.GetItemWithCondition(x => x.Name.Equals(request.Name), null, true);
                     if(checkExistByName != null)
                     {
                         return new ServiceResponse<string>
