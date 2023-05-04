@@ -61,7 +61,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.StaffPaking
                     Data = staffParkingEntity.StaffParkingId,
                     Message = "Thành công",
                     StatusCode = 201,
-                    Count = 0
+                    Count = 0,
+                    Success = true
                 };
 
             }
