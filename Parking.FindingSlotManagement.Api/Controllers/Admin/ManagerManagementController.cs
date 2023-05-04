@@ -8,6 +8,10 @@ using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Censorsh
 using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Commands.DeleteCensorshipManagerAccount;
 using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Commands.UpdateCensorshipManagerAccount;
 using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Queries.GetCensorshipManagerAccountList;
+using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.NonCensorshipManagerAccount.Queries.GetNonCensorshipManagerAccountList;
+using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.RequestCensorshipManagerAccount.Commands.AcceptRequestRegisterAccount;
+using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.RequestCensorshipManagerAccount.Commands.DeclineRequestRegisterAccount;
+using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.RequestCensorshipManagerAccount.Queries;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using System.Net;
 
@@ -18,13 +22,16 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
     public class ManagerManagementController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly IHubContext<MessageHub> _mesageHub;
+        private readonly IHubContext<MessageHub> _messageHub;
 
-        public ManagerManagementController(IMediator mediator, IHubContext<MessageHub> mesageHub)
+        public ManagerManagementController(IMediator mediator, IHubContext<MessageHub> messageHub)
         {
             _mediator = mediator;
-            _mesageHub = mesageHub;
+            _messageHub = messageHub;
         }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
         [HttpGet("censorship", Name = "GetCensorshipManagerAccountList")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -47,6 +54,12 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
+        /// <remarks>
+        /// SignalR: LoadCensorshipManagerAccounts
+        /// </remarks>
         [HttpDelete("censorship/{managerId}", Name = "DisableOrEnableCensorshipManagerAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -61,7 +74,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 {
                     return StatusCode((int)res.StatusCode, res);
                 }
-                await _mesageHub.Clients.All.SendAsync("LoadCensorshipManagerAccounts");
+                await _messageHub.Clients.All.SendAsync("LoadCensorshipManagerAccounts");
                 return NoContent();
             }
             catch (Exception ex)
@@ -70,6 +83,12 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
+        /// <remarks>
+        /// SignalR: LoadCensorshipManagerAccounts
+        /// </remarks>
         [HttpPut("censorship/{managerId}", Name = "UpdateCensorshipManagerAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -83,7 +102,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 {
                     return StatusCode((int)res.StatusCode, res);
                 }
-                await _mesageHub.Clients.All.SendAsync("LoadCensorshipManagerAccounts");
+                await _messageHub.Clients.All.SendAsync("LoadCensorshipManagerAccounts");
                 return NoContent();
             }
             catch (Exception ex)
@@ -99,6 +118,12 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 return StatusCode((int)ResponseCode.BadRequest, errorResponse);
             }
         }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
+        /// <remarks>
+        /// SignalR: LoadCensorshipManagerAccounts
+        /// </remarks>
         [HttpPost("censorship", Name = "CreateNewCensorshipManagerAccountList")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
@@ -110,10 +135,10 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 var res = await _mediator.Send(command);
                 if (res.Message == "Thành công")
                 {
-                    await _mesageHub.Clients.All.SendAsync("LoadCensorshipManagerAccounts");
+                    await _messageHub.Clients.All.SendAsync("LoadCensorshipManagerAccounts");
                     return StatusCode((int)res.StatusCode, res);
                 }
-                return BadRequest();
+                return StatusCode((int)res.StatusCode, res);
             }
             catch (Exception ex)
             {
@@ -125,6 +150,120 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 }
                 var errorResponse = new ErrorResponseModel(ResponseCode.BadRequest, "Validation Error: " + message.Remove(0, 31));
                 return StatusCode((int)ResponseCode.BadRequest, errorResponse);
+            }
+        }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
+        [HttpGet("request/register-censorship", Name = "GetRequestRegisterCensorshipManagerAccountList")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<RequestResponse>>>> GetRequestRegisterCensorshipManagerAccountList([FromQuery] int pageNo, [FromQuery] int pageSize)
+        {
+            try
+            {
+                var query = new GetRequestAccountListQuery()
+                {
+                    PageNo = pageNo,
+                    PageSize = pageSize
+                };
+                var res = await _mediator.Send(query);
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
+        /// <remarks>
+        /// SignalR: LoadRequestRegisterCensorshipManagerAccounts
+        /// </remarks>
+        [HttpPut("request/register-censorship/accept/{userId}", Name = "AcceptRequestRegisterAccount")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<ServiceResponse<string>>> AcceptRequestRegisterAccount(int userId)
+        {
+            try
+            {
+                var command = new AcceptRequestRegisterAccountCommand()
+                {
+                    UserId = userId
+                };
+                var res = await _mediator.Send(command);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                await _messageHub.Clients.All.SendAsync("LoadRequestRegisterCensorshipManagerAccounts");
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
+        /// <remarks>
+        /// SignalR: LoadRequestRegisterCensorshipManagerAccounts
+        /// </remarks>
+        [HttpPut("request/register-censorship/decline/{userId}", Name = "DeclineRequestRegisterAccount")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<ServiceResponse<string>>> DeclineRequestRegisterAccount(int userId)
+        {
+            try
+            {
+                var command = new DeclineRequestRegisterAccountCommand()
+                {
+                    UserId = userId
+                };
+                var res = await _mediator.Send(command);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                await _messageHub.Clients.All.SendAsync("LoadRequestRegisterCensorshipManagerAccounts");
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
+        [HttpGet("non-censorship", Name = "GetNonCensorshipManagerAccountList")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<NonCensorshipManagerAccountResponse>>>> GetNonCensorshipManagerAccountList([FromQuery] int pageNo, [FromQuery] int pageSize)
+        {
+            try
+            {
+                var query = new GetNonCensorshipManagerAccountListQuery()
+                {
+                    PageNo = pageNo,
+                    PageSize = pageSize
+                };
+                var res = await _mediator.Send(query);
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
     }

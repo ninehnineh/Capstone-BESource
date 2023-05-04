@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Infrastructure.Mail;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using Parking.FindingSlotManagement.Infrastructure.Repositories;
 using System;
@@ -22,7 +24,14 @@ namespace Parking.FindingSlotManagement.Infrastructure
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
-
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<ITrafficRepository, TrafficRepository>();
+            services.AddScoped<IParkingRepository, ParkingRepository>();
+            services.AddScoped<IStaffParkingRepository, StaffParkingRepository>();
+            services.AddScoped<IFloorRepository, FloorRepository>();
+            services.AddScoped<IFavoriteAddressRepository, FavoriteAddressRepository>();
+            services.AddScoped<IVehicleInfoRepository, VehicleInfoRepository>();
+            services.AddScoped<IBusinessProfileRepository, BusinessProfileRepository>();
             return services;
         }
     }

@@ -14,6 +14,6 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public int? ParkingId { get; set; }
 
         public virtual Parking? Parking { get; set; }
-        public virtual ICollection<ParkingSlot> ParkingSlots { get; set; }
+        public virtual ICollection<ParkingSlot>? ParkingSlots { get; set; }
     }
 }
