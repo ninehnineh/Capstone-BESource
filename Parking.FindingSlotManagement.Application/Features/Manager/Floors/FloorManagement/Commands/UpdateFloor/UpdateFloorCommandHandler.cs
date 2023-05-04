@@ -27,7 +27,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Floors.Floo
                 {
                     return new ServiceResponse<string>
                     {
-                        Message = "Không tìm thấy tầng",
+                        Message = "Không tìm thấy tầng.",
                         Success = true,
                         StatusCode = 200
                     };

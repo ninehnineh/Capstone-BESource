@@ -15,6 +15,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Floors.Floo
                 .NotEmpty().WithMessage("Vui lòng nhập {Tên tầng}.")
                 .NotNull()
                 .MaximumLength(15).WithMessage("{Tên tầng} không được nhập quá 15 kí tự");
+            RuleFor(p => p.ParkingId)
+                .NotEmpty().WithMessage("Vui lòng nhập {Parking Id}.")
+                .NotNull();
         }
     }
 }
