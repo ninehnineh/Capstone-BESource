@@ -30,7 +30,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.StaffPaking
                 {
                     return new ServiceResponse<string>
                     {
-                        Message = "Không tìm thấy",
+                        Message = "Không tìm thấy.",
                         Success = true,
                         StatusCode = 200,
                         Count = 0
