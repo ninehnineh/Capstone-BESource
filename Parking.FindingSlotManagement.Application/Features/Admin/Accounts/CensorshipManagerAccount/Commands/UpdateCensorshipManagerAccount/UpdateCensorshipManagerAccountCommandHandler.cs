@@ -58,7 +58,12 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Cens
                 }
                 if (!string.IsNullOrEmpty(request.Password))
                 {
-                    checkExist.Password = request.Password;
+                    CreatePasswordHash(request.Password,
+                    out byte[] passwordHash,
+                    out byte[] passwordSalt);
+
+                    checkExist.PasswordHash = passwordHash;
+                    checkExist.PasswordSalt = passwordSalt;
                 }
                 if (!string.IsNullOrEmpty(request.Phone))
                 {
@@ -89,6 +94,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Cens
             {
 
                 throw new Exception(ex.Message);
+            }
+        }
+
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using (var hmac = new System.Security.Cryptography.HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
         }
     }

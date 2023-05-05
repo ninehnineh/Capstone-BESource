@@ -34,7 +34,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
                 UserId = 10,
                 Name = "New Name",
                 Email = "new.email@example.com",
-                Password = "newPassword",
                 Phone = "123456789",
                 Avatar = "newavatarurl",
                 DateOfBirth = new DateTime(1990, 1, 1),
@@ -46,7 +45,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
                 UserId = request.UserId,
                 Name = "Old Name",
                 Email = "old.email@example.com",
-                Password = "oldPassword",
                 Phone = "987654321",
                 Avatar = "oldavatarurl",
                 DateOfBirth = new DateTime(1980, 1, 1),
@@ -66,7 +64,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             response.Count.ShouldBe(0);
             account.Name.ShouldBe(request.Name);
             account.Email.ShouldBe(request.Email);
-            account.Password.ShouldBe(request.Password);
             account.Phone.ShouldBe(request.Phone);
             account.Avatar.ShouldBe(request.Avatar);
             account.DateOfBirth.ShouldBe(request.DateOfBirth);
@@ -83,7 +80,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             };
             var cancellationToken = new CancellationToken();
             _accountRepositoryMock.Setup(x => x.GetById(request.UserId))
-                .ReturnsAsync((User)null);
+                .ReturnsAsync((User)null!);
 
             // Act
             var response = await _handler.Handle(request, cancellationToken);

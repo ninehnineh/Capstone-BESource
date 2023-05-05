@@ -1,4 +1,5 @@
 ﻿using Parking.FindingSlotManagement.Application.Models;
+using Parking.FindingSlotManagement.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
 {
-    public interface IAuthenticationRepository
+    public interface IAdminAuthenticationRepository
     {
-        Task<ServiceResponse<AuthResponse>> Login(AuthRequest request);
+        Task<ServiceResponse<AuthResponse>> AdminLogin(AuthRequest request);
+        Task<ServiceResponse<string>> AdminRegister(User user, string password);
     }
 }
