@@ -42,15 +42,24 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Cens
                         Message = "Email đã tồn tại. Vui lòng nhập lại email!!!"
                     };
                 }
+
+                CreatePasswordHash(request.Password,
+                out byte[] passwordHash,
+                out byte[] passwordSalt);
+
+
                 var _mapper = config.CreateMapper();
                 var managerEntity = _mapper.Map<User>(request);
+                managerEntity.PasswordHash = passwordHash;
+                managerEntity.PasswordSalt = passwordSalt;
+
                 await _accountRepository.Insert(managerEntity);
                 EmailModel emailModel = new EmailModel();
                 emailModel.To = managerEntity.Email;
                 emailModel.Subject = "Tài khoản đã được doanh nghiêp ParkZ thông qua.";
                 emailModel.Body = "Chào bạn, Doanh nghiệp ParkZ của chúng tôi vô cùng hân hạnh khi được liên kết và làm việc với bạn. Dưới đây là thông tin đăng nhập vào trang web quản lý bãi xe dành cho doanh nghiệp của bạn. Chúng tôi vô cùng hân hạnh được phục vụ bạn.";
                 emailModel.Body +="\n Email: "+managerEntity.Email;
-                emailModel.Body += "\n Password: " + managerEntity.Password;
+                //emailModel.Body += "\n Password: " + managerEntity.Password;
                 await _emailService.SendMail(emailModel);
                 return new ServiceResponse<int>
                 {
@@ -65,6 +74,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Cens
             {
 
                 throw new Exception(ex.Message);
+            }
+        }
+
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using (var hmac = new System.Security.Cryptography.HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
         }
     }

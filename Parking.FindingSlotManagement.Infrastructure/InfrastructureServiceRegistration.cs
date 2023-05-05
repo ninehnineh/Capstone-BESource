@@ -6,6 +6,7 @@ using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Infrastructure.Mail;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using Parking.FindingSlotManagement.Infrastructure.Repositories;
+using Parking.FindingSlotManagement.Infrastructure.Repositories.AuthenticationRepositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace Parking.FindingSlotManagement.Infrastructure
 
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+            services.AddScoped<IBusinessManagerAuthenticationRepository, BusinessManagerAuthenticationRepository>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ITrafficRepository, TrafficRepository>();
             services.AddScoped<IParkingRepository, ParkingRepository>();
@@ -32,6 +33,8 @@ namespace Parking.FindingSlotManagement.Infrastructure
             services.AddScoped<IFavoriteAddressRepository, FavoriteAddressRepository>();
             services.AddScoped<IVehicleInfoRepository, VehicleInfoRepository>();
             services.AddScoped<IBusinessProfileRepository, BusinessProfileRepository>();
+            services.AddScoped<IAdminAuthenticationRepository, AdminAuthenticationRepository>();
+            services.AddScoped<IStaffAuthenticationRepository, StaffAuthenticationRepository>();
             services.AddScoped<IPackagePriceRepository, PackagePriceRepository>();
             services.AddScoped<IVnPayRepository, VnPayRepository>();
             return services;

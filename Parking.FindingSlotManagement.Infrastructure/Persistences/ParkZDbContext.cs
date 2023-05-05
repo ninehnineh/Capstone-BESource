@@ -192,7 +192,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences
 
                 entity.Property(e => e.Description).HasMaxLength(255);
 
-                entity.Property(e => e.EndTime).HasColumnType("datetime");
+                entity.Property(e => e.EndTime).HasColumnType("time");
 
                 entity.Property(e => e.ExtraFee).HasColumnType("money");
 
@@ -202,7 +202,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences
 
                 entity.Property(e => e.Price).HasColumnType("money");
 
-                entity.Property(e => e.StartTime).HasColumnType("datetime");
+                entity.Property(e => e.StartTime).HasColumnType("time");
 
                 entity.Property(e => e.TrafficId).HasColumnName("TrafficID");
 
@@ -403,7 +403,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences
 
                 entity.Property(e => e.Name).HasMaxLength(50);
 
-                entity.Property(e => e.Password)
+                entity.Property(e => e.PasswordHash)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+                    
+                entity.Property(e => e.PasswordSalt)
                     .HasMaxLength(255)
                     .IsUnicode(false);
 

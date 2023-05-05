@@ -42,7 +42,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Requ
                 emailModel.Subject = "Tài khoản đã được doanh nghiêp ParkZ thông qua.";
                 emailModel.Body = "Chào bạn, Doanh nghiệp ParkZ của chúng tôi vô cùng hân hạnh khi được liên kết và làm việc với bạn. Dưới đây là thông tin đăng nhập vào trang web quản lý bãi xe dành cho doanh nghiệp của bạn. Chúng tôi vô cùng hân hạnh được phục vụ bạn.";
                 emailModel.Body += "\n Email: " + checkExist.Email;
-                emailModel.Body += "\n Password: " + checkExist.Password;
+                //emailModel.Body += "\n Password: " + checkExist.Password;
                 await _emailService.SendMail(emailModel);
                 return new ServiceResponse<string>
                 {

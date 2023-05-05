@@ -38,8 +38,4 @@
     <ProjectReference Include="..\Parking.FindingSlotManagement.Infrastructure\Parking.FindingSlotManagement.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\Staff\" />
-  </ItemGroup>
-
 </Project>

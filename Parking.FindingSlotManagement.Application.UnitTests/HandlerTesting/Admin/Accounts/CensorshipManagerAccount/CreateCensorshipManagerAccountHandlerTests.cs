@@ -60,12 +60,12 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             // Verify that the account repository was queried with the correct expression
             _accountRepositoryMock.Verify(x => x.GetItemWithCondition(It.Is<Expression<Func<User, bool>>>(exp => exp.Compile()(existingAccount)), null, true));
         }
+
         [Fact]
         public async Task Handle_WhenEmailDoesNotExist_CreatesNewAccountAndSendsEmail()
         {
             // Arrange
-            var request = new CreateNewCensorshipManagerAccountCommand {Name="Nguyên Lê", Email = "nle549220@gmail.com", Password = "password", Phone =  "0123456789", Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png", DateOfBirth = DateTime.Parse("2000-01-10"), Gender = "Female"};
-            var expectedAccount = new User { Email = "nle549220@gmail.com", Password = "password" };
+            var request = new CreateNewCensorshipManagerAccountCommand { Name = "Nguyên Lê", Email = "nle549220@gmail.com", Password = "password", Phone = "0123456789", Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png", DateOfBirth = DateTime.Parse("2000-01-10"), Gender = "Female" };
             _accountRepositoryMock.Setup(x => x.GetItemWithCondition(It.IsAny<Expression<Func<User, bool>>>(), null, true))
                 .ReturnsAsync((User)null);
 
@@ -78,10 +78,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             response.Success.ShouldBeTrue();
             response.Count.ShouldBe(0);
             response.Message.ShouldBe("Thành công");
-           
 
-            // Verify that the account repository was called to insert the new account
-            _accountRepositoryMock.Verify(x => x.Insert(It.Is<User>(account => account.Email == expectedAccount.Email && account.Password == expectedAccount.Password)));
         }
         [Fact]
         public void Name_ShouldNotBeEmpty()
