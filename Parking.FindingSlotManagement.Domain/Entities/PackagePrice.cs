@@ -13,8 +13,8 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public decimal? Price { get; set; }
         public string? Description { get; set; }
         public bool? IsActive { get; set; }
-        public DateTime? StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
+        public TimeSpan? StartTime { get; set; }
+        public TimeSpan? EndTime { get; set; }
         public bool? IsExtrafee { get; set; }
         public decimal? ExtraFee { get; set; }
         public float? ExtraTimeStep { get; set; }

@@ -29,13 +29,11 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             // Arrange
             var userId = 3;
             var email = "ln.loinguyen.ln@gmail.com";
-            var password = "123456";
             var account = new User
             { 
                 UserId = userId,
                 Name = "Lợi Nguyễn",
                 Email = email, 
-                Password = password,
                 Phone = "0777777777",
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147144.png?w=360",
                 DateOfBirth = DateTime.Parse("1999-04-14"),

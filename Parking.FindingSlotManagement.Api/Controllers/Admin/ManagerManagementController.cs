@@ -124,7 +124,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <remarks>
         /// SignalR: LoadCensorshipManagerAccounts
         /// </remarks>
-        [HttpPost("censorship", Name = "CreateNewCensorshipManagerAccountList")]
+        /// 
+        [HttpPost("register/censorship", Name = "CreateNewCensorshipManagerAccountList")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
