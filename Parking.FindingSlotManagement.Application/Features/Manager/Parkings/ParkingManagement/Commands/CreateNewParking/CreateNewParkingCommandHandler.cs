@@ -26,7 +26,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
         {
             try
             {
-                var checkExist = await _parkingRepository.GetAllItemWithConditionByNoInclude(x => x.Name.Equals(request.Name));
+                var checkExist = await _parkingRepository.GetItemWithCondition(x => x.Name.Equals(request.Name), null, true);
                 if(checkExist != null)
                 {
                     return new ServiceResponse<int>
