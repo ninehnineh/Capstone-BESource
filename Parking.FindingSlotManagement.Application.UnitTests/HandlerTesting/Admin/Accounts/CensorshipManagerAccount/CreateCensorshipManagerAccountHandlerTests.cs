@@ -65,7 +65,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
         public async Task Handle_WhenEmailDoesNotExist_CreatesNewAccountAndSendsEmail()
         {
             // Arrange
-            var request = new CreateNewCensorshipManagerAccountCommand { Name = "Nguyên Lê", Email = "nle549220@gmail.com", Password = "password", Phone = "0123456789", Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png", DateOfBirth = DateTime.Parse("2000-01-10"), Gender = "Female" };
+            var request = new CreateNewCensorshipManagerAccountCommand { Name = "Nguyên Lê", Email = "nle549220@gmail.com", Phone = "0123456789", Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png", DateOfBirth = DateTime.Parse("2000-01-10"), Gender = "Female" };
             _accountRepositoryMock.Setup(x => x.GetItemWithCondition(It.IsAny<Expression<Func<User, bool>>>(), null, true))
                 .ReturnsAsync((User)null);
 
@@ -87,7 +87,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             { 
                 Name = "", 
                 Email = "nle549220@gmail.com",
-                Password = "password", 
                 Phone = "0123456789", 
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png", 
                 DateOfBirth = DateTime.Parse("2000-01-10"), 
@@ -104,7 +103,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             var command = new CreateNewCensorshipManagerAccountCommand
             {
                 Email = "nle549220@gmail.com",
-                Password = "password",
                 Phone = "0123456789",
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
                 DateOfBirth = DateTime.Parse("2000-01-10"),
@@ -122,7 +120,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             {
                 Name = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,",
                 Email = "nle549220@gmail.com",
-                Password = "password",
                 Phone = "0123456789",
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
                 DateOfBirth = DateTime.Parse("2000-01-10"),
@@ -140,7 +137,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             {
                 Name = "Nguyên Lê",
                 Email = "",
-                Password = "password",
                 Phone = "0123456789",
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
                 DateOfBirth = DateTime.Parse("2000-01-10"),
@@ -158,7 +154,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             var command = new CreateNewCensorshipManagerAccountCommand
             {
                 Name = "Nguyên Lê",
-                Password = "password",
                 Phone = "0123456789",
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
                 DateOfBirth = DateTime.Parse("2000-01-10"),
@@ -176,7 +171,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             {
                 Name = "Nguyên Lê",
                 Email = "notavalidemailaddress",
-                Password = "password",
                 Phone = "0123456789",
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
                 DateOfBirth = DateTime.Parse("2000-01-10"),
@@ -194,7 +188,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             {
                 Name = "Nguyên Lê",
                 Email = "loremmfsadmfdmsfifjdsnmnksdakfgsaosfojdksfjsdfsadkfsdklafkljsdjkf.oldslfldsaflsdalfldsflsdfldslfldsfdsfnsdjffvsdafjdsvjk@gmail.com",
-                Password = "password",
                 Phone = "0123456789",
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
                 DateOfBirth = DateTime.Parse("2000-01-10"),
@@ -205,60 +198,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
 
             result.ShouldHaveValidationErrorFor(x => x.Email);
         }
-        [Fact]
-        public void Password_ShouldNotBeEmpty()
-        {
-            var command = new CreateNewCensorshipManagerAccountCommand
-            {
-                Name = "Nguyên Lê",
-                Email = "nle549220@gmail.com",
-                Password = "",
-                Phone = "0123456789",
-                Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
-                DateOfBirth = DateTime.Parse("2000-01-10"),
-                Gender = "Female"
-            };
-
-            var result = _validator.TestValidate(command);
-
-            result.ShouldHaveValidationErrorFor(x => x.Password);
-        }
-
-        [Fact]
-        public void Password_ShouldNotBeNull()
-        {
-            var command = new CreateNewCensorshipManagerAccountCommand
-            {
-                Name = "Nguyên Lê",
-                Email = "nle549220@gmail.com",
-                Phone = "0123456789",
-                Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
-                DateOfBirth = DateTime.Parse("2000-01-10"),
-                Gender = "Female"
-            };
-
-            var result = _validator.TestValidate(command);
-
-            result.ShouldHaveValidationErrorFor(x => x.Password);
-        }
-        [Fact]
-        public void Phone_ShouldNotBeEmpty()
-        {
-            var command = new CreateNewCensorshipManagerAccountCommand
-            {
-                Name = "Nguyên Lê",
-                Email = "nle549220@gmail.com",
-                Password = "password",
-                Phone = "",
-                Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
-                DateOfBirth = DateTime.Parse("2000-01-10"),
-                Gender = "Female"
-            };
-
-            var result = _validator.TestValidate(command);
-
-            result.ShouldHaveValidationErrorFor(x => x.Phone);
-        }
 
         [Fact]
         public void Phone_ShouldNotBeNull()
@@ -267,7 +206,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             {
                 Name = "Nguyên Lê",
                 Email = "nle549220@gmail.com",
-                Password = "password",
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
                 DateOfBirth = DateTime.Parse("2000-01-10"),
                 Gender = "Female"
@@ -284,7 +222,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             {
                 Name = "Nguyên Lê",
                 Email = "nle549220@gmail.com",
-                Password = "password",
                 Phone = "aaaaaaaaaa",
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
                 DateOfBirth = DateTime.Parse("2000-01-10"),
@@ -302,7 +239,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             {
                 Name = "Nguyên Lê",
                 Email = "nle549220@gmail.com",
-                Password = "password",
                 Phone = "0123456789113",
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
                 DateOfBirth = DateTime.Parse("2000-01-10"),
@@ -320,7 +256,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             {
                 Name = "Nguyên Lê",
                 Email = "nle549220@gmail.com",
-                Password = "password",
                 Phone = "0123456789",
                 Avatar = "",
                 DateOfBirth = DateTime.Parse("2000-01-10"),
@@ -339,7 +274,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             {
                 Name = "Nguyên Lê",
                 Email = "nle549220@gmail.com",
-                Password = "password",
                 Phone = "0123456789",
                 DateOfBirth = DateTime.Parse("2000-01-10"),
                 Gender = "Female"
@@ -356,7 +290,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             {
                 Name = "Nguyên Lê",
                 Email = "nle549220@gmail.com",
-                Password = "password",
                 Phone = "0123456789",
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
                 DateOfBirth = DateTime.MinValue,
@@ -375,7 +308,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             {
                 Name = "Nguyên Lê",
                 Email = "nle549220@gmail.com",
-                Password = "password",
                 Phone = "0123456789",
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
                 Gender = "Female"
@@ -392,7 +324,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             {
                 Name = "Nguyên Lê",
                 Email = "nle549220@gmail.com",
-                Password = "password",
                 Phone = "0123456789",
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
                 DateOfBirth = DateTime.UtcNow.AddHours(7).AddDays(1),
@@ -410,7 +341,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             {
                 Name = "Nguyên Lê",
                 Email = "nle549220@gmail.com",
-                Password = "password",
                 Phone = "0123456789",
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
                 DateOfBirth = DateTime.Parse("2000-01-10"),
@@ -429,7 +359,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             {
                 Name = "Nguyên Lê",
                 Email = "nle549220@gmail.com",
-                Password = "password",
                 Phone = "0123456789",
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
                 DateOfBirth = DateTime.Parse("2000-01-10"),
@@ -446,7 +375,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             {
                 Name = "Nguyên Lê",
                 Email = "nle549220@gmail.com",
-                Password = "password",
                 Phone = "0123456789",
                 Avatar = "https://cdn-icons-png.flaticon.com/512/147/147140.png",
                 DateOfBirth = DateTime.Parse("2000-01-10"),
