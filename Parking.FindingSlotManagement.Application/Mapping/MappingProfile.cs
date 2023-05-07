@@ -23,6 +23,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.BusinessProfile
 using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Commands.CreateNewFloor;
 using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Queries.GetListFloor;
 using Parking.FindingSlotManagement.Application.Features.Manager.PackagePrice.PackagePriceManagement.Commands.CreateNewPackagePrice;
+using Parking.FindingSlotManagement.Application.Features.Manager.PackagePrice.PackagePriceManagement.Queries.GetPackagePriceById;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.CreateNewParking;
 using Parking.FindingSlotManagement.Application.Features.Manager.StaffPakings.StaffParkingManagement.Commands.CreateNewStaffParking;
 using Parking.FindingSlotManagement.Domain.Entities;
@@ -70,6 +71,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<Floor, GetListFloorResponse>().ReverseMap();
             //For PackagePrice
             CreateMap<PackagePrice, CreateNewPackagePriceCommand>().ReverseMap();
+            CreateMap<PackagePrice, GetPackagePriceByIdResponse>()
+                .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.Traffic.Name))
+                .ReverseMap();
             //***Mapping For Staff
             //***Mapping For Customer
             //For FavoriteAddress
