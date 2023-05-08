@@ -45,10 +45,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="HandlerTesting\Staff\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Parking.FindingSlotManagement.Application\Parking.FindingSlotManagement.Application.csproj" />
   </ItemGroup>
 

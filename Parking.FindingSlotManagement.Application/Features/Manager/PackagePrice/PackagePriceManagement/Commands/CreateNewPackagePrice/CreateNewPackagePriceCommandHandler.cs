@@ -76,6 +76,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.PackagePric
                 }
                 var _mapper = config.CreateMapper();
                 var packagePriceEntity = _mapper.Map<Domain.Entities.PackagePrice>(request);
+                packagePriceEntity.IsActive = false;
                 await _packagePriceRepository.Insert(packagePriceEntity);
                 return new ServiceResponse<int>
                 {
