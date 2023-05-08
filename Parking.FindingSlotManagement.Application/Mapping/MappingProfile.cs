@@ -18,6 +18,7 @@ using Parking.FindingSlotManagement.Application.Features.Customer.FavoriteAddres
 using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfo.VehicleInfoManagement.Commands.CreateNewVehicleInfo;
 using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfo.VehicleInfoManagement.Queries.GetListVehicleInforByUserId;
 using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfo.VehicleInfoManagement.Queries.GetVehicleInforById;
+using Parking.FindingSlotManagement.Application.Features.Manager.Account.StaffAccountManagement.Commands.CreateNewStaffAccount;
 using Parking.FindingSlotManagement.Application.Features.Manager.BusinessProfile.BusinessProfileManagement.Commands.CreateNewBusinessProfile;
 using Parking.FindingSlotManagement.Application.Features.Manager.BusinessProfile.BusinessProfileManagement.Queries.GetBusinessProfileByUserId;
 using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Commands.CreateNewFloor;
@@ -74,6 +75,8 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<PackagePrice, GetPackagePriceByIdResponse>()
                 .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.Traffic.Name))
                 .ReverseMap();
+            //For Account
+            CreateMap<User, CreateNewStaffAccountCommand>().ReverseMap();
             //***Mapping For Staff
             //***Mapping For Customer
             //For FavoriteAddress
