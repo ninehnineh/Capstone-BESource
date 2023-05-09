@@ -33,5 +33,6 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public virtual ICollection<StaffParking> StaffParkings { get; set; }
         public virtual ICollection<VehicleInfor> VehicleInfors { get; set; }
         public virtual ICollection<VnPay> VnPays { get; set; }
+        public ICollection<OTP> OTPs { get; set; }
     }
 }
