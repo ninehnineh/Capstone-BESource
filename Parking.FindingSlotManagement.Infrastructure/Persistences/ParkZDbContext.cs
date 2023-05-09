@@ -34,6 +34,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<VehicleInfor> VehicleInfors { get; set; } = null!;
         public DbSet<VnPay> VnPays { get; set; } = null!;
+        public DbSet<OTP> OTPs { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -423,6 +424,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences
                     .WithMany(p => p.Users)
                     .HasForeignKey(d => d.RoleId)
                     .HasConstraintName("FK__Users__RoleID__276EDEB3");
+
+                entity.HasMany(u => u.OTPs)
+                    .WithOne(o => o.User)
+                    .HasForeignKey(o => o.UserId)
+                    .HasConstraintName("FK__OTP__OTPID");
             });
 
             modelBuilder.Entity<VehicleInfor>(entity =>
@@ -473,6 +479,26 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences
                     .HasForeignKey(d => d.ManagerId)
                     .HasConstraintName("FK__VnPay__ManagerID__2A4B4B5E");
             });
+
+
+            modelBuilder.Entity<OTP>(entity =>
+            {
+                entity.Property(x => x.OTPID).HasColumnName("OTPID");
+
+                entity.Property(x => x.Code)
+                    .HasMaxLength(6)
+                    .IsUnicode(false)
+                    .IsFixedLength();
+
+                entity.Property(x => x.ExpirationTime)
+                    .HasColumnType("datetime");
+
+                entity.HasOne(x => x.User)
+                        .WithMany(x => x.OTPs)
+                        .HasForeignKey(x => x.UserId)
+                        .HasConstraintName("FK__OTP__UserID");
+            });
+                
 
             //OnModelCreatingPartial(modelBuilder);
         }
