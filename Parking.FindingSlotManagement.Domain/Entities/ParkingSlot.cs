@@ -10,8 +10,6 @@ namespace Parking.FindingSlotManagement.Domain.Entities
     {
         public int ParkingSlotId { get; set; }
         public string? Name { get; set; }
-        public decimal? Price { get; set; }
-        public string? Description { get; set; }
         public bool? IsAvailable { get; set; }
         public int? RowIndex { get; set; }
         public int? ColumnIndex { get; set; }

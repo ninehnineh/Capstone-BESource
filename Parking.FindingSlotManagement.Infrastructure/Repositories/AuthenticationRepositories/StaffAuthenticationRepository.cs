@@ -55,10 +55,10 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories.Authenticati
                 return response;
             }
 
-            var staff = await _dbContext.Users.Include(x => x.Role)
+            var user = await _dbContext.Users.Include(x => x.Role)
                 .FirstOrDefaultAsync(x => x.Email!.Equals(request.Email));
 
-            if (staff == null)
+            if (user == null)
             {
                 response.Success = false;
                 response.Message = "Người dùng không tồn tại, đăng nhập thất bại";
@@ -66,16 +66,16 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories.Authenticati
 
                 return response;
             }
-            else if (!PasswordManage.VerifyPasswordHash(request.Password, staff.PasswordHash!, staff.PasswordSalt!))
+            else if (!PasswordManage.VerifyPasswordHash(request.Password, user.PasswordHash!, user.PasswordSalt!))
             {
                 response.Success = false;
                 response.Message = "Sai mật khẩu";
-                response.StatusCode = 404;
+                response.StatusCode = 200;
 
                 return response;
             }
 
-            if (staff!.IsActive == false)
+            if (user!.IsActive == false)
             {
                 return new ServiceResponse<AuthResponse>
                 {
@@ -84,19 +84,29 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories.Authenticati
                     Success = false,
                 };
             }
-            else
+
+            if (user.Role!.Name!.Equals("Staff") && user!.IsActive == true)
             {
                 TokenManage token = new TokenManage(_jwtSettings);
 
                 response.Success = true;
-                response.Message = $"Chào mừng {staff.Name}";
+                response.Message = $"Chào mừng {user.Name}";
                 response.StatusCode = 200;
                 response.Data = new AuthResponse
                 {
-                    Token = token.GenerateToken(staff).ToString()!,
+                    Token = token.GenerateToken(user).ToString()!,
                 };
 
                 return response;
+            }
+            else
+            {
+                return new ServiceResponse<AuthResponse>
+                {
+                    Message = "Xuất hiện lỗi, không thể đăng nhập vào hệ thống",
+                    StatusCode = 404,
+                    Success = false,
+                };
             }
         }
     }

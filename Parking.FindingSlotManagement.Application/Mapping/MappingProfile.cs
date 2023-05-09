@@ -10,7 +10,8 @@ using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficM
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Commands.UpdateTraffic;
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Queries.GetListTraffic;
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Queries.GetTraffic;
-using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.CreateNewVnPay;
+using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Commands.CreateNewVnPay;
+using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Queries.GetVnPayByManagerId;
 using Parking.FindingSlotManagement.Application.Features.Customer.FavoriteAddress.FavoriteAddressManagement.Commands.CreateNewFavoriteAddress;
 using Parking.FindingSlotManagement.Application.Features.Customer.FavoriteAddress.FavoriteAddressManagement.Queries.GetFavoriteAddressById;
 using Parking.FindingSlotManagement.Application.Features.Customer.FavoriteAddress.FavoriteAddressManagement.Queries.GetFavoriteAddressByUserId;
@@ -56,6 +57,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ReverseMap();
             //For VnPay
             CreateMap<VnPay, CreateNewVnPayCommand>().ReverseMap();
+            CreateMap<VnPay, GetVnPayByManagerIdResponse>()
+                .ForMember(dto => dto.ManagerName, act => act.MapFrom(obj => obj.Manager.Name))
+                .ReverseMap();
             //***Mapping For Manager
             //For Parking
             CreateMap<Domain.Entities.Parking, CreateNewParkingCommand>().ReverseMap();

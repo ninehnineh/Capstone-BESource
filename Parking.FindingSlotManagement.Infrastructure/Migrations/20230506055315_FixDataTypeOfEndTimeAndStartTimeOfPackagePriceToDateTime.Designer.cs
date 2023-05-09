@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 
@@ -11,9 +12,10 @@ using Parking.FindingSlotManagement.Infrastructure.Persistences;
 namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ParkZDbContext))]
-    partial class ParkZDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230506055315_FixDataTypeOfEndTimeAndStartTimeOfPackagePriceToDateTime")]
+    partial class FixDataTypeOfEndTimeAndStartTimeOfPackagePriceToDateTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -403,6 +405,10 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Property<int?>("ColumnIndex")
                         .HasColumnType("int");
 
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<int?>("FloorId")
                         .HasColumnType("int")
                         .HasColumnName("FloorID");
@@ -419,6 +425,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Property<int?>("ParkingId")
                         .HasColumnType("int")
                         .HasColumnName("ParkingID");
+
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("money");
 
                     b.Property<int?>("RowIndex")
                         .HasColumnType("int");

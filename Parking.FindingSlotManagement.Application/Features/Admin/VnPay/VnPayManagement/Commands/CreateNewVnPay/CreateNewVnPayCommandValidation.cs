@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.CreateNewVnPay
+namespace Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Commands.CreateNewVnPay
 {
     public class CreateNewVnPayCommandValidation : AbstractValidator<CreateNewVnPayCommand>
     {
