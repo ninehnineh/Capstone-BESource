@@ -18,19 +18,17 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.PackagePric
             RuleFor(c => c.Price)
                 .NotEmpty().WithMessage("Vui lòng nhập {Giá gói}.")
                 .NotNull()
-                .LessThanOrEqualTo(0).WithMessage("{Giá gói} phải lớn hơn 0");
+                .GreaterThan(0).WithMessage("{Giá gói} phải lớn hơn 0");
             RuleFor(c => c.Description)
                .NotEmpty().WithMessage("Vui lòng nhập {Mô tả}.")
                .NotNull()
                .MaximumLength(250).WithMessage("{Mô tả} không được nhập quá 250 kí tự");
-            /*RuleFor(c => c.StartTime)
+            RuleFor(c => c.StartTime)
                .NotEmpty().WithMessage("Vui lòng nhập {Giờ bắt đầu}.")
-               .NotNull()
-               .GreaterThan(DateTime.UtcNow.AddHours(7)).WithMessage("{Giờ bắt đầu} cần phải lớn hơn hoặc bằng ngày/giờ hiện tại");
+               .NotNull();
             RuleFor(c => c.EndTime)
                .NotEmpty().WithMessage("Vui lòng nhập {Giờ kết thúc}.")
-               .NotNull()
-               .LessThanOrEqualTo(c => c.StartTime).WithMessage("{Giờ kết thúc} cần phải lớn hơn {Giờ bắt đầu}");*/
+               .NotNull();
             RuleFor(c => c.TrafficId)
                 .NotEmpty().WithMessage("Vui lòng nhập {TrafficId}.")
                 .NotNull();

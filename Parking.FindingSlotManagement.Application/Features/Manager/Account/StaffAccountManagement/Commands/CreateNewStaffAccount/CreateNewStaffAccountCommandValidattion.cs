@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Commands.CreateNewCensorshipManagerAccount
+namespace Parking.FindingSlotManagement.Application.Features.Manager.Account.StaffAccountManagement.Commands.CreateNewStaffAccount
 {
-    public class CreateNewCensorshipManagerAccountCommandValidation : AbstractValidator<CreateNewCensorshipManagerAccountCommand>
+    public class CreateNewStaffAccountCommandValidattion : AbstractValidator<CreateNewStaffAccountCommand>
     {
-        public CreateNewCensorshipManagerAccountCommandValidation()
+        public CreateNewStaffAccountCommandValidattion()
         {
             RuleFor(p => p.Name)
                 .NotEmpty().WithMessage("Vui lòng nhập {Name}.")
@@ -20,9 +20,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Cens
                 .EmailAddress().WithMessage("Email không đúng định dạng.")
                 .NotNull()
                 .MaximumLength(50).WithMessage("{Email} không được nhập quá 50 kí tự");
-/*            RuleFor(p => p.Password)
-                .NotEmpty().WithMessage("Vui lòng nhập {Password}.")
-                .NotNull();*/
             RuleFor(p => p.Phone)
                 .NotEmpty().WithMessage("Vui lòng nhập {Phone}.")
                 .NotNull()

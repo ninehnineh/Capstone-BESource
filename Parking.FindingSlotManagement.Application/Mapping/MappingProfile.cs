@@ -18,6 +18,7 @@ using Parking.FindingSlotManagement.Application.Features.Customer.FavoriteAddres
 using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfo.VehicleInfoManagement.Commands.CreateNewVehicleInfo;
 using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfo.VehicleInfoManagement.Queries.GetListVehicleInforByUserId;
 using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfo.VehicleInfoManagement.Queries.GetVehicleInforById;
+using Parking.FindingSlotManagement.Application.Features.Manager.Account.StaffAccountManagement.Commands.CreateNewStaffAccount;
 using Parking.FindingSlotManagement.Application.Features.Manager.BusinessProfile.BusinessProfileManagement.Commands.CreateNewBusinessProfile;
 using Parking.FindingSlotManagement.Application.Features.Manager.BusinessProfile.BusinessProfileManagement.Queries.GetBusinessProfileByUserId;
 using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Commands.CreateNewFloor;
@@ -25,6 +26,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorMan
 using Parking.FindingSlotManagement.Application.Features.Manager.PackagePrice.PackagePriceManagement.Commands.CreateNewPackagePrice;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice.Queries.GetListParkingHasPriceWithPagination;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice.Queries.GetParkingHasPriceDetailWithPagination;
+using Parking.FindingSlotManagement.Application.Features.Manager.PackagePrice.PackagePriceManagement.Queries.GetPackagePriceById;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.CreateNewParking;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Commands.Create;
 using Parking.FindingSlotManagement.Application.Features.Manager.StaffPakings.StaffParkingManagement.Commands.CreateNewStaffParking;
@@ -73,6 +75,11 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<Floor, GetListFloorResponse>().ReverseMap();
             //For PackagePrice
             CreateMap<PackagePrice, CreateNewPackagePriceCommand>().ReverseMap();
+            CreateMap<PackagePrice, GetPackagePriceByIdResponse>()
+                .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.Traffic.Name))
+                .ReverseMap();
+            //For Account
+            CreateMap<User, CreateNewStaffAccountCommand>().ReverseMap();
             //***Mapping For Staff
             //***Mapping For Customer
             //For FavoriteAddress
