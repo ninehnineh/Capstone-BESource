@@ -263,8 +263,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences
 
                 entity.Property(e => e.BookingId).HasColumnName("BookingID");
 
-                entity.Property(e => e.Description).HasMaxLength(255);
-
                 entity.Property(e => e.FloorId).HasColumnName("FloorID");
 
                 entity.Property(e => e.Name)
@@ -273,8 +271,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences
                     .IsFixedLength();
 
                 entity.Property(e => e.ParkingId).HasColumnName("ParkingID");
-
-                entity.Property(e => e.Price).HasColumnType("money");
 
                 entity.Property(e => e.TrafficId).HasColumnName("TrafficID");
 

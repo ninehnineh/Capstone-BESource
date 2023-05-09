@@ -137,9 +137,18 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories.Authenticati
                 };
             }
 
+            if (manager.IsCensorship == false)
+            {
+                response.Success = false;
+                response.Message = "Tài khoản doanh nghiệp đang chờ xét duyệt. Vui lòng đợi email xác nhận";
+                response.StatusCode = 404;
+
+                return response;
+            }
+
             TokenManage token = new TokenManage(_jwtSettings);
 
-            if (manager.IsActive == true && manager.IsCensorship == true)
+            if (manager.IsActive == true && manager.IsCensorship == true && manager.Role!.Name!.Equals("Manager"))
             {
                 response.Success = true;
                 response.Message = $"Chào mừng {manager.Name}";
@@ -151,12 +160,15 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories.Authenticati
 
                 return response;
             }
-
-            response.Success = false;
-            response.Message = "Tài khoản doanh nghiệp đang chờ xét duyệt. Vui lòng đợi email xác nhận";
-            response.StatusCode = 404;
-
-            return response;
+            else
+            {
+                return new ServiceResponse<AuthResponse>
+                {
+                    Message = "Xuất hiện lỗi, không thể đăng nhập vào hệ thống",
+                    StatusCode = 404,
+                    Success = false,
+                };
+            }
         }
 
         public Task<ServiceResponse<string>> ManagerRegister(User user, string password)
