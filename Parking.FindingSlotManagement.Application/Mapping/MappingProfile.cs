@@ -23,7 +23,10 @@ using Parking.FindingSlotManagement.Application.Features.Manager.BusinessProfile
 using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Commands.CreateNewFloor;
 using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Queries.GetListFloor;
 using Parking.FindingSlotManagement.Application.Features.Manager.PackagePrice.PackagePriceManagement.Commands.CreateNewPackagePrice;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice.Queries.GetListParkingHasPriceWithPagination;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice.Queries.GetParkingHasPriceDetailWithPagination;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.CreateNewParking;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Commands.Create;
 using Parking.FindingSlotManagement.Application.Features.Manager.StaffPakings.StaffParkingManagement.Commands.CreateNewStaffParking;
 using Parking.FindingSlotManagement.Domain.Entities;
 using System;
@@ -84,6 +87,15 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             //For BusinessProfile 
             CreateMap<BusinessProfile, CreateNewBusinessProfileCommand>().ReverseMap();
             CreateMap<BusinessProfile, GetBusinessProfileResponse>().ReverseMap();
+
+            #region ParkingHasPrice Mapping
+            CreateMap<ParkingHasPrice, GetListParkingHasPriceWithPaginationResponse>().ReverseMap();
+            CreateMap<ParkingHasPrice, GetParkingHasPriceDetailWithPaginationResponse>().ReverseMap();
+            #endregion
+
+            #region Parkingslots Mapping
+            CreateMap<ParkingSlot, CreateParkingSlotsCommand>().ReverseMap();
+            #endregion
         }
     }
 }
