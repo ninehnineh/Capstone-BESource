@@ -6,6 +6,9 @@ using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.NonCenso
 using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.RequestCensorshipManagerAccount.Queries;
 using Parking.FindingSlotManagement.Application.Features.Admin.BusinessProfile.BusinessProfileManagement.Queries.GetBusinessProfileById;
 using Parking.FindingSlotManagement.Application.Features.Admin.BusinessProfile.BusinessProfileManagement.Queries.GetListBusinessProfile;
+using Parking.FindingSlotManagement.Application.Features.Admin.Paypal.PaypalManagement.Commands.CreateNewPaypal;
+using Parking.FindingSlotManagement.Application.Features.Admin.Paypal.PaypalManagement.Queries.GetListPaypal;
+using Parking.FindingSlotManagement.Application.Features.Admin.Paypal.PaypalManagement.Queries.GetPaypalByManagerId;
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Commands.CreateNewTraffic;
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Commands.UpdateTraffic;
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Queries.GetListTraffic;
@@ -63,6 +66,14 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             //For VnPay
             CreateMap<VnPay, CreateNewVnPayCommand>().ReverseMap();
             CreateMap<VnPay, GetVnPayByManagerIdResponse>()
+                .ForMember(dto => dto.ManagerName, act => act.MapFrom(obj => obj.Manager.Name))
+                .ReverseMap();
+            //For Paypal
+            CreateMap<PayPal, CreateNewPaypalCommand>().ReverseMap();
+            CreateMap<PayPal, GetPaypalByManagerIdResponse>()
+                .ForMember(dto => dto.ManagerName, act => act.MapFrom(obj => obj.Manager.Name))
+                .ReverseMap();
+            CreateMap<PayPal, GetListPaypalResponse>()
                 .ForMember(dto => dto.ManagerName, act => act.MapFrom(obj => obj.Manager.Name))
                 .ReverseMap();
             //***Mapping For Manager
