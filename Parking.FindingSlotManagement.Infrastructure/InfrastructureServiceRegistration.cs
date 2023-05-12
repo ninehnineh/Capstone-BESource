@@ -39,6 +39,7 @@ namespace Parking.FindingSlotManagement.Infrastructure
             services.AddScoped<IVnPayRepository, VnPayRepository>();
             services.AddScoped<IOTPRepository, OTPRepository>();
             services.AddScoped<IPaypalRepository, PaypalRepository>();
+            services.AddScoped<IParkingSpotImageRepository, ParkingSpotImageRepository>();
             return services;
         }
     }
