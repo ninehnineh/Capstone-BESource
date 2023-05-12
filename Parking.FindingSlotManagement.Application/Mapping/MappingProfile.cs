@@ -38,6 +38,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSpotImage.ParkingSpotImageManagement.Commands.CreateNewParkingSpotImage;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSpotImage.ParkingSpotImageManagement.Queries.GetListImageByParkingId;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Commands.Create;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
