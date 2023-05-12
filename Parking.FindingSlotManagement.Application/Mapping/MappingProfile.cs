@@ -31,7 +31,6 @@ using Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice.Queries.GetParkingHasPriceDetailWithPagination;
 using Parking.FindingSlotManagement.Application.Features.Manager.PackagePrice.PackagePriceManagement.Queries.GetPackagePriceById;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.CreateNewParking;
-using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Commands.Create;
 using Parking.FindingSlotManagement.Application.Features.Manager.StaffPakings.StaffParkingManagement.Commands.CreateNewStaffParking;
 using Parking.FindingSlotManagement.Domain.Entities;
 using System;
@@ -91,6 +90,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ReverseMap();
             //For Account
             CreateMap<User, CreateNewStaffAccountCommand>().ReverseMap();
+            //For ParkingSpotImage
+            CreateMap<ParkingSpotImage, CreateNewParkingSpotImageCommand>().ReverseMap();
+            CreateMap<ParkingSpotImage, GetListImageByParkingIdResponse>().ReverseMap();
             //***Mapping For Staff
             //***Mapping For Customer
             //For FavoriteAddress
