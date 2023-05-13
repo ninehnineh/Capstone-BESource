@@ -57,7 +57,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             response.Success.ShouldBeTrue();
             response.Count.ShouldBe(0);
             response.Message.ShouldBe("Thành công");
-            _packagePriceRepositoryMock.Verify(x => x.Insert(It.IsAny<Domain.Entities.PackagePrice>()), Times.Once);
+            _packagePriceRepositoryMock.Verify(x => x.Insert(It.IsAny<Domain.Entities.TimeLine>()), Times.Once);
         }
 
         [Fact]
@@ -92,7 +92,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             result.Message.ShouldBe("Không tìm thấy phương tiện.");
             result.StatusCode.ShouldBe(200);
 
-            _packagePriceRepositoryMock.Verify(x => x.Insert(It.IsAny<Domain.Entities.PackagePrice>()), Times.Never);
+            _packagePriceRepositoryMock.Verify(x => x.Insert(It.IsAny<Domain.Entities.TimeLine>()), Times.Never);
         }
         [Fact]
         public async Task Handle_InvalidStartTime_ReturnsErrorResponse()
@@ -127,7 +127,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             result.Message.ShouldBe("Ngày giờ bắt đầu phải bắt đầu trong khoảng từ 0h ngày hôm nay.");
             result.StatusCode.ShouldBe(400);
 
-            _packagePriceRepositoryMock.Verify(x => x.Insert(It.IsAny<Domain.Entities.PackagePrice>()), Times.Never);
+            _packagePriceRepositoryMock.Verify(x => x.Insert(It.IsAny<Domain.Entities.TimeLine>()), Times.Never);
         }
         [Fact]
         public async Task Handle_InvalidEndTime_ReturnsErrorResponse()
@@ -162,7 +162,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             result.Message.ShouldBe("Ngày giờ kết thúc không được vượt quá 1 ngày. Chỉ được set giờ cho đến ngày hôm sau.");
             result.StatusCode.ShouldBe(400);
 
-            _packagePriceRepositoryMock.Verify(x => x.Insert(It.IsAny<Domain.Entities.PackagePrice>()), Times.Never);
+            _packagePriceRepositoryMock.Verify(x => x.Insert(It.IsAny<Domain.Entities.TimeLine>()), Times.Never);
         }
         [Fact]
         public void Name_ShouldNotBeEmpty()

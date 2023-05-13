@@ -96,9 +96,12 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.HasKey("ParkingSlotId", "StartTime", "DateBook")
                         .HasName("PK__Booking__1BDD09E6ABAB9F2E");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "BookingId" }, "AK_Booking_BookingIDsas")
+                        .IsUnique();
 
-                    b.HasIndex("VehicleInforId");
+                    b.HasIndex(new[] { "UserId" }, "IX_Booking_UserID");
+
+                    b.HasIndex(new[] { "VehicleInforId" }, "IX_Booking_VehicleInforID");
 
                     b.HasIndex(new[] { "BookingId" }, "UQ__Booking__3214EC2628BBAE14")
                         .IsUnique();
@@ -110,8 +113,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 {
                     b.Property<int>("BusinessProfileId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("BusinessProfileId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BusinessProfileId"), 1L, 1);
 
@@ -146,7 +148,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     b.HasIndex(new[] { "UserId" }, "UQ__Business__1788CCAD877AB68C")
                         .IsUnique()
-                        .HasFilter("[UserID] IS NOT NULL");
+                        .HasFilter("([UserID] IS NOT NULL)");
 
                     b.ToTable("BusinessProfiles");
                 });
@@ -155,8 +157,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 {
                     b.Property<int>("FavoriteAddressId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("FavoriteAddressId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FavoriteAddressId"), 1L, 1);
 
@@ -174,17 +175,39 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     b.HasKey("FavoriteAddressId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "UserId" }, "IX_FavoriteAddress_UserID");
 
                     b.ToTable("FavoriteAddress", (string)null);
+                });
+
+            modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.FieldWorkImg", b =>
+                {
+                    b.Property<int>("FieldWorkImgId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FieldWorkImgId"), 1L, 1);
+
+                    b.Property<int>("BusinessProfileId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImgUrl")
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("FieldWorkImgId");
+
+                    b.HasIndex("BusinessProfileId");
+
+                    b.ToTable("FieldWorkImg", (string)null);
                 });
 
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.Floor", b =>
                 {
                     b.Property<int>("FloorId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("FloorId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FloorId"), 1L, 1);
 
@@ -201,7 +224,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     b.HasKey("FloorId");
 
-                    b.HasIndex("ParkingId");
+                    b.HasIndex(new[] { "ParkingId" }, "IX_Floors_ParkingID");
 
                     b.ToTable("Floors");
                 });
@@ -210,8 +233,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 {
                     b.Property<int>("NotificationId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("NotificationId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationId"), 1L, 1);
 
@@ -232,7 +254,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     b.HasKey("NotificationId");
 
-                    b.HasIndex("BookingId");
+                    b.HasIndex(new[] { "BookingId" }, "IX_Notifications_BookingID");
 
                     b.ToTable("Notifications");
                 });
@@ -261,75 +283,16 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     b.HasKey("OTPID");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "UserId" }, "IX_OTPs_UserId");
 
-                    b.ToTable("OTPs");
-                });
-
-            modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.PackagePrice", b =>
-                {
-                    b.Property<int>("PackagePriceId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("PackagePriceId");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PackagePriceId"), 1L, 1);
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime?>("EndTime")
-                        .HasColumnType("datetime");
-
-                    b.Property<decimal?>("ExtraFee")
-                        .HasColumnType("money");
-
-                    b.Property<float?>("ExtraTimeStep")
-                        .HasColumnType("real");
-
-                    b.Property<bool?>("HasPenaltyPrice")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsExtrafee")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal?>("PenaltyPrice")
-                        .HasColumnType("money");
-
-                    b.Property<float?>("PenaltyPriceStepTime")
-                        .HasColumnType("real");
-
-                    b.Property<decimal?>("Price")
-                        .HasColumnType("money");
-
-                    b.Property<DateTime?>("StartTime")
-                        .HasColumnType("datetime");
-
-                    b.Property<int?>("TrafficId")
-                        .HasColumnType("int")
-                        .HasColumnName("TrafficID");
-
-                    b.HasKey("PackagePriceId");
-
-                    b.HasIndex("TrafficId");
-
-                    b.ToTable("PackagePrice", (string)null);
+                    b.ToTable("OTPs", (string)null);
                 });
 
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.Parking", b =>
                 {
                     b.Property<int>("ParkingId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("ParkingId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ParkingId"), 1L, 1);
 
@@ -394,18 +357,15 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 {
                     b.Property<int>("ParkingHasPriceId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("ParkingHasPriceId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ParkingHasPriceId"), 1L, 1);
 
                     b.Property<int?>("ParkingId")
-                        .HasColumnType("int")
-                        .HasColumnName("ParkingID");
+                        .HasColumnType("int");
 
                     b.Property<int?>("ParkingPriceId")
-                        .HasColumnType("int")
-                        .HasColumnName("ParkingPriceID");
+                        .HasColumnType("int");
 
                     b.HasKey("ParkingHasPriceId");
 
@@ -416,12 +376,31 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.ToTable("ParkingHasPrice", (string)null);
                 });
 
+            modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.ParkingPrice", b =>
+                {
+                    b.Property<int>("ParkingPriceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ParkingPriceId"), 1L, 1);
+
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ParkingPriceName")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("ParkingPriceId");
+
+                    b.ToTable("ParkingPrice", (string)null);
+                });
+
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.ParkingSlot", b =>
                 {
                     b.Property<int>("ParkingSlotId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("ParkingSlotId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ParkingSlotId"), 1L, 1);
 
@@ -458,13 +437,13 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     b.HasKey("ParkingSlotId");
 
-                    b.HasIndex("BookingId");
+                    b.HasIndex(new[] { "BookingId" }, "IX_ParkingSlots_BookingID");
 
-                    b.HasIndex("FloorId");
+                    b.HasIndex(new[] { "FloorId" }, "IX_ParkingSlots_FloorID");
 
-                    b.HasIndex("ParkingId");
+                    b.HasIndex(new[] { "ParkingId" }, "IX_ParkingSlots_ParkingID");
 
-                    b.HasIndex("TrafficId");
+                    b.HasIndex(new[] { "TrafficId" }, "IX_ParkingSlots_TrafficID");
 
                     b.ToTable("ParkingSlots");
                 });
@@ -473,8 +452,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 {
                     b.Property<int>("ParkingSpotImageId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("ParkingSpotImageId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ParkingSpotImageId"), 1L, 1);
 
@@ -489,7 +467,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     b.HasKey("ParkingSpotImageId");
 
-                    b.HasIndex("ParkingId");
+                    b.HasIndex(new[] { "ParkingId" }, "IX_ParkingSpotImage_ParkingID");
 
                     b.ToTable("ParkingSpotImage", (string)null);
                 });
@@ -498,8 +476,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 {
                     b.Property<int>("PayPalId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("PayPalId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PayPalId"), 1L, 1);
 
@@ -519,7 +496,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     b.HasKey("PayPalId");
 
-                    b.HasIndex("ManagerId");
+                    b.HasIndex(new[] { "ManagerId" }, "IX_PayPal_ManagerID");
 
                     b.ToTable("PayPal", (string)null);
                 });
@@ -528,8 +505,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 {
                     b.Property<int>("RoleId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("RoleId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoleId"), 1L, 1);
 
@@ -549,8 +525,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 {
                     b.Property<int>("StaffParkingId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("StaffParkingId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StaffParkingId"), 1L, 1);
 
@@ -564,19 +539,82 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     b.HasKey("StaffParkingId");
 
-                    b.HasIndex("ParkingId");
+                    b.HasIndex(new[] { "ParkingId" }, "IX_StaffParking_ParkingID");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "UserId" }, "IX_StaffParking_UserID");
 
                     b.ToTable("StaffParking", (string)null);
+                });
+
+            modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.TimeLine", b =>
+                {
+                    b.Property<int>("TimeLineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TimeLineId"), 1L, 1);
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("EndTime")
+                        .HasColumnType("datetime");
+
+                    b.Property<decimal?>("ExtraFee")
+                        .HasColumnType("money");
+
+                    b.Property<float?>("ExtraTimeStep")
+                        .HasColumnType("real");
+
+                    b.Property<bool?>("HasPenaltyPrice")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsExtrafee")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("ParkingPriceId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("PenaltyPrice")
+                        .HasColumnType("money");
+
+                    b.Property<float?>("PenaltyPriceStepTime")
+                        .HasColumnType("real");
+
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("money");
+
+                    b.Property<DateTime?>("StartTime")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime?>("StartingTime")
+                        .HasColumnType("datetime");
+
+                    b.Property<int?>("TrafficId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TimeLineId");
+
+                    b.HasIndex("ParkingPriceId");
+
+                    b.HasIndex("TrafficId");
+
+                    b.ToTable("TimeLine", (string)null);
                 });
 
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.Traffic", b =>
                 {
                     b.Property<int>("TrafficId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("TrafficId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TrafficId"), 1L, 1);
 
@@ -596,8 +634,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("UserId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"), 1L, 1);
 
@@ -640,12 +677,10 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     b.Property<byte[]>("PasswordHash")
                         .HasMaxLength(255)
-                        .IsUnicode(false)
                         .HasColumnType("varbinary(255)");
 
                     b.Property<byte[]>("PasswordSalt")
                         .HasMaxLength(255)
-                        .IsUnicode(false)
                         .HasColumnType("varbinary(255)");
 
                     b.Property<string>("Phone")
@@ -660,9 +695,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     b.HasKey("UserId");
 
-                    b.HasIndex("ManagerId");
+                    b.HasIndex(new[] { "ManagerId" }, "IX_Users_ManagerID");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex(new[] { "RoleId" }, "IX_Users_RoleID");
 
                     b.ToTable("Users");
                 });
@@ -671,8 +706,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 {
                     b.Property<int>("VehicleInforId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("VehicleInforId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VehicleInforId"), 1L, 1);
 
@@ -698,9 +732,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     b.HasKey("VehicleInforId");
 
-                    b.HasIndex("TrafficId");
+                    b.HasIndex(new[] { "TrafficId" }, "IX_VehicleInfor_TrafficID");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex(new[] { "UserId" }, "IX_VehicleInfor_UserID");
 
                     b.ToTable("VehicleInfor", (string)null);
                 });
@@ -709,8 +743,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 {
                     b.Property<int>("VnPayId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("VnPayId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VnPayId"), 1L, 1);
 
@@ -730,7 +763,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     b.HasKey("VnPayId");
 
-                    b.HasIndex("ManagerId");
+                    b.HasIndex(new[] { "ManagerId" }, "IX_VnPay_ManagerID");
 
                     b.ToTable("VnPay", (string)null);
                 });
@@ -772,6 +805,18 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.FieldWorkImg", b =>
+                {
+                    b.HasOne("Parking.FindingSlotManagement.Domain.Entities.BusinessProfile", "BusinessProfile")
+                        .WithMany("FieldWorkImgs")
+                        .HasForeignKey("BusinessProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_FieldWorkImg_BusinessProfiles");
+
+                    b.Navigation("BusinessProfile");
+                });
+
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.Floor", b =>
                 {
                     b.HasOne("Parking.FindingSlotManagement.Domain.Entities.Parking", "Parking")
@@ -805,27 +850,17 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.PackagePrice", b =>
-                {
-                    b.HasOne("Parking.FindingSlotManagement.Domain.Entities.Traffic", "Traffic")
-                        .WithMany("PackagePrices")
-                        .HasForeignKey("TrafficId")
-                        .HasConstraintName("FK__PackagePr__Traff__412EB0B6");
-
-                    b.Navigation("Traffic");
-                });
-
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.ParkingHasPrice", b =>
                 {
                     b.HasOne("Parking.FindingSlotManagement.Domain.Entities.Parking", "Parking")
                         .WithMany("ParkingHasPrices")
                         .HasForeignKey("ParkingId")
-                        .HasConstraintName("FK__ParkingHa__Parki__440B1D61");
+                        .HasConstraintName("FK_ParkingHasPrice_Parking");
 
-                    b.HasOne("Parking.FindingSlotManagement.Domain.Entities.PackagePrice", "ParkingPrice")
+                    b.HasOne("Parking.FindingSlotManagement.Domain.Entities.ParkingPrice", "ParkingPrice")
                         .WithMany("ParkingHasPrices")
                         .HasForeignKey("ParkingPriceId")
-                        .HasConstraintName("FK__ParkingHa__Parki__44FF419A");
+                        .HasConstraintName("FK_ParkingHasPrice_ParkingPrice");
 
                     b.Navigation("Parking");
 
@@ -901,6 +936,23 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.TimeLine", b =>
+                {
+                    b.HasOne("Parking.FindingSlotManagement.Domain.Entities.ParkingPrice", "ParkingPrice")
+                        .WithMany("TimeLines")
+                        .HasForeignKey("ParkingPriceId")
+                        .HasConstraintName("FK_Timeline_ParkingPrice");
+
+                    b.HasOne("Parking.FindingSlotManagement.Domain.Entities.Traffic", "Traffic")
+                        .WithMany("TimeLines")
+                        .HasForeignKey("TrafficId")
+                        .HasConstraintName("FK_Timeline_Traffic");
+
+                    b.Navigation("ParkingPrice");
+
+                    b.Navigation("Traffic");
+                });
+
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.User", b =>
                 {
                     b.HasOne("Parking.FindingSlotManagement.Domain.Entities.User", "Manager")
@@ -952,14 +1004,14 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Navigation("ParkingSlots");
                 });
 
+            modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.BusinessProfile", b =>
+                {
+                    b.Navigation("FieldWorkImgs");
+                });
+
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.Floor", b =>
                 {
                     b.Navigation("ParkingSlots");
-                });
-
-            modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.PackagePrice", b =>
-                {
-                    b.Navigation("ParkingHasPrices");
                 });
 
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.Parking", b =>
@@ -975,6 +1027,13 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Navigation("StaffParkings");
                 });
 
+            modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.ParkingPrice", b =>
+                {
+                    b.Navigation("ParkingHasPrices");
+
+                    b.Navigation("TimeLines");
+                });
+
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.Role", b =>
                 {
                     b.Navigation("Users");
@@ -982,9 +1041,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.Traffic", b =>
                 {
-                    b.Navigation("PackagePrices");
-
                     b.Navigation("ParkingSlots");
+
+                    b.Navigation("TimeLines");
 
                     b.Navigation("VehicleInfors");
                 });

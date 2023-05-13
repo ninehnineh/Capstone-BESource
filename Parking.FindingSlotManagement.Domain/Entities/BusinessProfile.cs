@@ -18,5 +18,8 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public int? UserId { get; set; }
 
         public virtual User? User { get; set; }
+
+        public ICollection<FieldWorkImg>? FieldWorkImgs { get; set; }
+
     }
 }

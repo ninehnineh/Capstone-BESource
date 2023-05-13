@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 {
-    public partial class InitialDB : Migration
+    public partial class AddedThreeEntityAndModifyPackagePRiceToTimeLine : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -34,6 +34,20 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Parking", x => x.ParkingId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ParkingPrice",
+                columns: table => new
+                {
+                    ParkingPriceId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ParkingPriceName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ParkingPrice", x => x.ParkingPriceId);
                 });
 
             migrationBuilder.CreateTable(
@@ -104,6 +118,30 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ParkingHasPrice",
+                columns: table => new
+                {
+                    ParkingHasPriceId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ParkingId = table.Column<int>(type: "int", nullable: true),
+                    ParkingPriceId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ParkingHasPrice", x => x.ParkingHasPriceId);
+                    table.ForeignKey(
+                        name: "FK_ParkingHasPrice_Parking",
+                        column: x => x.ParkingId,
+                        principalTable: "Parking",
+                        principalColumn: "ParkingId");
+                    table.ForeignKey(
+                        name: "FK_ParkingHasPrice_ParkingPrice",
+                        column: x => x.ParkingPriceId,
+                        principalTable: "ParkingPrice",
+                        principalColumn: "ParkingPriceId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -111,7 +149,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Email = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: true),
-                    Password = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true),
+                    PasswordHash = table.Column<byte[]>(type: "varbinary(255)", maxLength: 255, nullable: true),
+                    PasswordSalt = table.Column<byte[]>(type: "varbinary(255)", maxLength: 255, nullable: true),
                     Phone = table.Column<string>(type: "char(10)", unicode: false, fixedLength: true, maxLength: 10, nullable: true),
                     Avatar = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true),
                     DateOfBirth = table.Column<DateTime>(type: "date", nullable: true),
@@ -138,10 +177,10 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PackagePrice",
+                name: "TimeLine",
                 columns: table => new
                 {
-                    PackagePriceId = table.Column<int>(type: "int", nullable: false)
+                    TimeLineId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Price = table.Column<decimal>(type: "money", nullable: true),
@@ -149,20 +188,27 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     IsActive = table.Column<bool>(type: "bit", nullable: true),
                     StartTime = table.Column<DateTime>(type: "datetime", nullable: true),
                     EndTime = table.Column<DateTime>(type: "datetime", nullable: true),
+                    StartingTime = table.Column<DateTime>(type: "datetime", nullable: true),
                     IsExtrafee = table.Column<bool>(type: "bit", nullable: true),
                     ExtraFee = table.Column<decimal>(type: "money", nullable: true),
                     ExtraTimeStep = table.Column<float>(type: "real", nullable: true),
                     HasPenaltyPrice = table.Column<bool>(type: "bit", nullable: true),
                     PenaltyPrice = table.Column<decimal>(type: "money", nullable: true),
                     PenaltyPriceStepTime = table.Column<float>(type: "real", nullable: true),
-                    TrafficID = table.Column<int>(type: "int", nullable: true)
+                    TrafficId = table.Column<int>(type: "int", nullable: true),
+                    ParkingPriceId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PackagePrice", x => x.PackagePriceId);
+                    table.PrimaryKey("PK_TimeLine", x => x.TimeLineId);
                     table.ForeignKey(
-                        name: "FK__PackagePr__Traff__412EB0B6",
-                        column: x => x.TrafficID,
+                        name: "FK_Timeline_ParkingPrice",
+                        column: x => x.ParkingPriceId,
+                        principalTable: "ParkingPrice",
+                        principalColumn: "ParkingPriceId");
+                    table.ForeignKey(
+                        name: "FK_Timeline_Traffic",
+                        column: x => x.TrafficId,
                         principalTable: "Traffic",
                         principalColumn: "TrafficId");
                 });
@@ -208,6 +254,27 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                         column: x => x.UserID,
                         principalTable: "Users",
                         principalColumn: "UserId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OTPs",
+                columns: table => new
+                {
+                    OTPID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "char(6)", unicode: false, fixedLength: true, maxLength: 6, nullable: false),
+                    ExpirationTime = table.Column<DateTime>(type: "datetime", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OTPs", x => x.OTPID);
+                    table.ForeignKey(
+                        name: "FK__OTP__UserID",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -302,27 +369,23 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ParkingHasPrice",
+                name: "FieldWorkImg",
                 columns: table => new
                 {
-                    ParkingHasPriceId = table.Column<int>(type: "int", nullable: false)
+                    FieldWorkImgId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ParkingID = table.Column<int>(type: "int", nullable: true),
-                    ParkingPriceID = table.Column<int>(type: "int", nullable: true)
+                    ImgUrl = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true),
+                    BusinessProfileId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ParkingHasPrice", x => x.ParkingHasPriceId);
+                    table.PrimaryKey("PK_FieldWorkImg", x => x.FieldWorkImgId);
                     table.ForeignKey(
-                        name: "FK__ParkingHa__Parki__440B1D61",
-                        column: x => x.ParkingID,
-                        principalTable: "Parking",
-                        principalColumn: "ParkingId");
-                    table.ForeignKey(
-                        name: "FK__ParkingHa__Parki__44FF419A",
-                        column: x => x.ParkingPriceID,
-                        principalTable: "PackagePrice",
-                        principalColumn: "PackagePriceId");
+                        name: "FK_FieldWorkImg_BusinessProfiles",
+                        column: x => x.BusinessProfileId,
+                        principalTable: "BusinessProfiles",
+                        principalColumn: "BusinessProfileId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -392,8 +455,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     ParkingSlotId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "char(10)", unicode: false, fixedLength: true, maxLength: 10, nullable: true),
-                    Price = table.Column<decimal>(type: "money", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     IsAvailable = table.Column<bool>(type: "bit", nullable: true),
                     RowIndex = table.Column<int>(type: "int", nullable: true),
                     ColumnIndex = table.Column<int>(type: "int", nullable: true),
@@ -428,6 +489,12 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "AK_Booking_BookingIDsas",
+                table: "Booking",
+                column: "BookingID",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Booking_UserID",
                 table: "Booking",
                 column: "UserID");
@@ -448,12 +515,17 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 table: "BusinessProfiles",
                 column: "UserID",
                 unique: true,
-                filter: "[UserID] IS NOT NULL");
+                filter: "([UserID] IS NOT NULL)");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FavoriteAddress_UserID",
                 table: "FavoriteAddress",
                 column: "UserID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FieldWorkImg_BusinessProfileId",
+                table: "FieldWorkImg",
+                column: "BusinessProfileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Floors_ParkingID",
@@ -466,19 +538,19 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 column: "BookingID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PackagePrice_TrafficID",
-                table: "PackagePrice",
-                column: "TrafficID");
+                name: "IX_OTPs_UserId",
+                table: "OTPs",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ParkingHasPrice_ParkingID",
+                name: "IX_ParkingHasPrice_ParkingId",
                 table: "ParkingHasPrice",
-                column: "ParkingID");
+                column: "ParkingId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ParkingHasPrice_ParkingPriceID",
+                name: "IX_ParkingHasPrice_ParkingPriceId",
                 table: "ParkingHasPrice",
-                column: "ParkingPriceID");
+                column: "ParkingPriceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ParkingSlots_BookingID",
@@ -521,6 +593,16 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 column: "UserID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TimeLine_ParkingPriceId",
+                table: "TimeLine",
+                column: "ParkingPriceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TimeLine_TrafficId",
+                table: "TimeLine",
+                column: "TrafficId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_ManagerID",
                 table: "Users",
                 column: "ManagerID");
@@ -549,13 +631,16 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BusinessProfiles");
-
-            migrationBuilder.DropTable(
                 name: "FavoriteAddress");
 
             migrationBuilder.DropTable(
+                name: "FieldWorkImg");
+
+            migrationBuilder.DropTable(
                 name: "Notifications");
+
+            migrationBuilder.DropTable(
+                name: "OTPs");
 
             migrationBuilder.DropTable(
                 name: "ParkingHasPrice");
@@ -573,16 +658,22 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                 name: "StaffParking");
 
             migrationBuilder.DropTable(
+                name: "TimeLine");
+
+            migrationBuilder.DropTable(
                 name: "VnPay");
 
             migrationBuilder.DropTable(
-                name: "PackagePrice");
+                name: "BusinessProfiles");
 
             migrationBuilder.DropTable(
                 name: "Booking");
 
             migrationBuilder.DropTable(
                 name: "Floors");
+
+            migrationBuilder.DropTable(
+                name: "ParkingPrice");
 
             migrationBuilder.DropTable(
                 name: "VehicleInfor");
