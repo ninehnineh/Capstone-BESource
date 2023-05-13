@@ -13,6 +13,6 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public int? ParkingPriceId { get; set; }
 
         public virtual Parking? Parking { get; set; }
-        public virtual PackagePrice? ParkingPrice { get; set; }
+        public virtual ParkingPrice? ParkingPrice { get; set; }  
     }
 }
