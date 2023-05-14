@@ -6,9 +6,11 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Parking.FindingSlotManagement.Application;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice.Commands.CreateParkingHasPrice;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice.Queries.GetListParkingHasPriceWithPagination;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice.Queries.GetParkingHasPriceDetailWithPagination;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 {
@@ -72,6 +74,32 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
             catch (Exception ex)
             {
                 return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<ServiceResponse<int>>> CreateParkingHasPrice([FromBody] CreateParkingHasPriceCommand command )
+        {
+            try
+            {
+                var res = await mediator.Send(command);
+                if (res.Message == "Thành công")
+                {
+                    await hubContext.Clients.All.SendAsync("LoadParkingHasPrice");
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                IEnumerable<string> list1 = new List<string> { "Severity: Error" };
+                string message = "";
+                foreach (var item in list1)
+                {
+                    message = ex.Message.Replace(item, string.Empty);
+                }
+                var errorResponse = new ErrorResponseModel(ResponseCode.BadRequest, "Validation Error: " + message.Remove(0, 31));
+                return StatusCode((int)ResponseCode.BadRequest, errorResponse);
             }
         }
 
