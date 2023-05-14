@@ -6,6 +6,9 @@ using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.NonCenso
 using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.RequestCensorshipManagerAccount.Queries;
 using Parking.FindingSlotManagement.Application.Features.Admin.BusinessProfile.BusinessProfileManagement.Queries.GetBusinessProfileById;
 using Parking.FindingSlotManagement.Application.Features.Admin.BusinessProfile.BusinessProfileManagement.Queries.GetListBusinessProfile;
+using Parking.FindingSlotManagement.Application.Features.Admin.Paypal.PaypalManagement.Commands.CreateNewPaypal;
+using Parking.FindingSlotManagement.Application.Features.Admin.Paypal.PaypalManagement.Queries.GetListPaypal;
+using Parking.FindingSlotManagement.Application.Features.Admin.Paypal.PaypalManagement.Queries.GetPaypalByManagerId;
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Commands.CreateNewTraffic;
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Commands.UpdateTraffic;
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Queries.GetListTraffic;
@@ -28,7 +31,6 @@ using Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice.Queries.GetParkingHasPriceDetailWithPagination;
 using Parking.FindingSlotManagement.Application.Features.Manager.PackagePrice.PackagePriceManagement.Queries.GetPackagePriceById;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.CreateNewParking;
-using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Commands.Create;
 using Parking.FindingSlotManagement.Application.Features.Manager.StaffPakings.StaffParkingManagement.Commands.CreateNewStaffParking;
 using Parking.FindingSlotManagement.Domain.Entities;
 using System;
@@ -36,6 +38,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSpotImage.ParkingSpotImageManagement.Commands.CreateNewParkingSpotImage;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSpotImage.ParkingSpotImageManagement.Queries.GetListImageByParkingId;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Commands.Create;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -65,6 +70,14 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<VnPay, GetVnPayByManagerIdResponse>()
                 .ForMember(dto => dto.ManagerName, act => act.MapFrom(obj => obj.Manager.Name))
                 .ReverseMap();
+            //For Paypal
+            CreateMap<PayPal, CreateNewPaypalCommand>().ReverseMap();
+            CreateMap<PayPal, GetPaypalByManagerIdResponse>()
+                .ForMember(dto => dto.ManagerName, act => act.MapFrom(obj => obj.Manager.Name))
+                .ReverseMap();
+            CreateMap<PayPal, GetListPaypalResponse>()
+                .ForMember(dto => dto.ManagerName, act => act.MapFrom(obj => obj.Manager.Name))
+                .ReverseMap();
             //***Mapping For Manager
             //For Parking
             CreateMap<Domain.Entities.Parking, CreateNewParkingCommand>().ReverseMap();
@@ -80,6 +93,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ReverseMap();
             //For Account
             CreateMap<User, CreateNewStaffAccountCommand>().ReverseMap();
+            //For ParkingSpotImage
+            CreateMap<ParkingSpotImage, CreateNewParkingSpotImageCommand>().ReverseMap();
+            CreateMap<ParkingSpotImage, GetListImageByParkingIdResponse>().ReverseMap();
             //***Mapping For Staff
             //***Mapping For Customer
             //For FavoriteAddress

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
@@ -42,7 +42,8 @@ namespace Parking.FindingSlotManagement.Infrastructure
             services.AddScoped<IParkingSlotRepository, ParkingSlotRepository>();
             services.AddScoped<IBookingRepository, BookingRepository>();
             services.AddScoped<IOTPRepository, OTPRepository>();
-
+            services.AddScoped<IPaypalRepository, PaypalRepository>();
+            services.AddScoped<IParkingSpotImageRepository, ParkingSpotImageRepository>();
             return services;
         }
     }
