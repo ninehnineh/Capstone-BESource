@@ -10,7 +10,6 @@ using Parking.FindingSlotManagement.Application.Features.Admin.Paypal.PaypalMana
 using Parking.FindingSlotManagement.Application.Features.Admin.Paypal.PaypalManagement.Queries.GetListPaypal;
 using Parking.FindingSlotManagement.Application.Features.Admin.Paypal.PaypalManagement.Queries.GetPaypalByManagerId;
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Commands.CreateNewTraffic;
-using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Commands.UpdateTraffic;
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Queries.GetListTraffic;
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Queries.GetTraffic;
 using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Commands.CreateNewVnPay;
@@ -33,14 +32,13 @@ using Parking.FindingSlotManagement.Application.Features.Manager.PackagePrice.Pa
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.CreateNewParking;
 using Parking.FindingSlotManagement.Application.Features.Manager.StaffPakings.StaffParkingManagement.Commands.CreateNewStaffParking;
 using Parking.FindingSlotManagement.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSpotImage.ParkingSpotImageManagement.Commands.CreateNewParkingSpotImage;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSpotImage.ParkingSpotImageManagement.Queries.GetListImageByParkingId;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Commands.Create;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice.Commands.CreateParkingHasPrice;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingPrice.Commands.CreateParkingPrice;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingPrice.Commands.DisableOrEnableParkingPrice;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingPrice.Queries.GetAllParkingPrice;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -48,29 +46,38 @@ namespace Parking.FindingSlotManagement.Application.Mapping
     {
         public MappingProfile()
         {
-            //Common Mapping
-            //***Mapping For Admin
-            //ForAccount
+            #region User Mapping
             CreateMap<User, CensorshipManagerAccountResponse>().ReverseMap();
             CreateMap<User, CreateNewCensorshipManagerAccountCommand>().ReverseMap();
             CreateMap<User, UpdateCensorshipManagerAccountCommand>().ReverseMap();
             CreateMap<User, RequestResponse>().ReverseMap();
             CreateMap<User, NonCensorshipManagerAccountResponse>().ReverseMap();
-            //ForTraffic
+            CreateMap<User, CreateNewStaffAccountCommand>().ReverseMap();
+            #endregion
+
+            #region Traffic Mapping
             CreateMap<Traffic, CreateNewTrafficCommand>().ReverseMap();
             CreateMap<Traffic, GetListTrafficResponse>().ReverseMap();
             CreateMap<Traffic, GetTrafficResponse>().ReverseMap();
-            //For BusinessProfile
+            #endregion
+
+            #region BusinessProfile Mapping
             CreateMap<BusinessProfile, GetBusinessProfileByIdResponse>().ReverseMap();
             CreateMap<BusinessProfile, GetListBusinessProfileResponse>()
                 .ForMember(dto => dto.UserName, act => act.MapFrom(obj => obj.User.Name))
                 .ReverseMap();
-            //For VnPay
+            CreateMap<BusinessProfile, CreateNewBusinessProfileCommand>().ReverseMap();
+            CreateMap<BusinessProfile, GetBusinessProfileResponse>().ReverseMap();
+            #endregion
+
+            #region VnPay Mapping
             CreateMap<VnPay, CreateNewVnPayCommand>().ReverseMap();
             CreateMap<VnPay, GetVnPayByManagerIdResponse>()
                 .ForMember(dto => dto.ManagerName, act => act.MapFrom(obj => obj.Manager.Name))
                 .ReverseMap();
-            //For Paypal
+            #endregion
+
+            #region PayPal Mapping
             CreateMap<PayPal, CreateNewPaypalCommand>().ReverseMap();
             CreateMap<PayPal, GetPaypalByManagerIdResponse>()
                 .ForMember(dto => dto.ManagerName, act => act.MapFrom(obj => obj.Manager.Name))
@@ -78,42 +85,58 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<PayPal, GetListPaypalResponse>()
                 .ForMember(dto => dto.ManagerName, act => act.MapFrom(obj => obj.Manager.Name))
                 .ReverseMap();
-            //***Mapping For Manager
-            //For Parking
+            #endregion
+
+            #region Parking Mapping
             CreateMap<Domain.Entities.Parking, CreateNewParkingCommand>().ReverseMap();
-            //For StaffParking
+            #endregion
+
+            #region StaffParking Mapping
             CreateMap<StaffParking, CreateNewStaffParkingCommand>().ReverseMap();
-            //For Floor
+            #endregion
+
+            #region Floor Mapping
             CreateMap<Floor, CreateNewFloorCommand>().ReverseMap();
             CreateMap<Floor, GetListFloorResponse>().ReverseMap();
-            //For PackagePrice
-            CreateMap<PackagePrice, CreateNewPackagePriceCommand>().ReverseMap();
-            CreateMap<PackagePrice, GetPackagePriceByIdResponse>()
+            #endregion
+
+            #region TimeLine Mapping
+            CreateMap<TimeLine, CreateNewPackagePriceCommand>().ReverseMap();
+            CreateMap<TimeLine, GetPackagePriceByIdResponse>()
                 .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.Traffic.Name))
                 .ReverseMap();
-            //For Account
-            CreateMap<User, CreateNewStaffAccountCommand>().ReverseMap();
-            //For ParkingSpotImage
+            #endregion
+
+            #region ParkingSpotImage Mapping
             CreateMap<ParkingSpotImage, CreateNewParkingSpotImageCommand>().ReverseMap();
             CreateMap<ParkingSpotImage, GetListImageByParkingIdResponse>().ReverseMap();
-            //***Mapping For Staff
-            //***Mapping For Customer
-            //For FavoriteAddress
+            #endregion
+
+            #region ParkingPrice Mapping
+            CreateMap<ParkingPrice, CreateParkingPriceCommand>()
+                .ForMember(dest => dest.BusinessId, opt => opt.MapFrom(src => src.UserId))
+                .ReverseMap();
+            CreateMap<ParkingPrice, DisableOrEnableParkingPriceCommand>().ReverseMap();
+            CreateMap<ParkingPrice, GetAllParkingPriceQueryResponse>().ReverseMap();
+            #endregion
+
+            #region FavoriteAddress Mapping
             CreateMap<FavoriteAddress, CreateNewFavoriteAddressCommand>().ReverseMap();
             CreateMap<FavoriteAddress, GetFavoriteAddressByIdResponse>().ReverseMap(); 
             CreateMap<FavoriteAddress, GetFavoriteAddressByUserIdResponse>().ReverseMap();
-            //For Vehicle Infor 
+            #endregion
+
+            #region VehicleInfor Mapping
             CreateMap<VehicleInfor, VehicleInfoCommand>().ReverseMap();
             CreateMap<VehicleInfor, GetVehicleInforByIdResponse>().ReverseMap();
             CreateMap<VehicleInfor, GetListVehicleInforByUserIdResponse>()
                 .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.Traffic.Name)).ReverseMap();
-            //For BusinessProfile 
-            CreateMap<BusinessProfile, CreateNewBusinessProfileCommand>().ReverseMap();
-            CreateMap<BusinessProfile, GetBusinessProfileResponse>().ReverseMap();
+            #endregion
 
             #region ParkingHasPrice Mapping
             CreateMap<ParkingHasPrice, GetListParkingHasPriceWithPaginationResponse>().ReverseMap();
             CreateMap<ParkingHasPrice, GetParkingHasPriceDetailWithPaginationResponse>().ReverseMap();
+            CreateMap<ParkingHasPrice, CreateParkingHasPriceCommand>().ReverseMap();
             #endregion
 
             #region Parkingslots Mapping

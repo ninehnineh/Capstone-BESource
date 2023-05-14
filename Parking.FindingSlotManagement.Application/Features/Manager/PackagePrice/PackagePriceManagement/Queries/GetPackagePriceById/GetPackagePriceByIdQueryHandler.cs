@@ -27,11 +27,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.PackagePric
         {
             try
             {
-                List<Expression<Func<Domain.Entities.PackagePrice, object>>> includes = new List<Expression<Func<Domain.Entities.PackagePrice, object>>>
+                List<Expression<Func<Domain.Entities.TimeLine, object>>> includes = new List<Expression<Func<Domain.Entities.TimeLine, object>>>
                 {
                     x => x.Traffic
                 };
-                var res = await _packagePriceRepository.GetItemWithCondition(x => x.PackagePriceId == request.PackagePriceId, includes, true);
+                var res = await _packagePriceRepository.GetItemWithCondition(x => x.TimeLineId == request.PackagePriceId, includes, true);
                 if(res == null)
                 {
                     return new ServiceResponse<GetPackagePriceByIdResponse>
