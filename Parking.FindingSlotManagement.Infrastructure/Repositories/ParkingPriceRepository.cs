@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 {
-    public class PackagePriceRepository : GenericRepository<TimeLine>, IPackagePriceRepository
+    public class ParkingPriceRepository : GenericRepository<ParkingPrice>, IParkingPriceRepository
     {
-        public PackagePriceRepository(ParkZDbContext dbContext) : base(dbContext)
+        public ParkingPriceRepository(ParkZDbContext dbContext) : base(dbContext)
         {
         }
     }

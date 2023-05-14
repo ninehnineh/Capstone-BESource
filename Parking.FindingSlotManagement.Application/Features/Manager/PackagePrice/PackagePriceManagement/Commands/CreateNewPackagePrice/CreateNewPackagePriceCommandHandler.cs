@@ -75,12 +75,12 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.PackagePric
                     request.PenaltyPriceStepTime = null;
                 }
                 var _mapper = config.CreateMapper();
-                var packagePriceEntity = _mapper.Map<Domain.Entities.PackagePrice>(request);
+                var packagePriceEntity = _mapper.Map<Domain.Entities.TimeLine>(request);
                 packagePriceEntity.IsActive = false;
                 await _packagePriceRepository.Insert(packagePriceEntity);
                 return new ServiceResponse<int>
                 {
-                    Data = packagePriceEntity.PackagePriceId,
+                    Data = packagePriceEntity.TimeLineId,
                     Message = "Thành công",
                     Success = true,
                     StatusCode = 201

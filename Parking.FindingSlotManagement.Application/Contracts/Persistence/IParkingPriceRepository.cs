@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
 {
-    public interface IPackagePriceRepository : IGenericRepository<TimeLine>
+    public interface IParkingPriceRepository : IGenericRepository<ParkingPrice>
     {
     }
 }
