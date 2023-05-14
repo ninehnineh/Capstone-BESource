@@ -11,7 +11,10 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public int ParkingPriceId { get; set; }
         public string? ParkingPriceName { get; set; }
         public bool? IsActive { get; set; }
+        public int UserId { get; set; }
 
+
+        public User? User { get; set; }
         public virtual ICollection<TimeLine>? TimeLines { get; set; }
         public virtual ICollection<ParkingHasPrice>? ParkingHasPrices { get; set; }
     }
