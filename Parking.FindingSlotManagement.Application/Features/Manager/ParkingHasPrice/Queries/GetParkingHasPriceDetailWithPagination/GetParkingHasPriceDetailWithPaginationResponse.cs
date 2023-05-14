@@ -9,7 +9,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasP
     {
         public int ParkingHasPriceId { get; set; }
         public string? ParkingName { get; set; }
-        public Domain.Entities.PackagePrice? ParkingPrice { get; set; }
+        public Domain.Entities.TimeLine? ParkingPrice { get; set; }
 
     }
 }

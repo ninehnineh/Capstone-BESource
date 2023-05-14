@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 {
-    public class PackagePriceRepository : GenericRepository<PackagePrice>, IPackagePriceRepository
+    public class PackagePriceRepository : GenericRepository<TimeLine>, IPackagePriceRepository
     {
         public PackagePriceRepository(ParkZDbContext dbContext) : base(dbContext)
         {
