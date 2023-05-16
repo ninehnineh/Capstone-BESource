@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Org.BouncyCastle.Math.EC.Rfc7748;
 using Parking.FindingSlotManagement.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
 
             builder.Property(e => e.StartTime).HasColumnType("datetime");
 
-            builder.Property(e => e.StartingTime).HasColumnType("datetime");
+            builder.Property(e => e.StartingTime).HasColumnName("StartingTime").HasColumnType("int");
 
             builder.HasOne(d => d.ParkingPrice)
                 .WithMany(p => p.TimeLines)

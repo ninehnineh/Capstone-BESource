@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 
@@ -11,9 +12,10 @@ using Parking.FindingSlotManagement.Infrastructure.Persistences;
 namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ParkZDbContext))]
-    partial class ParkZDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230516043332_ModifyStartingTimeToInt")]
+    partial class ModifyStartingTimeToInt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -621,9 +623,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Property<DateTime?>("StartTime")
                         .HasColumnType("datetime");
 
-                    b.Property<int?>("StartingTime")
-                        .HasColumnType("int")
-                        .HasColumnName("StartingTime");
+                    b.Property<DateTime?>("StartingTime")
+                        .HasColumnType("datetime");
 
                     b.Property<int?>("TrafficId")
                         .HasColumnType("int");
