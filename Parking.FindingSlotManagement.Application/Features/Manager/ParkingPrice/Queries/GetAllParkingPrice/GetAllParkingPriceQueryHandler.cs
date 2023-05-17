@@ -31,11 +31,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
                                                 request.PageNo,
                                                 request.PageSize);
 
-                if (parkingPrices.Count() < 0)
+                if (parkingPrices.Count() == 0)
                 {
                     return new ServiceResponse<IEnumerable<GetAllParkingPriceQueryResponse>>
                     {
-                        Message = "Danh sách trống",
+                        Message = "Không tìm thấy",
                         StatusCode = 200,
                         Success = true
                     };
