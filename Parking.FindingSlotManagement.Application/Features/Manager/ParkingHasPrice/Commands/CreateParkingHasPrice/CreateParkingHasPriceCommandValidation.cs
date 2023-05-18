@@ -37,7 +37,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasP
                 .MustAsync(async (ParkingPriceId, token) =>
                     {
                         var exist = await _packagePriceRepository.GetById(ParkingPriceId!);
-                        return exist != null;
+                        return exist == null;
                     }).WithMessage("{PropertyName} không tồn tại");
 
         }

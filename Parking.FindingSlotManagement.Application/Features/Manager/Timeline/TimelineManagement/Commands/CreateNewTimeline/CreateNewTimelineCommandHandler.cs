@@ -41,7 +41,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                         Success = true
                     };
                 }
-                var lstTimeline = await _timelineRepository.GetAllItemWithConditionByNoInclude(x => x.ParkingPriceId == request.ParkingPriceId);
+                var lstTimeline = await _timelineRepository.GetAllItemWithCondition(x => x.ParkingPriceId == request.ParkingPriceId);
                 if(lstTimeline.Count() > 0)
                 {
                     var firstTimeLine = lstTimeline.FirstOrDefault();
@@ -65,6 +65,29 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                         Success = true
                     };
                 }
+
+
+                if (request.EndTime < request.StartTime)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Giờ kết thúc phải lớn hơn giờ bắt đầu.",
+                        StatusCode = 400,
+                        Success = false
+                    };
+                }
+
+                var a = request.EndTime - request.StartTime;
+                if (a.Value.TotalHours < 1)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Giờ kết thúc phải lớn hơn giờ bắt đầu 1 tiếng.",
+                        StatusCode = 400,
+                        Success = false
+                    };
+                }
+
 
                 var lstTimelineHasExist = await _timelineRepository.GetAllItemWithCondition(x => x.ParkingPriceId == request.ParkingPriceId && x.IsActive == true, null, x => x.TimeLineId, true);
                 if(lstTimelineHasExist.Count() > 0)
@@ -126,6 +149,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                     }
                     if (request.IsExtrafee == false)
                     {
+                        request.StartingTime = null;
                         request.ExtraFee = null;
                         request.PenaltyPrice = null;
                     }
@@ -155,7 +179,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                         Success = false,
                     };
                 }
-                if (request.EndTime > DateTime.UtcNow.Date.AddDays(2))
+                if (request.EndTime > request.StartTime.Value.AddDays(1))
                 {
                     return new ServiceResponse<int>
                     {
@@ -173,6 +197,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                 }
                 if (request.IsExtrafee == false)
                 {
+                    request.StartingTime = null;
                     request.ExtraFee = null;
                     request.PenaltyPrice = null;
                 }

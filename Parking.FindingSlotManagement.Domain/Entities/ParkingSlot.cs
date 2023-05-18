@@ -15,7 +15,6 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public int? ColumnIndex { get; set; }
         public int? TrafficId { get; set; }
         public int? FloorId { get; set; }
-        public int? ParkingId { get; set; }
         public int? BookingId { get; set; }
 
         public virtual Booking? Booking { get; set; }
