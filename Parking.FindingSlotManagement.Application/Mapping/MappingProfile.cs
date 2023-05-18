@@ -39,6 +39,8 @@ using Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingPrice.Commands.CreateParkingPrice;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingPrice.Commands.DisableOrEnableParkingPrice;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingPrice.Queries.GetAllParkingPrice;
+using Parking.FindingSlotManagement.Application.Features.Manager.Timeline.TimelineManagement.Commands.CreateNewTimeline;
+using Parking.FindingSlotManagement.Application.Features.Manager.Timeline.TimelineManagement.Queries.GetListTimelineByParkingPriceId;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -142,6 +144,12 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #region Parkingslots Mapping
             CreateMap<ParkingSlot, CreateParkingSlotsCommand>().ReverseMap();
             #endregion
+
+            #region Timeline Mapping
+            CreateMap<TimeLine, CreateNewTimelineCommand>().ReverseMap();
+            CreateMap<TimeLine, GetListTimelineByParkingPriceIdResponse>().ReverseMap();
+            #endregion
+
         }
     }
 }

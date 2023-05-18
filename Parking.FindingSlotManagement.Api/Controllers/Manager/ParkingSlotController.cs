@@ -23,6 +23,13 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
             _hubContext = hubContext;
         }
 
+
+        /// <summary>
+        /// Api for Manager
+        /// </summary>
+        /// <remark>SignalR: LoadParkingSlot</remark>
+        /// <param name="command"></param>
+        /// <returns></returns>
         [HttpPost("create")]
         public async Task<ActionResult<ServiceResponse<int>>> Create([FromBody] CreateParkingSlotsCommand command)
         {

@@ -28,7 +28,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
             this.mediator = mediator;
         }
 
-        /// <summary>
+        /*/// <summary>
         /// API for Manager
         /// get all parking has price of specific manager
         /// </summary>
@@ -76,7 +76,13 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
-
+*/
+        /// <summary>
+        /// API For Manager
+        /// </summary>
+        /// <remarks>
+        /// SignalR: LoadParkingHasPrice
+        /// </remarks>
         [HttpPost]
         public async Task<ActionResult<ServiceResponse<int>>> CreateParkingHasPrice([FromBody] CreateParkingHasPriceCommand command )
         {

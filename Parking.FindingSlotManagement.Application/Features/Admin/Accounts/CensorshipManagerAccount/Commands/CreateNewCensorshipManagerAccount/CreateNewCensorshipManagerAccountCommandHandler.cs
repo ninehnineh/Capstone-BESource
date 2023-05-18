@@ -31,6 +31,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Cens
         {
             try
             {
+                var phoneExists = await _accountRepository.Exists(request.Phone);
+                if (phoneExists) return new ServiceResponse<int>
+                {
+                    StatusCode = 400,
+                    Success = false,
+                    Count = 0,
+                    Message = "Phone đã tồn tại. Vui lòng nhập lại!!!"
+                };
+
                 var checkExist = await _accountRepository.GetItemWithCondition(x => x.Email.Equals(request.Email));
                 if (checkExist != null)
                 {
