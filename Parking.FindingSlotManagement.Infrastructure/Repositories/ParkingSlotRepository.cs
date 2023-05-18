@@ -20,16 +20,16 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<bool> isExists(ParkingSlotDTO parkingSlotDTO)
-        {
-            var slotNameExist = await _dbContext.ParkingSlots
-                .AnyAsync(x =>
-                    x.Name!.Trim().Equals(parkingSlotDTO.Name) &&
-                    x.FloorId == parkingSlotDTO.FloorId && 
-                    x.ParkingId == parkingSlotDTO.ParkingId
-                );
+        //public async Task<bool> isExists(ParkingSlotDTO parkingSlotDTO)
+        //{
+        //    var slotNameExist = await _dbContext.ParkingSlots
+        //        .AnyAsync(x =>
+        //            x.Name!.Trim().Equals(parkingSlotDTO.Name) &&
+        //            x.FloorId == parkingSlotDTO.FloorId && 
+        //            x.ParkingId == parkingSlotDTO.ParkingId
+        //        );
 
-            return slotNameExist;
-        }
+        //    return slotNameExist;
+        //}
     }
 }

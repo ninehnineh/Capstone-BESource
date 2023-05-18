@@ -99,6 +99,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasP
                 //check overnight == true and the timeline will have 24 hours
                 List<TimeSpan> lstTime = new List<TimeSpan>();
                 var lstTimline = await _timelineRepository.GetAllItemWithCondition(x => x.ParkingPriceId == request.ParkingPriceId && x.IsActive == true, null, null, true);
+                if (lstTimline.Count() == 0)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Gói chưa có khung giờ, vui lòng tạo mới khung trước khi áp dụng gói vào bãi giữ xe.",
+                        Success = false,
+                        StatusCode = 400
+                    };
+                }
                 foreach (var item in lstTimline)
                 {
                     var result = item.EndTime - item.StartTime;

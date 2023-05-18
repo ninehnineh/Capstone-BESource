@@ -49,7 +49,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
 
             var trafficExist = new Domain.Entities.Traffic { TrafficId = 2 };
             _trafficRepositoryMock.Setup(x => x.GetById(request.TrafficId)).ReturnsAsync(trafficExist);
-            var parkingPriceExist = new ParkingPrice { ParkingPriceId = 1 };
+            var parkingPriceExist = new Domain.Entities.ParkingPrice { ParkingPriceId = 1 };
             _parkingPriceRepositoryMock.Setup(x => x.GetById(request.ParkingPriceId)).ReturnsAsync(parkingPriceExist);
 
 
@@ -87,7 +87,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             };
 
             _trafficRepositoryMock.Setup(x => x.GetById(request.TrafficId)).ReturnsAsync((Traffic)null);
-            var parkingPriceExist = new ParkingPrice { ParkingPriceId = 1 };
+            var parkingPriceExist = new Domain.Entities.ParkingPrice { ParkingPriceId = 1 };
             _parkingPriceRepositoryMock.Setup(x => x.GetById(request.ParkingPriceId)).ReturnsAsync(parkingPriceExist);
 
 
@@ -125,7 +125,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
 
             var trafficExist = new Domain.Entities.Traffic { TrafficId = 2 };
             _trafficRepositoryMock.Setup(x => x.GetById(request.TrafficId)).ReturnsAsync(trafficExist);
-            _parkingPriceRepositoryMock.Setup(x => x.GetById(request.ParkingPriceId)).ReturnsAsync((ParkingPrice)null);
+            _parkingPriceRepositoryMock.Setup(x => x.GetById(request.ParkingPriceId)).ReturnsAsync((Domain.Entities.ParkingPrice)null);
 
 
             // Act
@@ -163,7 +163,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
 
             var trafficExist = new Domain.Entities.Traffic { TrafficId = 2 };
             _trafficRepositoryMock.Setup(x => x.GetById(request.TrafficId)).ReturnsAsync(trafficExist);
-            var parkingPriceExist = new ParkingPrice { ParkingPriceId = 1 };
+            var parkingPriceExist = new Domain.Entities.ParkingPrice { ParkingPriceId = 1 };
             _parkingPriceRepositoryMock.Setup(x => x.GetById(request.ParkingPriceId)).ReturnsAsync(parkingPriceExist);
 
             var existingTimelines = new List<TimeLine>
@@ -220,7 +220,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
 
             var trafficExist = new Domain.Entities.Traffic { TrafficId = 2 };
             _trafficRepositoryMock.Setup(x => x.GetById(request.TrafficId)).ReturnsAsync(trafficExist);
-            var parkingPriceExist = new ParkingPrice { ParkingPriceId = 1 };
+            var parkingPriceExist = new Domain.Entities.ParkingPrice { ParkingPriceId = 1 };
             _parkingPriceRepositoryMock.Setup(x => x.GetById(request.ParkingPriceId)).ReturnsAsync(parkingPriceExist);
 
             var existingTimelines = new List<TimeLine>

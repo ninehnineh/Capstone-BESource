@@ -17,8 +17,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
 
             builder.HasIndex(e => e.FloorId, "IX_ParkingSlots_FloorID");
 
-            builder.HasIndex(e => e.ParkingId, "IX_ParkingSlots_ParkingID");
-
             builder.HasIndex(e => e.TrafficId, "IX_ParkingSlots_TrafficID");
 
             builder.Property(e => e.BookingId).HasColumnName("BookingID");
@@ -29,8 +27,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .HasMaxLength(10)
                 .IsUnicode(false)
                 .IsFixedLength();
-
-            builder.Property(e => e.ParkingId).HasColumnName("ParkingID");
 
             builder.Property(e => e.TrafficId).HasColumnName("TrafficID");
 
@@ -45,10 +41,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .HasForeignKey(d => d.FloorId)
                 .HasConstraintName("FK__ParkingSl__Floor__5441852A");
 
-            builder.HasOne(d => d.Parking)
-                .WithMany(p => p.ParkingSlots)
-                .HasForeignKey(d => d.ParkingId)
-                .HasConstraintName("FK__ParkingSl__Parki__5535A963");
 
             builder.HasOne(d => d.Traffic)
                 .WithMany(p => p.ParkingSlots)
