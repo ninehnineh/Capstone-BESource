@@ -23,7 +23,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 
         public async Task<bool> Exists(int id)
         {
-            var isExist = await dbContext.ParkingHasPrices.FirstOrDefaultAsync(x => x.ParkingHasPriceId == id);
+            var isExist = await dbContext.ParkingHasPrices
+                .FindAsync(id);
             return isExist != null;
         }
     }

@@ -11,8 +11,19 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 {
     public class AccountRepository : GenericRepository<User>, IAccountRepository
     {
+        private readonly ParkZDbContext _dbContext;
+
         public AccountRepository(ParkZDbContext dbContext) : base(dbContext)
         {
+            _dbContext = dbContext;
+        }
+
+        public async Task<bool> Exists(string phoneNumber)
+        {
+            var exist = _dbContext.Users
+                .Any(x => x.Phone!.Trim().Equals(phoneNumber.Trim()));
+
+            return exist;
         }
     }
 }

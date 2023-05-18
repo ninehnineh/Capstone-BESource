@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
 {
-    public interface IAccountRepository : IGenericRepository<User>
+    public interface ITimelineRepository : IGenericRepository<TimeLine>
     {
-        Task<bool> Exists(string phoneNumber);
     }
 }
