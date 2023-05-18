@@ -1,124 +1,138 @@
-﻿//using AutoMapper;
-//using MediatR;
-//using Parking.FindingSlotManagement.Application.Contracts.Persistence;
-//using Parking.FindingSlotManagement.Application.Mapping;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Linq.Expressions;
-//using System.Text;
-//using System.Threading.Tasks;
+﻿using AutoMapper;
+using MediatR;
+using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Mapping;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
+using System.Threading.Tasks;
 
-//namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice.Commands.CreateParkingHasPrice
-//{
-//    public class CreateParkingHasPriceCommandHandler : IRequestHandler<CreateParkingHasPriceCommand, ServiceResponse<int>>
-//    {
-//        private readonly IParkingHasPriceRepository _parkingHasPriceRepository;
-//        private readonly IPackagePriceRepository _packagePriceRepository;
-//        MapperConfiguration config = new MapperConfiguration(cfg =>
-//        {
-//            cfg.AddProfile(new MappingProfile());
-//        });
+namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice.Commands.CreateParkingHasPrice
+{
+    public class CreateParkingHasPriceCommandHandler : IRequestHandler<CreateParkingHasPriceCommand, ServiceResponse<int>>
+    {
+        private readonly IParkingHasPriceRepository _parkingHasPriceRepository;
+        private readonly IParkingRepository _parkingRepository;
+        private readonly IParkingPriceRepository _parkingPriceRepository;
+        private readonly ITimelineRepository _timelineRepository;
+        MapperConfiguration config = new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile(new MappingProfile());
+        });
 
-//        public CreateParkingHasPriceCommandHandler(IParkingHasPriceRepository parkingHasPriceRepository, 
-//            IPackagePriceRepository packagePriceRepository)
-//        {
-//            _parkingHasPriceRepository = parkingHasPriceRepository;
-//            _packagePriceRepository = packagePriceRepository;
-//        }
+        public CreateParkingHasPriceCommandHandler(IParkingHasPriceRepository parkingHasPriceRepository
+            , IParkingRepository parkingRepository, IParkingPriceRepository parkingPriceRepository, ITimelineRepository timelineRepository)
+        {
+            _parkingHasPriceRepository = parkingHasPriceRepository;
+            _parkingRepository = parkingRepository;
+            _parkingPriceRepository = parkingPriceRepository;
+            _timelineRepository = timelineRepository;
+        }
 
-//        public async Task<ServiceResponse<int>> Handle(CreateParkingHasPriceCommand request, CancellationToken cancellationToken)
-//        {
-//            try
-//            {
-//                var packagePrice = await _packagePriceRepository.GetById(request.ParkingPriceId!);
-//                if (packagePrice.IsActive == true)
-//                {
-//                    return new ServiceResponse<int>
-//                    {
-//                        Message = "Gói đang được áp dụng, vui lòng chọn gói khác",
-//                        StatusCode = 400,
-//                        Success = false,
-//                    };
-//                }
-
-//                List<Expression<Func<Domain.Entities.ParkingHasPrice, object>>> includes = new List<Expression<Func<Domain.Entities.ParkingHasPrice, object>>>
-//                {
-//                    x => x.ParkingPrice!,
-//                };
-
-//                var listPackingHasPrice = await _parkingHasPriceRepository
-//                    .GetAllItemWithCondition(x => x.ParkingId == request.ParkingId, includes);
-//                if (listPackingHasPrice.Count() > 0)
-//                {
-//                    //qua ngay hom sau
-//                    if(packagePrice.EndTime.Value.Date > packagePrice.StartTime.Value.Date)
-//                    {
-//                        foreach (var item in listPackingHasPrice)
-//                        {
-//                            var goicuEnd = item.ParkingPrice!.EndTime;
-//                            var goicuStart = item.ParkingPrice!.StartTime;
-//                            var gói_đang_định_dùng_start = packagePrice.StartTime;
-//                            var gói_đang_định_dùng_end = packagePrice.EndTime;
-
-///*                            if (gói_đang_định_dùng_end.Value.Date > gói_đang_định_dùng_start.Value.Date)
-//                            {*/
-//                                if (gói_đang_định_dùng_start.Value.TimeOfDay < goicuEnd.Value.TimeOfDay)
-//                                {
-//                                    return new ServiceResponse<int>
-//                                    {
-//                                        Message = "Gói không hợp lệ",
-//                                        StatusCode = 400,
-//                                        Success = false,
-//                                    };
-//                                }
-///*                            }*/
-///*                            else
-//                            {*/
-                                
-//                            /*}*/
-//                        }
-//                    }
-//                    else // trong ngay
-//                    {
-//                        foreach (var item in listPackingHasPrice)
-//                        {
-//                            var goicuEnd = item.ParkingPrice!.EndTime;
-//                            var goicuStart = item.ParkingPrice!.StartTime;
-//                            var gói_đang_định_dùng_start = packagePrice.StartTime;
-//                            var gói_đang_định_dùng_end = packagePrice.EndTime;
-//                            if (gói_đang_định_dùng_start.Value.TimeOfDay < goicuEnd.Value.TimeOfDay)
-//                            {
-//                                return new ServiceResponse<int>
-//                                {
-//                                    Message = "Gói không hợp lệ",
-//                                    StatusCode = 400,
-//                                    Success = false,
-//                                };
-//                            }
-//                        }
-                            
-//                    }
-                    
-//                }
-
-//                var _mapper = config.CreateMapper();
-//                var entity = _mapper.Map<Domain.Entities.ParkingHasPrice>(request);
-//                await _parkingHasPriceRepository.Insert(entity);
-//                packagePrice.IsActive = true;
-//                await _packagePriceRepository.Save();
-//                return new ServiceResponse<int>
-//                {
-//                    Data = entity.ParkingHasPriceId,
-//                    Message = "Thành công",
-//                    StatusCode = 201,
-//                    Success = true,
-//                };
-//            }
-//            catch (Exception ex)
-//            {
-//                throw new Exception(ex.Message);
-//            }
-//        }
-//    }
-//}
+        public async Task<ServiceResponse<int>> Handle(CreateParkingHasPriceCommand request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var checkParkingExist = await _parkingRepository.GetById(request.ParkingId!);
+                if(checkParkingExist == null)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Không tìm thấy bãi giữ xe.",
+                        Success = true,
+                        StatusCode = 200
+                    };
+                }
+                List<Expression<Func<Domain.Entities.ParkingPrice, object>>> includes = new List<Expression<Func<Domain.Entities.ParkingPrice, object>>>
+                {
+                    x => x.TimeLines
+                };
+                var checkParkingPriceExist = await _parkingPriceRepository.GetItemWithCondition(x => x.ParkingPriceId == request.ParkingPriceId, includes, true);
+                if(checkParkingPriceExist == null)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Không tìm thấy gói.",
+                        Success = true,
+                        StatusCode = 200
+                    };
+                }
+                if(checkParkingExist.IsActive == false)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Bãi giữ xe không khả dụng.",
+                        StatusCode = 400,
+                        Success = false
+                    };
+                }
+                if(checkParkingPriceExist.IsActive == false)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Gói không khả dụng.",
+                        StatusCode = 400,
+                        Success = false
+                    };
+                }
+                //check traffic of the parking and the timeline has match
+                if(checkParkingExist.CarSpot == 0 && checkParkingPriceExist.TimeLines.FirstOrDefault().TrafficId != 1)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Bãi giữ xe không hổ trợ xe hơi nên áp dụng gói không phù hợp.",
+                        Success = false,
+                        StatusCode = 400
+                    };
+                }
+                if(checkParkingExist.MotoSpot == 0 && checkParkingPriceExist.TimeLines.FirstOrDefault().TrafficId != 2)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Bãi giữ xe không hổ trợ xe mô tô nên áp dụng gói không phù hợp.",
+                        Success = false,
+                        StatusCode = 400
+                    };
+                }
+                //check overnight == true and the timeline will have 24 hours
+                List<TimeSpan> lstTime = new List<TimeSpan>();
+                var lstTimline = await _timelineRepository.GetAllItemWithCondition(x => x.ParkingPriceId == request.ParkingPriceId && x.IsActive == true, null, null, true);
+                foreach (var item in lstTimline)
+                {
+                    var result = item.EndTime - item.StartTime;
+                    lstTime.Add((TimeSpan)result);
+                }
+                TimeSpan sumOfTime = new TimeSpan();
+                foreach (var item in lstTime)
+                {
+                    sumOfTime += item;
+                }
+                if(checkParkingExist.IsOvernight == true && sumOfTime.TotalHours != 24)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Gói không hợp lệ do bãi có áp dụng giữ 24h nên tổng số giờ của gói phải trong 24h.",
+                        Success = false,
+                        StatusCode = 400
+                    };
+                }
+                var _mapper = config.CreateMapper();
+                var entityDto = _mapper.Map<Domain.Entities.ParkingHasPrice>(request);
+                await _parkingHasPriceRepository.Insert(entityDto);
+                return new ServiceResponse<int>
+                {
+                    Data = entityDto.ParkingHasPriceId,
+                    Message = "Thành công",
+                    Success = true,
+                    StatusCode = 201
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+    }
+}
