@@ -19,7 +19,6 @@ namespace Parking.FindingSlotManagement.Domain.Entities
 
         public virtual Booking? Booking { get; set; }
         public virtual Floor? Floor { get; set; }
-        public virtual Parking? Parking { get; set; }
         public virtual Traffic? Traffic { get; set; }
     }
 }
