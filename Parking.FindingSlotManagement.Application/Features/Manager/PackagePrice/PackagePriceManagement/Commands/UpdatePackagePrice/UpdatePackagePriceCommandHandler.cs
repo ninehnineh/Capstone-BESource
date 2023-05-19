@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿/*using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using System;
 using System.Collections.Generic;
@@ -173,3 +173,4 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.PackagePric
         }
     }
 }
+*/

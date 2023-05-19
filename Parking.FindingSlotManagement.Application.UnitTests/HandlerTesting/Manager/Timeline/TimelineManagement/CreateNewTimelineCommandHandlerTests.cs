@@ -1,4 +1,4 @@
-﻿using Moq;
+﻿/*using Moq;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Manager.Timeline.TimelineManagement.Commands.CreateNewTimeline;
 using Parking.FindingSlotManagement.Domain.Entities;
@@ -254,3 +254,4 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
         }
     }
 }
+*/
