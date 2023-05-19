@@ -146,7 +146,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #endregion
 
             #region Timeline Mapping
-            CreateMap<TimeLine, CreateNewTimelineCommand>().ReverseMap();
+            CreateMap<TimeLine, CreateNewTimelineCommandMapper>().ReverseMap();
             CreateMap<TimeLine, GetListTimelineByParkingPriceIdResponse>().ReverseMap();
             #endregion
 

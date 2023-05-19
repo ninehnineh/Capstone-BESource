@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿/*using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using System;
 using System.Collections.Generic;
@@ -114,7 +114,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                                 };
                             }
                         }
-                        
+
                         checkTimelineExist.StartTime = res_Start;
                         checkTimelineExist.EndTime = res_End;
                     }
@@ -246,3 +246,4 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
         }
     }
 }
+*/

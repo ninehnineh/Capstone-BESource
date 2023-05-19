@@ -18,7 +18,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
 
             builder.Property(e => e.Description).HasMaxLength(255);
 
-            builder.Property(e => e.EndTime).HasColumnType("datetime");
+            builder.Property(e => e.EndTime).HasColumnType("time");
 
             builder.Property(e => e.ExtraFee).HasColumnType("money");
 
@@ -28,7 +28,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
 
             builder.Property(e => e.Price).HasColumnType("money");
 
-            builder.Property(e => e.StartTime).HasColumnType("datetime");
+            builder.Property(e => e.StartTime).HasColumnType("time");
 
             builder.Property(e => e.StartingTime).HasColumnName("StartingTime").HasColumnType("int");
 
