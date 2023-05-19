@@ -4,6 +4,7 @@ using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Mapping;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -110,8 +111,19 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasP
                 }
                 foreach (var item in lstTimline)
                 {
-                    var result = item.EndTime - item.StartTime;
-                    lstTime.Add((TimeSpan)result);
+                    if (item.EndTime < item.StartTime)
+                    {
+                        var start = TimeSpan.FromHours(24) - item.StartTime;
+                        var end = item.EndTime - TimeSpan.FromHours(0);
+                        var result = start + end;
+                        lstTime.Add((TimeSpan)result);
+                    }
+                    else
+                    {
+                        var result = item.EndTime - item.StartTime;
+                        lstTime.Add((TimeSpan)result);
+                    }
+                    
                 }
                 TimeSpan sumOfTime = new TimeSpan();
                 foreach (var item in lstTime)

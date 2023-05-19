@@ -95,8 +95,18 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasP
                         var lstTimline = await _timelineRepository.GetAllItemWithCondition(x => x.ParkingPriceId == request.ParkingPriceId && x.IsActive == true, null, null, true);
                         foreach (var item in lstTimline)
                         {
-                            var result = item.EndTime - item.StartTime;
-                            lstTime.Add((TimeSpan)result);
+                            if (item.EndTime < item.StartTime)
+                            {
+                                var start = TimeSpan.FromHours(24) - item.StartTime;
+                                var end = item.EndTime - TimeSpan.FromHours(0);
+                                var result = start + end;
+                                lstTime.Add((TimeSpan)result);
+                            }
+                            else
+                            {
+                                var result = item.EndTime - item.StartTime;
+                                lstTime.Add((TimeSpan)result);
+                            }
                         }
                         TimeSpan sumOfTime = new TimeSpan();
                         foreach (var item in lstTime)

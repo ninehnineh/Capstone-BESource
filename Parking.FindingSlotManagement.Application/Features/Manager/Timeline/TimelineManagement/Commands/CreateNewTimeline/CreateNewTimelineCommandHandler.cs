@@ -5,6 +5,7 @@ using Parking.FindingSlotManagement.Application.Mapping;
 using Parking.FindingSlotManagement.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,21 +43,21 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                     };
                 }
                 var lstTimeline = await _timelineRepository.GetAllItemWithCondition(x => x.ParkingPriceId == request.ParkingPriceId);
-                if(lstTimeline.Count() > 0)
+                if (lstTimeline.Count() > 0)
                 {
                     var firstTimeLine = lstTimeline.FirstOrDefault();
-                    if(firstTimeLine.TrafficId != request.TrafficId)
+                    if (firstTimeLine.TrafficId != request.TrafficId)
                     {
                         return new ServiceResponse<int>
                         {
-                            Message = "Phương tiện của khung giời không trùng với phương tiện của gói.",
+                            Message = "Phương tiện của khung giờ không trùng với phương tiện của gói.",
                             Success = false,
                             StatusCode = 400
                         };
                     }
                 }
                 var checkParkingPriceExist = await _parkingPriceRepository.GetById(request.ParkingPriceId);
-                if(checkParkingPriceExist == null)
+                if (checkParkingPriceExist == null)
                 {
                     return new ServiceResponse<int>
                     {
@@ -67,7 +68,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                 }
 
 
-                if (request.EndTime < request.StartTime)
+                /*if (request.EndTime < request.StartTime)
                 {
                     return new ServiceResponse<int>
                     {
@@ -75,10 +76,24 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                         StatusCode = 400,
                         Success = false
                     };
+                }*/
+                var lstTimelineHasExist = await _timelineRepository.GetAllItemWithCondition(x => x.ParkingPriceId == request.ParkingPriceId && x.IsActive == true, null, x => x.TimeLineId, true);
+                if (lstTimelineHasExist.Count() > 0)
+                {
+                    var TimeFirst = lstTimelineHasExist.LastOrDefault();
+                    var TimeLast = lstTimelineHasExist.FirstOrDefault();
+                    if (TimeFirst.StartTime == TimeLast.EndTime)
+                    {
+                        return new ServiceResponse<int>
+                        {
+                            Message = "Không thể tạo mới khung giờ. Do các khung giờ trong gói đã đủ 24 tiếng. Bạn chỉ có thể tạo mới khi xóa các gói trước đó hoặc tạo mới 1 gói khác sau đó bạn có thể tạo mới khung giờ của gói đó.",
+                            Success = false,
+                            StatusCode = 400
+                        };
+                    }
                 }
-
-                var a = request.EndTime - request.StartTime;
-                if (a.Value.TotalHours < 1)
+                var a = TimeSpan.Parse(request.EndTime) - TimeSpan.Parse(request.StartTime);
+                if (a.TotalHours < 1 && a.TotalHours >= 0)
                 {
                     return new ServiceResponse<int>
                     {
@@ -87,42 +102,23 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                         Success = false
                     };
                 }
-
-
-                var lstTimelineHasExist = await _timelineRepository.GetAllItemWithCondition(x => x.ParkingPriceId == request.ParkingPriceId && x.IsActive == true, null, x => x.TimeLineId, true);
-                if(lstTimelineHasExist.Count() > 0)
+                if (lstTimelineHasExist.Count() > 0)
                 {
                     var lastEntity = lstTimelineHasExist.FirstOrDefault();
                     var goi_cu_end = lastEntity.EndTime;
                     var goi_cu_start = lastEntity.StartTime;
                     var gói_đang_định_dùng_start = request.StartTime;
                     var gói_đang_định_dùng_end = request.EndTime;
-                    //qua ngay hom sau
-                    if (gói_đang_định_dùng_end.Value.Date > gói_đang_định_dùng_start.Value.Date)
+                    if (TimeSpan.Parse(gói_đang_định_dùng_start) < goi_cu_end)
                     {
-                        if (gói_đang_định_dùng_start.Value.TimeOfDay < goi_cu_end.Value.TimeOfDay)
+                        return new ServiceResponse<int>
                         {
-                            return new ServiceResponse<int>
-                            {
-                                Message = "Gói không hợp lệ",
-                                StatusCode = 400,
-                                Success = false,
-                            };
-                        }
+                            Message = "Gói không hợp lệ",
+                            StatusCode = 400,
+                            Success = false,
+                        };
                     }
-                    else
-                    {
-                        if (gói_đang_định_dùng_start.Value.TimeOfDay < goi_cu_end.Value.TimeOfDay)
-                        {
-                            return new ServiceResponse<int>
-                            {
-                                Message = "Gói không hợp lệ",
-                                StatusCode = 400,
-                                Success = false,
-                            };
-                        }
-                    }
-                    if (request.StartTime.Value < DateTime.UtcNow.Date)
+                    /*if (request.StartTime.Value < DateTime.UtcNow.Date)
                     {
                         return new ServiceResponse<int>
                         {
@@ -139,13 +135,22 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                             StatusCode = 400,
                             Success = false,
                         };
-                    }
-                    if (request.EndTime.Value.TimeOfDay < request.StartTime.Value.TimeOfDay)
+                    }*/
+                    /*if (request.EndTime.Value.TimeOfDay < request.StartTime.Value.TimeOfDay)
                     {
                         request.EndTime = request.StartTime.Value.AddDays(1).Date
                             .AddHours(request.EndTime.Value.Hour)
                             .AddMinutes(request.EndTime.Value.Minute)
                             .AddSeconds(request.EndTime.Value.Second);
+                    }*/
+                    if(TimeSpan.Parse(request.EndTime) < TimeSpan.Parse(request.StartTime))
+                    {
+                        /*var resEndTime = TimeSpan.Parse(request.StartTime) + (TimeSpan.Parse(request.StartTime) - TimeSpan.Parse(request.EndTime));
+                        request.EndTime = resEndTime.ToString();*/
+                        var TimeTomorow = TimeSpan.Parse(request.EndTime) - TimeSpan.Parse("00:00:00");
+                        var resEndTime = TimeSpan.FromHours(24) + TimeTomorow;
+                        TimeSpan timeSpan = TimeSpan.ParseExact(resEndTime.ToString(), @"d\.hh\:mm\:ss", CultureInfo.InvariantCulture);
+                        request.EndTime = timeSpan.ToString(@"hh\:mm\:ss");
                     }
                     if (request.IsExtrafee == false)
                     {
@@ -158,8 +163,25 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                         request.PenaltyPrice = null;
                         request.PenaltyPriceStepTime = null;
                     }
+                    var entityMapper2 = new CreateNewTimelineCommandMapper
+                    {
+                        Name = request.Name,
+                        Price = request.Price,
+                        Description = request.Description,
+                        StartTime = TimeSpan.Parse(request.StartTime),
+                        EndTime = TimeSpan.Parse(request.EndTime),
+                        StartingTime = request.StartingTime,
+                        IsExtrafee = request.IsExtrafee,
+                        ExtraFee = request.ExtraFee,
+                        ExtraTimeStep = request.ExtraTimeStep,
+                        HasPenaltyPrice = request.HasPenaltyPrice,
+                        PenaltyPrice = request.PenaltyPrice,
+                        PenaltyPriceStepTime = request.PenaltyPriceStepTime,
+                        TrafficId = request.TrafficId,
+                        ParkingPriceId = request.ParkingPriceId
+                    };
                     var _mapper2 = config.CreateMapper();
-                    var timeLineEntity2 = _mapper2.Map<TimeLine>(request);
+                    var timeLineEntity2 = _mapper2.Map<TimeLine>(entityMapper2);
                     timeLineEntity2.IsActive = true;
                     await _timelineRepository.Insert(timeLineEntity2);
                     return new ServiceResponse<int>
@@ -170,7 +192,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                         StatusCode = 201
                     };
                 }
-                if (request.StartTime.Value < DateTime.UtcNow.Date)
+                /*if (request.StartTime.Value < DateTime.UtcNow.Date)
                 {
                     return new ServiceResponse<int>
                     {
@@ -194,7 +216,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                         .AddHours(request.EndTime.Value.Hour)
                         .AddMinutes(request.EndTime.Value.Minute)
                         .AddSeconds(request.EndTime.Value.Second);
-                }
+                }*/
                 if (request.IsExtrafee == false)
                 {
                     request.StartingTime = null;
@@ -206,8 +228,25 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                     request.PenaltyPrice = null;
                     request.PenaltyPriceStepTime = null;
                 }
+                var entityMapper = new CreateNewTimelineCommandMapper
+                {
+                    Name = request.Name,
+                    Price = request.Price,
+                    Description = request.Description,
+                    StartTime = TimeSpan.Parse(request.StartTime),
+                    EndTime = TimeSpan.Parse(request.EndTime),
+                    StartingTime = request.StartingTime,
+                    IsExtrafee = request.IsExtrafee,
+                    ExtraFee = request.ExtraFee,
+                    ExtraTimeStep = request.ExtraTimeStep,
+                    HasPenaltyPrice = request.HasPenaltyPrice,
+                    PenaltyPrice = request.PenaltyPrice,
+                    PenaltyPriceStepTime = request.PenaltyPriceStepTime,
+                    TrafficId = request.TrafficId,
+                    ParkingPriceId = request.ParkingPriceId
+                };
                 var _mapper = config.CreateMapper();
-                var timeLineEntity = _mapper.Map<TimeLine>(request);
+                var timeLineEntity = _mapper.Map<TimeLine>(entityMapper);
                 timeLineEntity.IsActive = true;
                 await _timelineRepository.Insert(timeLineEntity);
                 return new ServiceResponse<int>
