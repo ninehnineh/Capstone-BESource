@@ -49,6 +49,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .HasMaxLength(225)
                 .IsUnicode(false);
 
+            builder.Property(e => e.Status)
+                .HasMaxLength(30);
+
             builder.Property(e => e.QrcodeText)
                 .HasMaxLength(225)
                 .IsUnicode(false)

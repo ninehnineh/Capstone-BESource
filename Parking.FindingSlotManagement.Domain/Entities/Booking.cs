@@ -19,7 +19,7 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public TimeSpan? CheckoutTime { get; set; }
         public decimal? ActualPrice { get; set; }
         public string? QrcodeText { get; set; }
-        public int? Status { get; set; }
+        public string? Status { get; set; }
         public string? GuestName { get; set; }
         public string? GuestPhone { get; set; }
         public decimal? TotalPrice { get; set; }
