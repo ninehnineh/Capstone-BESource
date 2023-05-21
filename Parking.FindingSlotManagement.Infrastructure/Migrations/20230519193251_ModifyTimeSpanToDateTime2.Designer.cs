@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 
@@ -11,9 +12,10 @@ using Parking.FindingSlotManagement.Infrastructure.Persistences;
 namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ParkZDbContext))]
-    partial class ParkZDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230519193251_ModifyTimeSpanToDateTime2")]
+    partial class ModifyTimeSpanToDateTime2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -392,9 +394,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Property<bool?>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsStartAndEndNull")
-                        .HasColumnType("bit");
-
                     b.Property<string>("ParkingPriceName")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
@@ -617,7 +616,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Property<float?>("PenaltyPriceStepTime")
                         .HasColumnType("real");
 
-                    b.Property<decimal>("Price")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("money");
 
                     b.Property<TimeSpan?>("StartTime")

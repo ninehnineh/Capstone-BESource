@@ -18,7 +18,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
             builder.HasData(
                     new Role {RoleId = 1, Name = "Manager", IsActive = true}, 
                     new Role {RoleId = 2, Name = "Staff", IsActive = true}, 
-                    new Role {RoleId = 3, Name = "Admin", IsActive = true});
+                    new Role {RoleId = 3, Name = "Customer", IsActive = true});
         }
     }
 }
