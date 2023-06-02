@@ -36,11 +36,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .WithMany(p => p.TimeLines)
                 .HasForeignKey(d => d.ParkingPriceId)
                 .HasConstraintName("FK_Timeline_ParkingPrice");
-
-            builder.HasOne(d => d.Traffic)
-                .WithMany(p => p.TimeLines)
-                .HasForeignKey(d => d.TrafficId)
-                .HasConstraintName("FK_Timeline_Traffic");
         }
     }
 }

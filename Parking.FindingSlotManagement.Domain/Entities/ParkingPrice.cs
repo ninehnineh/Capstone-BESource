@@ -12,8 +12,11 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public string? ParkingPriceName { get; set; }
         public bool? IsActive { get; set; }
         public int UserId { get; set; }
-        public bool IsStartAndEndNull { get; set; }
+        public bool IsWholeDay { get; set; }
 
+
+        public int? TrafficId { get; set; }
+        public virtual Traffic? Traffic { get; set; }
         public User? User { get; set; }
         public virtual ICollection<TimeLine>? TimeLines { get; set; }
         public virtual ICollection<ParkingHasPrice>? ParkingHasPrices { get; set; }
