@@ -10,6 +10,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
 {
     public interface IParkingSlotRepository : IGenericRepository<ParkingSlot>
     {
-        //Task<bool> isExists(ParkingSlotDTO parkingSlotDTO);
+        Task<bool> isExists(ParkingSlotDTO parkingSlotDTO);
     }
 }

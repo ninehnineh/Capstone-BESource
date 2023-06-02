@@ -41,6 +41,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.ParkingPrice.Co
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingPrice.Queries.GetAllParkingPrice;
 using Parking.FindingSlotManagement.Application.Features.Manager.Timeline.TimelineManagement.Commands.CreateNewTimeline;
 using Parking.FindingSlotManagement.Application.Features.Manager.Timeline.TimelineManagement.Queries.GetListTimelineByParkingPriceId;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -104,9 +105,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
 
             #region TimeLine Mapping
             CreateMap<TimeLine, CreateNewPackagePriceCommand>().ReverseMap();
-            CreateMap<TimeLine, GetPackagePriceByIdResponse>()
-                .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.Traffic.Name))
-                .ReverseMap();
+            //CreateMap<TimeLine, GetPackagePriceByIdResponse>()
+            //    .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.Traffic.Name))
+            //    .ReverseMap();
             #endregion
 
             #region ParkingSpotImage Mapping
@@ -124,7 +125,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
 
             #region FavoriteAddress Mapping
             CreateMap<FavoriteAddress, CreateNewFavoriteAddressCommand>().ReverseMap();
-            CreateMap<FavoriteAddress, GetFavoriteAddressByIdResponse>().ReverseMap(); 
+            CreateMap<FavoriteAddress, GetFavoriteAddressByIdResponse>().ReverseMap();
             CreateMap<FavoriteAddress, GetFavoriteAddressByUserIdResponse>().ReverseMap();
             #endregion
 
@@ -150,6 +151,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<TimeLine, GetListTimelineByParkingPriceIdResponse>().ReverseMap();
             #endregion
 
+            #region Booking Mapping
+            CreateMap<Booking, CreateBookingCommand>().ReverseMap();
+            #endregion
         }
     }
 }

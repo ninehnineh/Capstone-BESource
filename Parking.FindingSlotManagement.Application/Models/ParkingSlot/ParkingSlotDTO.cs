@@ -10,6 +10,5 @@ namespace Parking.FindingSlotManagement.Application.Models.ParkingSlot
     {
         public string? Name { get; set; }
         public int? FloorId { get; set; }
-        public int? ParkingId { get; set; }
     }
 }

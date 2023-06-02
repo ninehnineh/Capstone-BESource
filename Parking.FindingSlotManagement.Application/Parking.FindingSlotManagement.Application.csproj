@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <Folder Include="Features\Admin\Accounts\NonCensorshipManagerAccount\Commands\" />
+    <Folder Include="Features\Customer\Booking\Queries\" />
     <Folder Include="Features\Manager\Account\ManagerAccountManagement\Queries\" />
     <Folder Include="Features\Manager\Account\StaffAccountManagement\Queries\" />
     <Folder Include="Features\Manager\Parkings\ParkingManagement\Queries\" />
