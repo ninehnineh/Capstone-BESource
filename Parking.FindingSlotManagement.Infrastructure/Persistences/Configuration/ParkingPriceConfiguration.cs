@@ -28,6 +28,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                     .HasForeignKey(x => x.UserId)
                     .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK__Business__ParkingPri__sdwq23dca");
+
+            builder.HasOne(x => x.Traffic)
+                .WithMany(x => x.ParkingPrices)
+                .HasForeignKey(x => x.TrafficId)
+                .HasConstraintName("FK__Traffic_Parkingpri");
         }
     }
 }

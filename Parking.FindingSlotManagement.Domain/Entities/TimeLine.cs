@@ -24,8 +24,7 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public decimal? PenaltyPrice { get; set; }
         public float? PenaltyPriceStepTime { get; set; }
 
-        public int? TrafficId { get; set; }
-        public virtual Traffic? Traffic { get; set; }
+
         public int? ParkingPriceId { get; set; }
         public ParkingPrice? ParkingPrice { get; set; }
 
