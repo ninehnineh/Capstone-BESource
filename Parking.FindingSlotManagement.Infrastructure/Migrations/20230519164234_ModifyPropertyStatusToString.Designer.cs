@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 
@@ -11,9 +12,10 @@ using Parking.FindingSlotManagement.Infrastructure.Persistences;
 namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ParkZDbContext))]
-    partial class ParkZDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230519164234_ModifyPropertyStatusToString")]
+    partial class ModifyPropertyStatusToString
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,8 +30,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ParkingSlotID");
 
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time");
 
                     b.Property<DateTime>("DateBook")
                         .HasColumnType("date");
@@ -44,14 +46,14 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookingId"), 1L, 1);
 
-                    b.Property<DateTime?>("CheckinTime")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan?>("CheckinTime")
+                        .HasColumnType("time");
 
-                    b.Property<DateTime?>("CheckoutTime")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan?>("CheckoutTime")
+                        .HasColumnType("time");
 
-                    b.Property<DateTime?>("EndTime")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan?>("EndTime")
+                        .HasColumnType("time");
 
                     b.Property<string>("GuestName")
                         .HasMaxLength(50)
@@ -67,10 +69,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                         .HasMaxLength(225)
                         .IsUnicode(false)
                         .HasColumnType("varchar(225)");
-
-                    b.Property<string>("QRImage")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("QrcodeText")
                         .HasMaxLength(225)
@@ -392,9 +390,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Property<bool?>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsStartAndEndNull")
-                        .HasColumnType("bit");
-
                     b.Property<string>("ParkingPriceName")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
@@ -545,7 +540,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                         {
                             RoleId = 3,
                             IsActive = true,
-                            Name = "Customer"
+                            Name = "Admin"
                         });
                 });
 
@@ -617,7 +612,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Property<float?>("PenaltyPriceStepTime")
                         .HasColumnType("real");
 
-                    b.Property<decimal>("Price")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("money");
 
                     b.Property<TimeSpan?>("StartTime")

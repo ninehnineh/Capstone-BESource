@@ -32,7 +32,17 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
 
             builder.Property(e => e.DateBook).HasColumnType("date");
 
+            //builder.Property(e => e.StartTime).HasColumnType("datetime2");
+
+            builder.Property(e => e.CheckinTime).HasColumnType("datetime2");
+
+            builder.Property(e => e.CheckoutTime).HasColumnType("datetime2");
+
+            builder.Property(e => e.EndTime).HasColumnType("datetime2");
+
             builder.Property(e => e.ActualPrice).HasColumnType("money");
+
+            builder.Property(e => e.QRImage).HasMaxLength(255);
 
             builder.Property(e => e.BookingId)
                 .ValueGeneratedOnAdd()
@@ -48,6 +58,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
             builder.Property(e => e.PaymentMethod)
                 .HasMaxLength(225)
                 .IsUnicode(false);
+
+            builder.Property(e => e.Status)
+                .HasMaxLength(30);
 
             builder.Property(e => e.QrcodeText)
                 .HasMaxLength(225)

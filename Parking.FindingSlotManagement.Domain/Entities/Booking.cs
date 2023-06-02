@@ -10,22 +10,23 @@ namespace Parking.FindingSlotManagement.Domain.Entities
 {
     public class Booking 
     {
-        public TimeSpan StartTime { get; set; }
+        public DateTime StartTime { get; set; }
         public DateTime DateBook { get; set; }
         public int ParkingSlotId { get; set; }
         public int BookingId { get; set; }
-        public TimeSpan? EndTime { get; set; }
-        public TimeSpan? CheckinTime { get; set; }
-        public TimeSpan? CheckoutTime { get; set; }
+        public DateTime? EndTime { get; set; }
+        public DateTime? CheckinTime { get; set; }
+        public DateTime? CheckoutTime { get; set; }
         public decimal? ActualPrice { get; set; }
         public string? QrcodeText { get; set; }
-        public int? Status { get; set; }
+        public string? Status { get; set; }
         public string? GuestName { get; set; }
         public string? GuestPhone { get; set; }
         public decimal? TotalPrice { get; set; }
         public string? PaymentMethod { get; set; }
         public string? TmnCodeVnPay { get; set; }
-        
+        public string? QRImage { get; set; }
+
         public int? UserId { get; set; }
         public virtual User? User { get; set; }
         public int? VehicleInforId { get; set; }

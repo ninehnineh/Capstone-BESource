@@ -11,7 +11,7 @@ namespace Parking.FindingSlotManagement.Domain.Entities
     {
         public int TimeLineId { get; set; }
         public string? Name { get; set; }
-        public decimal? Price { get; set; }
+        public decimal Price { get; set; }
         public string? Description { get; set; }
         public bool? IsActive { get; set; }
         public TimeSpan? StartTime { get; set; }
