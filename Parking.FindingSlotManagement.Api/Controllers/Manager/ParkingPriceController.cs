@@ -67,8 +67,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <summary>
         /// Api for Manager to disable or enable parking price
         /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// SignalR: LoadParkingPrice
+        /// </remarks>
         [HttpPut("disable-or-enable-parking-price")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -78,11 +79,12 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
             try
             {
                 var res = await _mediator.Send(command);
-                if (res.Message == "Thành công")
+                if (res.Message != "Thành công")
                 {
                     return StatusCode((int)res.StatusCode, res);
                 }
-                return StatusCode((int)res.StatusCode, res);
+                await _hubContext.Clients.All.SendAsync("LoadParkingPrice");
+                return NoContent();
             }
             catch (Exception ex)
             {
@@ -96,7 +98,12 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
                 return StatusCode((int)ResponseCode.BadRequest, errorResponse);
             }
         }
-        
+        /// <summary>
+        /// Api for Manager to modify the parking price
+        /// </summary>
+        /// <remarks>
+        /// SignalR: LoadParkingPrice
+        /// </remarks>
         [HttpPut("update-parking-price")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -106,11 +113,12 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
             try
             {
                 var res = await _mediator.Send(command);
-                if (res.Message == "Thành công")
+                if (res.Message != "Thành công")
                 {
                     return StatusCode((int)res.StatusCode, res);
                 }
-                return StatusCode((int)res.StatusCode, res);
+                await _hubContext.Clients.All.SendAsync("LoadParkingPrice");
+                return NoContent();
             }
             catch (Exception ex)
             {

@@ -1,4 +1,4 @@
-﻿/*using MediatR;
+﻿using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using System;
 using System.Collections.Generic;
@@ -21,6 +21,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
         {
             try
             {
+                TimeSpan res_Start = new();
+                TimeSpan res_End = new();
                 var checkTimelineExist = await _timelineRepository.GetById(request.TimeLineId);
                 if (checkTimelineExist == null)
                 {
@@ -31,6 +33,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                         StatusCode = 200
                     };
                 }
+                if (request.StartTime != null || request.EndTime != null || request.StartTime != null && request.EndTime != null)
+                {
+                    res_Start = TimeSpan.Parse(request.StartTime);
+                    res_End = TimeSpan.Parse(request.EndTime);
+                }
                 if (!string.IsNullOrEmpty(request.Name))
 
                 {
@@ -38,25 +45,24 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                 }
                 if (!string.IsNullOrEmpty(request.Price.ToString()))
                 {
-                    checkTimelineExist.Price = request.Price;
+                    checkTimelineExist.Price = (int)request.Price;
                 }
                 if (!string.IsNullOrEmpty(request.Description))
                 {
                     checkTimelineExist.Description = request.Description;
                 }
-                if (!string.IsNullOrEmpty(request.StartTime.ToString()) && !string.IsNullOrEmpty(request.StartTime.ToString()) || !string.IsNullOrEmpty(request.StartTime.ToString()) || !string.IsNullOrEmpty(request.StartTime.ToString()))
+                if (request.StartTime != null || request.EndTime != null || request.StartTime != null && request.EndTime != null)
                 {
-                    var res_Start = request.StartTime;
-                    var res_End = request.EndTime;
+                    
                     if (string.IsNullOrEmpty(request.StartTime.ToString()) == null)
                     {
-                        res_Start = checkTimelineExist.StartTime;
+                        res_Start = (TimeSpan)checkTimelineExist.StartTime;
                     }
                     if (string.IsNullOrEmpty(request.EndTime.ToString()) == null)
                     {
-                        res_End = checkTimelineExist.EndTime;
+                        res_End = (TimeSpan)checkTimelineExist.EndTime;
                     }
-                    if (res_Start.Value < DateTime.UtcNow.Date)
+/*                    if (res_Start.Value < DateTime.UtcNow.Date)
                     {
                         return new ServiceResponse<string>
                         {
@@ -64,8 +70,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                             StatusCode = 400,
                             Success = false,
                         };
-                    }
-                    if (res_End > DateTime.UtcNow.Date.AddDays(2))
+                    }*/
+                    /*if (res_End > DateTime.UtcNow.Date.AddDays(2))
                     {
                         return new ServiceResponse<string>
                         {
@@ -73,14 +79,14 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                             StatusCode = 400,
                             Success = false,
                         };
-                    }
-                    if (res_End.Value.TimeOfDay < res_Start.Value.TimeOfDay)
+                    }*/
+                   /* if (res_End.Value.TimeOfDay < res_Start.Value.TimeOfDay)
                     {
                         res_End = res_Start.Value.AddDays(1).Date
                             .AddHours(res_End.Value.Hour)
                             .AddMinutes(res_End.Value.Minute)
                             .AddSeconds(res_End.Value.Second);
-                    }
+                    }*/
                     var lstTimelineHasExist = await _timelineRepository.GetAllItemWithCondition(x => x.ParkingPriceId == checkTimelineExist.ParkingPriceId && x.IsActive == true && x.TimeLineId != checkTimelineExist.TimeLineId, null, x => x.TimeLineId, true);
                     var lastEntity = lstTimelineHasExist.FirstOrDefault();
                     if (lstTimelineHasExist.Count() > 0)
@@ -90,9 +96,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                         var gói_đang_định_dùng_start = res_Start;
                         var gói_đang_định_dùng_end = res_End;
                         //qua ngay hom sau
-                        if (gói_đang_định_dùng_end.Value.Date > gói_đang_định_dùng_start.Value.Date)
+                        if (gói_đang_định_dùng_end < gói_đang_định_dùng_start)
                         {
-                            if (gói_đang_định_dùng_start.Value.TimeOfDay < goi_cu_end.Value.TimeOfDay || gói_đang_định_dùng_end.Value.TimeOfDay > goi_cu_start.Value.TimeOfDay)
+                            if (gói_đang_định_dùng_start < goi_cu_end || gói_đang_định_dùng_end > goi_cu_start)
                             {
                                 return new ServiceResponse<string>
                                 {
@@ -104,7 +110,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                         }
                         else
                         {
-                            if (gói_đang_định_dùng_start.Value.TimeOfDay > goi_cu_end.Value.TimeOfDay || gói_đang_định_dùng_end.Value.TimeOfDay > goi_cu_start.Value.TimeOfDay)
+                            if (gói_đang_định_dùng_start < goi_cu_end || gói_đang_định_dùng_end < goi_cu_start)
                             {
                                 return new ServiceResponse<string>
                                 {
@@ -120,7 +126,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                     }
                     else
                     {
-                        if (res_Start.Value < DateTime.UtcNow.Date)
+                        /*if (res_Start.Value < DateTime.UtcNow.Date)
                         {
                             return new ServiceResponse<string>
                             {
@@ -144,7 +150,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                                 .AddHours(res_End.Value.Hour)
                                 .AddMinutes(res_End.Value.Minute)
                                 .AddSeconds(res_End.Value.Second);
-                        }
+                        }*/
                         checkTimelineExist.StartTime = res_Start;
                         checkTimelineExist.EndTime = res_End;
                     }
@@ -215,20 +221,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                         checkTimelineExist.PenaltyPriceStepTime = request.PenaltyPriceStepTime;
                     }
                 }
-                if (!string.IsNullOrEmpty(request.TrafficId.ToString()))
-                {
-                    var checkTrafficExist = await _trafficRepository.GetById(request.TrafficId);
-                    if (checkTrafficExist == null)
-                    {
-                        return new ServiceResponse<string>
-                        {
-                            Message = "Không tìm thấy phương tiện.",
-                            Success = true,
-                            StatusCode = 200
-                        };
-                    }
-                    checkTimelineExist.TrafficId = request.TrafficId;
-                }
                 await _timelineRepository.Update(checkTimelineExist);
                 return new ServiceResponse<string>
                 {
@@ -246,4 +238,3 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
         }
     }
 }
-*/
