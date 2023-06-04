@@ -21,7 +21,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
         public decimal? PenaltyPrice { get; set; }
         public float? PenaltyPriceStepTime { get; set; }
 
-        public int? TrafficId { get; set; }
         public int? ParkingPriceId { get; set; }
     }
 }

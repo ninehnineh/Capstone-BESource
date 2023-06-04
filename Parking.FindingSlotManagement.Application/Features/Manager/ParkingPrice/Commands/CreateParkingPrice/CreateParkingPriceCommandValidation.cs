@@ -13,20 +13,33 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
     {
         private readonly IParkingPriceRepository _parkingPriceRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ITrafficRepository _trafficRepository;
 
         public CreateParkingPriceCommandValidation(IParkingPriceRepository parkingPriceRepository,
-            IUserRepository userRepository)
+            IUserRepository userRepository, ITrafficRepository trafficRepository)
         {
             _parkingPriceRepository = parkingPriceRepository;
             _userRepository = userRepository;
-
+            _trafficRepository = trafficRepository;
             RuleFor(x => x.BusinessId)
-                .GreaterThan(0)
+                .NotEmpty().WithMessage("Vui lòng nhập {PropertyName}.")
+                .NotNull()
+                .GreaterThanOrEqualTo(0).WithMessage("{BusinessId} phải lớn hơn 0")
                 .MustAsync(async (id, token) =>
                 {
                     var exist = await _userRepository.GetItemWithCondition(x => x.UserId == id);
                     return exist != null;
                 }).WithMessage("Business không tồn tại");
+
+            RuleFor(x => x.TrafficId)
+                .NotEmpty().WithMessage("Vui lòng nhập {PropertyName}.")
+                .NotNull()
+                .GreaterThanOrEqualTo(0).WithMessage("{TrafficId} phải lớn hơn 0")
+                .MustAsync(async (id, token) =>
+                {
+                    var exist = await _trafficRepository.GetById(id);
+                    return exist != null;
+                }).WithMessage("Phương tiện không tồn tại");
 
             RuleFor(p => p.ParkingPriceName)
                 .NotEmpty().WithMessage("Vui lòng nhập {PropertyName}.")

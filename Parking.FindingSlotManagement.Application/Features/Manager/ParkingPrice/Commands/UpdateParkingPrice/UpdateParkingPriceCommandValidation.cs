@@ -12,14 +12,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
     public class UpdateParkingPriceCommandValidation : AbstractValidator<UpdateParkingPriceCommand>
     {
         private readonly IParkingPriceRepository _parkingPriceRepository;
-        private readonly IUserRepository _userRepository;
 
-        public UpdateParkingPriceCommandValidation(IParkingPriceRepository parkingPriceRepository,
-            IUserRepository userRepository)
+        public UpdateParkingPriceCommandValidation(IParkingPriceRepository parkingPriceRepository)
         {
             _parkingPriceRepository = parkingPriceRepository;
-            _userRepository = userRepository;
-
             RuleFor(x => x.ParkingPriceId)
                 .GreaterThan(0)
                 .MustAsync(async (ParkingPriceId, token) =>
@@ -29,13 +25,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
                     return exist != null;
                 }).WithMessage("'{PropertyValue}' không tồn tại");
 
-            RuleFor(x => x.BusinessId)
-                .GreaterThan(0)
-                .MustAsync(async (id, token) =>
-                {
-                    var exist = await _userRepository.GetItemWithCondition(x => x.UserId == id);
-                    return exist != null;
-                }).WithMessage("'{PropertyName}' không tồn tại");
 
             RuleFor(p => p.ParkingPriceName)
                 .NotEmpty().WithMessage("Vui lòng nhập {PropertyName}.")

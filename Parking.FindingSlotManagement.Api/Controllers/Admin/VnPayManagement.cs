@@ -25,7 +25,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             _messageHub = messageHub;
         }
         /// <summary>
-        /// API For Admin
+        /// API For Manager, Admin
         /// </summary>
         /// <remarks>
         /// SignalR: LoadVnPays
@@ -60,7 +60,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         }
 
         /// <summary>
-        /// API For Admin
+        /// API For Manager, Admin
         /// </summary>
         /// <remarks>
         /// SignalR: LoadVnPays
@@ -94,7 +94,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             }
         }
         /// <summary>
-        /// API For Admin
+        /// API For Manager, Admin
         /// </summary>
         /// <remarks>
         /// SignalR: LoadVnPays
@@ -123,7 +123,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             }
         }
         /// <summary>
-        /// API For Admin
+        /// API For Manager, Admin
         /// </summary>
         [HttpGet("{managerId}", Name = "GetVnpayInforByManagerId")]
         [Produces("application/json")]

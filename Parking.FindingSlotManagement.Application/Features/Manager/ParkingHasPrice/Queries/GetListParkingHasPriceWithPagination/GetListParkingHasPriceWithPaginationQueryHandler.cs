@@ -64,7 +64,7 @@ public class GetListParkingHasPriceWithPaginationQueryHandler :
 
         var listParkingHasPrice = await _parkingHasPriceRepository
             .GetAllItemWithPagination(
-                x => x.Parking!.ManagerId == request.ManagerId,
+                x => x.ParkingId == request.ParkingId,
                 includes,
                 x => x.ParkingHasPriceId, true,
                 request.PageNo,

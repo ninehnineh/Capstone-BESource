@@ -137,8 +137,14 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #endregion
 
             #region ParkingHasPrice Mapping
-            CreateMap<ParkingHasPrice, GetListParkingHasPriceWithPaginationResponse>().ReverseMap();
-            CreateMap<ParkingHasPrice, GetParkingHasPriceDetailWithPaginationResponse>().ReverseMap();
+            CreateMap<ParkingHasPrice, GetListParkingHasPriceWithPaginationResponse>()
+                .ForMember(dto => dto.ParkingName, act => act.MapFrom(obj => obj.Parking.Name))
+                .ForMember(dto => dto.ParkingPriceName, act => act.MapFrom(obj => obj.ParkingPrice.ParkingPriceName))
+                .ReverseMap();
+            CreateMap<ParkingHasPrice, GetParkingHasPriceDetailWithPaginationResponse>()
+                .ForMember(dto => dto.ParkingName, act => act.MapFrom(obj => obj.Parking.Name))
+                .ForMember(dto => dto.ParkingPriceName, act => act.MapFrom(obj => obj.ParkingPrice.ParkingPriceName))
+                .ReverseMap();
             CreateMap<ParkingHasPrice, CreateParkingHasPriceCommand>().ReverseMap();
             #endregion
 

@@ -11,34 +11,19 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasP
 {
     public class CreateParkingHasPriceCommandValidation : AbstractValidator<CreateParkingHasPriceCommand>
     {
-        private readonly IParkingRepository _parkingRepository;
-        private readonly IPackagePriceRepository _packagePriceRepository;
 
-        public CreateParkingHasPriceCommandValidation(IParkingRepository parkingRepository,
-            IPackagePriceRepository packagePriceRepository)
+        public CreateParkingHasPriceCommandValidation()
         {
-            _parkingRepository = parkingRepository;
-            _packagePriceRepository = packagePriceRepository;
 
             RuleFor(x => x.ParkingId)
                 .NotEmpty().WithMessage("Vui lòng nhập {PropertyName}")
                 .NotNull()
-                .GreaterThan(0)
-                .MustAsync(async (ParkingId, token) =>
-                    {
-                        var exist = await _parkingRepository.GetById(ParkingId!);
-                        return exist != null;
-                    }).WithMessage("{PropertyName} không tồn tại");
+                .GreaterThanOrEqualTo(0).WithMessage("{PropertyName} phải lớn hơn 0");
 
             RuleFor(x => x.ParkingPriceId)
                 .NotEmpty().WithMessage("Vui lòng nhập {PropertyName}")
                 .NotNull()
-                .GreaterThan(0)
-                .MustAsync(async (ParkingPriceId, token) =>
-                    {
-                        var exist = await _packagePriceRepository.GetById(ParkingPriceId!);
-                        return exist == null;
-                    }).WithMessage("{PropertyName} không tồn tại");
+                .GreaterThanOrEqualTo(0).WithMessage("{PropertyName} phải lớn hơn 0");
 
         }
     }

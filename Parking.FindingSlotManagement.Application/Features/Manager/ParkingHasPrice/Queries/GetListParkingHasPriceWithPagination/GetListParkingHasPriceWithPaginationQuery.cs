@@ -5,7 +5,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasP
 public class GetListParkingHasPriceWithPaginationQuery :
     IRequest<ServiceResponse<IEnumerable<GetListParkingHasPriceWithPaginationResponse>>>
 {   
-    public int ManagerId { get; set; }
+    public int ParkingId { get; set; }
     public int PageNo { get; set; }
     public int PageSize { get; set; }
 }
