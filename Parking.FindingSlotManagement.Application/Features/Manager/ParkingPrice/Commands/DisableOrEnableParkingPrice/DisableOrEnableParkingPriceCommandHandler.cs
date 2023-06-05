@@ -31,7 +31,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
                 return new ServiceResponse<string>
                 {
                     Message = "Thành công",
-                    StatusCode = 200,
+                    StatusCode = 204,
                     Success = true,
                 };
             }

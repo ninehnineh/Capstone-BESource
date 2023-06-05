@@ -26,7 +26,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             _messageHub = messageHub;
         }
         /// <summary>
-        /// API For Admin
+        /// API For Manager, Admin
         /// </summary>
         /// <remarks>
         /// SignalR: LoadPaypalList
@@ -61,7 +61,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             }
         }
         /// <summary>
-        /// API For Admin
+        /// API For For Manager, Admin
         /// </summary>
         /// <remarks>
         /// SignalR: LoadPaypalList
@@ -89,7 +89,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             }
         }
         /// <summary>
-        /// API For Admin
+        /// API For Manager, Admin
         /// </summary>
         /// <remarks>
         /// SignalR: LoadPaypalList
@@ -123,7 +123,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             }
         }
         /// <summary>
-        /// API For Admin
+        /// API For Manager, Admin
         /// </summary>
         [HttpGet("{managerId}", Name = "GetPaypalInforByManagerId")]
         [Produces("application/json")]
@@ -148,7 +148,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             }
         }
         /// <summary>
-        /// API For Admin
+        /// API For Manager, Admin
         /// </summary>
         [HttpGet(Name = "GetPaypalList")]
         [Produces("application/json")]

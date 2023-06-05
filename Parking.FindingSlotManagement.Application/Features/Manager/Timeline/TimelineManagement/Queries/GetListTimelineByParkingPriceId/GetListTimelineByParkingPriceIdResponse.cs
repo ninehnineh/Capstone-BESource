@@ -10,9 +10,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
     {
         public int TimeLineId { get; set; }
         public string? Name { get; set; }
-        public decimal? Price { get; set; }
-        public DateTime? StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
+        public decimal Price { get; set; }
+        public TimeSpan? StartTime { get; set; }
+        public TimeSpan? EndTime { get; set; }
         public int? StartingTime { get; set; }
     }
 }

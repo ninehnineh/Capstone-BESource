@@ -23,23 +23,17 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                .NotEmpty().WithMessage("Vui lòng nhập {Mô tả}.")
                .NotNull()
                .MaximumLength(250).WithMessage("{Mô tả} không được nhập quá 250 kí tự");
-            RuleFor(c => c.StartTime)
+            /*RuleFor(c => c.StartTime)
                .NotEmpty().WithMessage("Vui lòng nhập {Giờ bắt đầu}.")
                .NotNull();
             RuleFor(c => c.EndTime)
                .NotEmpty().WithMessage("Vui lòng nhập {Giờ kết thúc}.")
-               .NotNull();
+               .NotNull();*/
             RuleFor(c => c.StartingTime)
                 .NotEmpty().WithMessage("Vui lòng nhập {Số tiếng khởi điểm}.")
                 .NotNull()
                 .GreaterThanOrEqualTo(0).WithMessage("{Số tiếng khởi điểm} phải lớn hơn 0")
                 .LessThan(24).WithMessage("{Số tiếng khởi điểm} phải nhỏ hơn hoặc bằng 24");
-            RuleFor(c => c.TrafficId)
-                .NotEmpty().WithMessage("Vui lòng nhập {TrafficId}.")
-                .NotNull();
-            RuleFor(c => c.ParkingPriceId)
-                .NotEmpty().WithMessage("Vui lòng nhập {ParkingPriceId}.")
-                .NotNull();
         }
     }
 }
