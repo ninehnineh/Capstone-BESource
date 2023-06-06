@@ -79,7 +79,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 ParkingPriceName = "Gói cho xe ô tô",
                 BusinessId = 1,
                 TrafficId = 1
-            }; 
+            };
 
             // Act
             var result = await _validator.TestValidateAsync(request);
@@ -117,7 +117,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             _trafficRepositoryMock.Setup(x => x.GetById(request.TrafficId)).ReturnsAsync(trafficExist);
             // Act
             var response = await _handler.Handle(request, cancellationToken);
-            
+
 
             // Assert
             response.ShouldNotBeNull();
@@ -156,7 +156,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             _trafficRepositoryMock.Setup(x => x.GetById(request.TrafficId)).ReturnsAsync(trafficExist);
             // Act
             var response = await _handler.Handle(request, cancellationToken);
-            
+
 
             // Assert
             response.ShouldNotBeNull();

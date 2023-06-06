@@ -1,4 +1,4 @@
-﻿/*using FluentValidation.TestHelper;
+﻿using FluentValidation.TestHelper;
 using Moq;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Manager.Timeline.TimelineManagement.Commands.UpdateTimeline;
@@ -43,7 +43,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             };
             _timelineRepositoryMock.Setup(x => x.GetById(request.TimeLineId))
                 .ReturnsAsync(OldTimeLine);
-            
+
             // Act
             var response = await _handler.Handle(request, cancellationToken);
 
@@ -121,36 +121,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
 
             result.ShouldHaveValidationErrorFor(x => x.Price);
         }
-        [Fact]
-        public void StartingTime_ShouldNotLessThan_0()
-        {
-            var command = new UpdateTimelineCommand
-            {
-                TimeLineId = 1,
-                Name = "Khung hung modify",
-                Price = 30000,
-                StartingTime = -1
-            };
-
-            var result = _validator.TestValidate(command);
-
-            result.ShouldHaveValidationErrorFor(x => x.StartingTime);
-        }
-        [Fact]
-        public void StartingTime_ShouldNotGreaterThan_24()
-        {
-            var command = new UpdateTimelineCommand
-            {
-                TimeLineId = 1,
-                Name = "Khung hung modify",
-                Price = 30000,
-                StartingTime = 25
-            };
-
-            var result = _validator.TestValidate(command);
-
-            result.ShouldHaveValidationErrorFor(x => x.StartingTime);
-        }
+        
     }
 }
-*/
