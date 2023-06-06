@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 
@@ -11,9 +12,10 @@ using Parking.FindingSlotManagement.Infrastructure.Persistences;
 namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ParkZDbContext))]
-    partial class ParkZDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230606034037_DropPropertyAtTimeLine")]
+    partial class DropPropertyAtTimeLine
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -389,16 +391,10 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ParkingPriceId"), 1L, 1);
 
-                    b.Property<float?>("ExtraTimeStep")
-                        .HasColumnType("real");
-
                     b.Property<bool?>("HasPenaltyPrice")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsExtrafee")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsWholeDay")
@@ -622,7 +618,13 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Property<decimal?>("ExtraFee")
                         .HasColumnType("money");
 
+                    b.Property<float?>("ExtraTimeStep")
+                        .HasColumnType("real");
+
                     b.Property<bool?>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsExtrafee")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")

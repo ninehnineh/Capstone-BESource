@@ -13,6 +13,12 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public bool? IsActive { get; set; }
         public int UserId { get; set; }
         public bool IsWholeDay { get; set; }
+        public int? StartingTime { get; set; }
+        public bool? HasPenaltyPrice { get; set; }
+        public decimal? PenaltyPrice { get; set; }
+        public float? PenaltyPriceStepTime { get; set; }
+        public bool? IsExtrafee { get; set; }
+        public float? ExtraTimeStep { get; set; }
 
 
         public int? TrafficId { get; set; }
