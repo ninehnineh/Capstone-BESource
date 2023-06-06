@@ -82,7 +82,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasP
                 {
                     foreach (var item in lstParkingHasPrice)
                     {
-                        var checkParkingPriceExistVer2 = await _parkingPriceRepository.GetItemWithCondition(x => x.ParkingPriceId == item.ParkingPriceId);
+                        var checkParkingPriceExistVer2 = await _parkingPriceRepository.GetById(item.ParkingPriceId);
                         if(checkParkingPriceExistVer2.TrafficId == checkParkingPriceExist.TrafficId)
                         {
                             return new ServiceResponse<int>

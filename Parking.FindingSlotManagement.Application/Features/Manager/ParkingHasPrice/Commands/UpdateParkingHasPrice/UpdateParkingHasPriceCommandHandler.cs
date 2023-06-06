@@ -141,7 +141,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasP
                 return new ServiceResponse<string>
                 {
                     Message = "Thành công",
-                    StatusCode = 200,
+                    StatusCode = 204,
                     Success = true
                 };
             }

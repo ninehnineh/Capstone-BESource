@@ -15,17 +15,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
     public class CreateNewTimelineCommandHandler : IRequestHandler<CreateNewTimelineCommand, ServiceResponse<int>>
     {
         private readonly ITimelineRepository _timelineRepository;
-        private readonly ITrafficRepository _trafficRepository;
         private readonly IParkingPriceRepository _parkingPriceRepository;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MappingProfile());
         });
 
-        public CreateNewTimelineCommandHandler(ITimelineRepository timelineRepository, ITrafficRepository trafficRepository, IParkingPriceRepository parkingPriceRepository)
+        public CreateNewTimelineCommandHandler(ITimelineRepository timelineRepository, IParkingPriceRepository parkingPriceRepository)
         {
             _timelineRepository = timelineRepository;
-            _trafficRepository = trafficRepository;
             _parkingPriceRepository = parkingPriceRepository;
         }
         public async Task<ServiceResponse<int>> Handle(CreateNewTimelineCommand request, CancellationToken cancellationToken)
@@ -132,7 +130,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                         {
                             return new ServiceResponse<int>
                             {
-                                Message = "Gói không hợp lệ",
+                                Message = "Gói không hợp lệ.",
                                 StatusCode = 400,
                                 Success = false,
                             };
