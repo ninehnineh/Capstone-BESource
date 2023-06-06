@@ -21,7 +21,8 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public bool? IsFull { get; set; }
         public bool? IsPrepayment { get; set; }
         public bool? IsOvernight { get; set; }
-        public int? Stars { get; set; }
+        public float? Stars { get; set; }
+        public float? TotalStars { get; set; }
         public int? StarsCount { get; set; }
         public int? ManagerId { get; set; }
 
