@@ -57,12 +57,12 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
                 .NotNull()
                 .GreaterThanOrEqualTo(0).WithMessage("{Số tiếng khởi điểm} phải lớn hơn 0")
                 .LessThan(24).WithMessage("{Số tiếng khởi điểm} phải nhỏ hơn hoặc bằng 24");
-            RuleFor(c => c.PenaltyPrice)
+            /*RuleFor(c => c.PenaltyPrice)
                 .GreaterThan(0).WithMessage("{Giá tiền phạt} phải lớn hơn hoặc bằng 0");
             RuleFor(c => c.PenaltyPriceStepTime)
                 .GreaterThan(0).WithMessage("{Bước tính phí phạt} phải lớn hơn hoặc bằng 0");
             RuleFor(c => c.ExtraTimeStep)
-                .GreaterThan(0).WithMessage("{Bước tính phụ phí} phải lớn hơn hoặc bằng 0");
+                .GreaterThan(0).WithMessage("{Bước tính phụ phí} phải lớn hơn hoặc bằng 0");*/
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿/*using AutoMapper;
+﻿using AutoMapper;
 using FluentValidation;
 using FluentValidation.TestHelper;
 using Moq;
@@ -35,11 +35,17 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
         [Fact]
         public async Task Handle_Should_ReturnSuccessResult_WhenValidData()
         {
-            var command = new CreateParkingPriceCommand 
-            { 
-                BusinessId = 1, 
+            var command = new CreateParkingPriceCommand
+            {
+                BusinessId = 1,
                 ParkingPriceName = "Test",
-                TrafficId = 1
+                TrafficId = 1,
+                StartingTime = 1,
+                IsExtrafee = true,
+                ExtraTimeStep = 2,
+                HasPenaltyPrice = true,
+                PenaltyPrice = 30000,
+                PenaltyPriceStepTime = 2,
             };
 
             var checkUserExist = new User { UserId = 1 };
@@ -64,7 +70,12 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
         public async Task Should_Have_Error_When_ParkingPriceName_Is_LessThan_250()
         {
             // Arrange
-            var command = new CreateParkingPriceCommand { BusinessId = 1, ParkingPriceName = "testtesttesttesttesttesttesttesttesttestesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttestttesttesttesttesttesttesttesttesttesttestesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttestt", TrafficId = 1 };
+            var command = new CreateParkingPriceCommand 
+            { 
+                BusinessId = 1, 
+                ParkingPriceName = "testtesttesttesttesttesttesttesttesttestesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttestttesttesttesttesttesttesttesttesttesttestesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttestt", 
+                TrafficId = 1 
+            };
             var checkUserExist = new User { UserId = 1 };
             _userRepositoryMock.Setup(x => x.GetById(command.BusinessId)).ReturnsAsync(checkUserExist);
             var checkTrafficExist = new Traffic { TrafficId = 1 };
@@ -123,7 +134,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
         public async Task Should_Have_Error_When_BusinessId_Does_Not_Exist()
         {
             // Arrange
-            var command = new CreateParkingPriceCommand {BusinessId = 1, ParkingPriceName = "Test12", TrafficId = 1 };
+            var command = new CreateParkingPriceCommand { BusinessId = 1, ParkingPriceName = "Test12", TrafficId = 1 };
 
             var checkTrafficExist = new Traffic { TrafficId = 1 };
             _trafficRepositoryMock.Setup(x => x.GetById(command.TrafficId)).ReturnsAsync(checkTrafficExist);
@@ -183,7 +194,105 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 .WithErrorMessage("Phương tiện không tồn tại")
                 .WithSeverity(Severity.Error);
         }
-        
+        [Fact]
+        public async void StartingTime_ShouldNotBeEmpty()
+        {
+            var command = new CreateParkingPriceCommand
+            {
+                BusinessId = 1,
+                ParkingPriceName = "Test",
+                TrafficId = 1,
+                StartingTime = null,
+                IsExtrafee = true,
+            };
+            var checkUserExist = new User { UserId = 1 };
+            _userRepositoryMock.Setup(x => x.GetById(command.BusinessId)).ReturnsAsync(checkUserExist);
+            var checkTrafficExist = new Traffic { TrafficId = 1 };
+            _trafficRepositoryMock.Setup(x => x.GetById(command.TrafficId)).ReturnsAsync(checkTrafficExist);
+
+            var result = await _validator.TestValidateAsync(command);
+
+            // Assert
+            result.ShouldHaveValidationErrorFor(x => x.StartingTime)
+                .WithErrorMessage("Vui lòng nhập {Số tiếng khởi điểm}.")
+                .WithSeverity(Severity.Error);
+        }
+        [Fact]
+        public async void StartingTime_ShouldNotBeNull()
+        {
+            var command = new CreateParkingPriceCommand
+            {
+                BusinessId = 1,
+                ParkingPriceName = "Test",
+                TrafficId = 1,
+                IsExtrafee = true,
+                ExtraTimeStep = 2,
+                HasPenaltyPrice = true,
+                PenaltyPrice = 30000,
+                PenaltyPriceStepTime = 2,
+            };
+            var checkUserExist = new User { UserId = 1 };
+            _userRepositoryMock.Setup(x => x.GetById(command.BusinessId)).ReturnsAsync(checkUserExist);
+            var checkTrafficExist = new Traffic { TrafficId = 1 };
+            _trafficRepositoryMock.Setup(x => x.GetById(command.TrafficId)).ReturnsAsync(checkTrafficExist);
+            var result = await _validator.TestValidateAsync(command);
+
+            // Assert
+            result.ShouldHaveValidationErrorFor(x => x.StartingTime)
+                .WithErrorMessage("Vui lòng nhập {Số tiếng khởi điểm}.")
+                .WithSeverity(Severity.Error);
+        }
+        [Fact]
+        public async void StartingTime_ShouldNotLessThan_0()
+        {
+            var command = new CreateParkingPriceCommand
+            {
+                BusinessId = 1,
+                ParkingPriceName = "Test",
+                TrafficId = 1,
+                StartingTime = -1,
+                IsExtrafee = true,
+                ExtraTimeStep = 2,
+                HasPenaltyPrice = true,
+                PenaltyPrice = 30000,
+                PenaltyPriceStepTime = 2,
+            };
+            var checkUserExist = new User { UserId = 1 };
+            _userRepositoryMock.Setup(x => x.GetById(command.BusinessId)).ReturnsAsync(checkUserExist);
+            var checkTrafficExist = new Traffic { TrafficId = 1 };
+            _trafficRepositoryMock.Setup(x => x.GetById(command.TrafficId)).ReturnsAsync(checkTrafficExist);
+            var result = await _validator.TestValidateAsync(command);
+
+            // Assert
+            result.ShouldHaveValidationErrorFor(x => x.StartingTime)
+                .WithErrorMessage("{Số tiếng khởi điểm} phải lớn hơn 0")
+                .WithSeverity(Severity.Error);
+        }
+        [Fact]
+        public async void StartingTime_ShouldNotGreaterThan_24()
+        {
+            var command = new CreateParkingPriceCommand
+            {
+                BusinessId = 1,
+                ParkingPriceName = "Test",
+                TrafficId = 1,
+                StartingTime = 25,
+                IsExtrafee = true,
+                ExtraTimeStep = 2,
+                HasPenaltyPrice = true,
+                PenaltyPrice = 30000,
+                PenaltyPriceStepTime = 2,
+            };
+            var checkUserExist = new User { UserId = 1 };
+            _userRepositoryMock.Setup(x => x.GetById(command.BusinessId)).ReturnsAsync(checkUserExist);
+            var checkTrafficExist = new Traffic { TrafficId = 1 };
+            _trafficRepositoryMock.Setup(x => x.GetById(command.TrafficId)).ReturnsAsync(checkTrafficExist);
+            var result = await _validator.TestValidateAsync(command);
+
+            // Assert
+            result.ShouldHaveValidationErrorFor(x => x.StartingTime)
+                .WithErrorMessage("{Số tiếng khởi điểm} phải nhỏ hơn hoặc bằng 24")
+                .WithSeverity(Severity.Error);
+        }
     }
 }
-*/

@@ -1,4 +1,4 @@
-﻿/*using FluentValidation.TestHelper;
+﻿using FluentValidation.TestHelper;
 using Moq;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Manager.Timeline.TimelineManagement.Commands.CreateNewTimeline;
@@ -37,13 +37,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 Description = "Gói giữ xe máy vào ban ngày",
                 StartTime = "06:00:00",
                 EndTime = "18:00:00",
-                StartingTime = 2,
-                IsExtrafee = true,
                 ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
                 ParkingPriceId = 1
             };
 
@@ -75,13 +69,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 Description = "Gói giữ xe máy vào ban ngày",
                 StartTime = "06:00:00",
                 EndTime = "18:00:00",
-                StartingTime = 2,
-                IsExtrafee = true,
                 ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
                 ParkingPriceId = 1
             };
 
@@ -110,13 +98,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 Description = "Gói giữ xe máy vào ban ngày",
                 StartTime = "06:00:00",
                 EndTime = "08:00:00",
-                StartingTime = 2,
-                IsExtrafee = true,
                 ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
                 ParkingPriceId = 1
             };
 
@@ -151,13 +133,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 Description = "Gói giữ xe máy vào ban ngày",
                 StartTime = "04:00:00",
                 EndTime = "04:00:00",
-                StartingTime = 2,
-                IsExtrafee = true,
                 ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
                 ParkingPriceId = 1
             };
 
@@ -169,7 +145,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             {
                 new TimeLine { TimeLineId = 2, ParkingPriceId = 1, StartTime = TimeSpan.Parse("18:00:00"), EndTime = TimeSpan.Parse("04:00:00")},
                 new TimeLine { TimeLineId = 1, ParkingPriceId = 1, StartTime = TimeSpan.Parse("06:00:00"), EndTime = TimeSpan.Parse("18:00:00")},
-                
+
             };
             _timelineRepositoryMock.Setup(x => x.GetAllItemWithCondition(x => x.ParkingPriceId == request.ParkingPriceId && x.IsActive == true, null, x => x.TimeLineId, true)).ReturnsAsync(lstTimeLine);
             // Act
@@ -193,13 +169,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 Description = "Gói giữ xe máy vào ban ngày",
                 StartTime = "02:00:00",
                 EndTime = "05:00:00",
-                StartingTime = 2,
-                IsExtrafee = true,
                 ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
                 ParkingPriceId = 1
             };
 
@@ -234,13 +204,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 Description = "Gói giữ xe máy vào ban ngày",
                 StartTime = "02:00:00",
                 EndTime = "05:00:00",
-                StartingTime = 2,
-                IsExtrafee = true,
                 ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
                 ParkingPriceId = 1
             };
 
@@ -257,13 +221,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 Description = "Gói giữ xe máy vào ban ngày",
                 StartTime = "02:00:00",
                 EndTime = "05:00:00",
-                StartingTime = 2,
-                IsExtrafee = true,
                 ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
                 ParkingPriceId = 1
             };
 
@@ -281,13 +239,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 Description = "Gói giữ xe máy vào ban ngày",
                 StartTime = "02:00:00",
                 EndTime = "05:00:00",
-                StartingTime = 2,
-                IsExtrafee = true,
                 ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
                 ParkingPriceId = 1
             };
 
@@ -305,13 +257,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 Description = "",
                 StartTime = "02:00:00",
                 EndTime = "05:00:00",
-                StartingTime = 2,
-                IsExtrafee = true,
                 ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
                 ParkingPriceId = 1
             };
 
@@ -328,13 +274,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 Price = 5000,
                 StartTime = "02:00:00",
                 EndTime = "05:00:00",
-                StartingTime = 2,
-                IsExtrafee = true,
                 ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
                 ParkingPriceId = 1
             };
 
@@ -352,13 +292,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 Description = "Gói giữ xe máy vào ban ngàyGói giữ xe máy vào ban ngàyGói giữ xe máy vào ban ngàyGói giữ xe máy vào ban ngàyGói giữ xe máy vào ban ngàyGói giữ xe máy vào ban ngàyvào ban ngàyGói giữ xe máy vào ban ngàyvào ban ngàyGói giữ xe máy vào ban ngàyvào ban ngàyGói giữ xe máy vào ban ngàyvào ban ngàyGói giữ xe máy vào ban ngàyvào ban ngàyGói giữ xe máy vào ban ngàyvào ban ngàyGói giữ xe máy vào ban ngàyvào ban ngàyGói giữ xe máy vào ban ngàyvào ban ngàyGói giữ xe máy vào ban ngày",
                 StartTime = "02:00:00",
                 EndTime = "05:00:00",
-                StartingTime = 2,
-                IsExtrafee = true,
                 ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
                 ParkingPriceId = 1
             };
 
@@ -376,13 +310,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 Description = "Gói giữ xe máy vào ban ngày",
                 StartTime = "02:00:00",
                 EndTime = "05:00:00",
-                StartingTime = 2,
-                IsExtrafee = true,
                 ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
                 ParkingPriceId = 1
             };
             var result = _validator.TestValidate(command);
@@ -398,13 +326,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 Description = "Gói giữ xe máy vào ban ngày",
                 StartTime = "02:00:00",
                 EndTime = "05:00:00",
-                StartingTime = 2,
-                IsExtrafee = true,
                 ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
                 ParkingPriceId = 1
             };
 
@@ -422,13 +344,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 Description = "Gói giữ xe máy vào ban ngày",
                 StartTime = "02:00:00",
                 EndTime = "05:00:00",
-                StartingTime = 2,
-                IsExtrafee = true,
                 ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
                 ParkingPriceId = 1
             };
 
@@ -436,100 +352,6 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
 
             result.ShouldHaveValidationErrorFor(x => x.Price);
         }
-        [Fact]
-        public void StartingTime_ShouldNotBeEmpty()
-        {
-            var command = new CreateNewTimelineCommand
-            {
-                Name = "Gói giữ xe ban ngày",
-                Price = 5000,
-                Description = "Gói giữ xe máy vào ban ngày",
-                StartTime = "02:00:00",
-                EndTime = "05:00:00",
-                StartingTime = null,
-                IsExtrafee = true,
-                ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
-                ParkingPriceId = 1
-            };
-            var result = _validator.TestValidate(command);
-
-            result.ShouldHaveValidationErrorFor(x => x.StartingTime);
-        }
-        [Fact]
-        public void StartingTime_ShouldNotBeNull()
-        {
-            var command = new CreateNewTimelineCommand
-            {
-                Name = "Gói giữ xe ban ngày",
-                Price = 5000,
-                Description = "Gói giữ xe máy vào ban ngày",
-                StartTime = "02:00:00",
-                EndTime = "05:00:00",
-                IsExtrafee = true,
-                ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
-                ParkingPriceId = 1
-            };
-
-            var result = _validator.TestValidate(command);
-
-            result.ShouldHaveValidationErrorFor(x => x.StartingTime);
-        }
-        [Fact]
-        public void StartingTime_ShouldNotLessThan_0()
-        {
-            var command = new CreateNewTimelineCommand
-            {
-                Name = "Gói giữ xe ban ngày",
-                Price = 5000,
-                Description = "Gói giữ xe máy vào ban ngày",
-                StartTime = "02:00:00",
-                EndTime = "05:00:00",
-                StartingTime = -1,
-                IsExtrafee = true,
-                ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
-                ParkingPriceId = 1
-            };
-
-            var result = _validator.TestValidate(command);
-
-            result.ShouldHaveValidationErrorFor(x => x.StartingTime);
-        }
-        [Fact]
-        public void StartingTime_ShouldNotGreaterThan_24()
-        {
-            var command = new CreateNewTimelineCommand
-            {
-                Name = "Gói giữ xe ban ngày",
-                Price = 5000,
-                Description = "Gói giữ xe máy vào ban ngày",
-                StartTime = "02:00:00",
-                EndTime = "05:00:00",
-                StartingTime = 25,
-                IsExtrafee = true,
-                ExtraFee = 20000,
-                ExtraTimeStep = 2,
-                HasPenaltyPrice = true,
-                PenaltyPrice = 30000,
-                PenaltyPriceStepTime = 2,
-                ParkingPriceId = 1
-            };
-
-            var result = _validator.TestValidate(command);
-
-            result.ShouldHaveValidationErrorFor(x => x.StartingTime);
-        }
+        
     }
 }
-*/
