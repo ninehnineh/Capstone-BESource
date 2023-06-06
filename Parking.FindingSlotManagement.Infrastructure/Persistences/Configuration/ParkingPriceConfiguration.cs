@@ -22,6 +22,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
             builder.Property(x => x.UserId)
                     .HasColumnName("BusinessId");
 
+            builder.Property(e => e.PenaltyPrice).HasColumnType("money");
+
+            builder.Property(e => e.StartingTime).HasColumnName("StartingTime")
+                .HasColumnType("int");
+
 
             builder.HasOne(x => x.User)
                     .WithMany(x => x.ParkingPrices)

@@ -16,14 +16,7 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public bool? IsActive { get; set; }
         public TimeSpan? StartTime { get; set; }
         public TimeSpan? EndTime { get; set; }
-        public int? StartingTime { get; set; }
-        public bool? IsExtrafee { get; set; }
         public decimal? ExtraFee { get; set; }
-        public float? ExtraTimeStep { get; set; }
-        public bool? HasPenaltyPrice { get; set; }
-        public decimal? PenaltyPrice { get; set; }
-        public float? PenaltyPriceStepTime { get; set; }
-
 
         public int? ParkingPriceId { get; set; }
         public ParkingPrice? ParkingPrice { get; set; }
