@@ -26,7 +26,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             _handler = new UpdateFloorCommandHandler(_floorRepositoryMock.Object, _parkingRepositoryMock.Object);
         }
         [Fact]
-        public async Task UpdateFloorCommandHandler_Should_Update_Traffic_Successfully()
+        public async Task UpdateFloorCommandHandler_Should_Update_Floor_Successfully()
         {
             // Arrange
             var request = new UpdateFloorCommand
@@ -62,7 +62,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             _floorRepositoryMock.Verify(x => x.Update(OldFloor), Times.Once);
         }
         [Fact]
-        public async Task UpdateFloorCommandHandler_Should_Return_Not_Found_If_Traffic_Does_Not_Exist()
+        public async Task UpdateFloorCommandHandler_Should_Return_Not_Found_If_Floor_Does_Not_Exist()
         {
             // Arrange
             var request = new UpdateFloorCommand

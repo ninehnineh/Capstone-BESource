@@ -23,12 +23,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
                     var exist = await _parkingPriceRepository
                         .GetItemWithCondition(x => x.ParkingPriceId == ParkingPriceId);
                     return exist != null;
-                }).WithMessage("'{PropertyValue}' không tồn tại");
+                }).WithMessage("'{PropertyName}' không tồn tại");
 
 
             RuleFor(p => p.ParkingPriceName)
-                .NotEmpty().WithMessage("Vui lòng nhập {PropertyName}.")
-                .NotNull()
                 .MaximumLength(250).WithMessage("{PropertyName} không được nhập quá 250 kí tự")
                 .MustAsync(async (command, context , token) =>
                 {

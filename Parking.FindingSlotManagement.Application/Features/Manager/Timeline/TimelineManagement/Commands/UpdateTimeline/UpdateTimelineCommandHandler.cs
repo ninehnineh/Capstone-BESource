@@ -11,11 +11,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
     public class UpdateTimelineCommandHandler : IRequestHandler<UpdateTimelineCommand, ServiceResponse<string>>
     {
         private readonly ITimelineRepository _timelineRepository;
-        private readonly ITrafficRepository _trafficRepository;
-        public UpdateTimelineCommandHandler(ITimelineRepository timelineRepository, ITrafficRepository trafficRepository)
+        public UpdateTimelineCommandHandler(ITimelineRepository timelineRepository)
         {
             _timelineRepository = timelineRepository;
-            _trafficRepository = trafficRepository;
         }
         public async Task<ServiceResponse<string>> Handle(UpdateTimelineCommand request, CancellationToken cancellationToken)
         {
