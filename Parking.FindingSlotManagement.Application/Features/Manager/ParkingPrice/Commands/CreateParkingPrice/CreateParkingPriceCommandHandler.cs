@@ -30,6 +30,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
         {
             try
             {
+                if(request.HasPenaltyPrice == false)
+                {
+                    request.PenaltyPrice = null;
+                    request.PenaltyPriceStepTime = null;
+                }
+                if(request.IsExtrafee == false)
+                {
+                    request.ExtraTimeStep = null;
+                }
                 var _mapper = config.CreateMapper();
                 var entity = _mapper.Map<Domain.Entities.ParkingPrice>(request);
 

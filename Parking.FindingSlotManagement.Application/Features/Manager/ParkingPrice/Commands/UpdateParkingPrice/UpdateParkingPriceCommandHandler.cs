@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿/*using MediatR;
 using NuGet.Protocol.Plugins;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using System;
@@ -85,3 +85,4 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
         }
     }
 }
+*/

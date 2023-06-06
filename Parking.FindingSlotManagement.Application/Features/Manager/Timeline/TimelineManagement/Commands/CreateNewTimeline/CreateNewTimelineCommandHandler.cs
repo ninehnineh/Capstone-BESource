@@ -44,17 +44,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
 
                 if(checkParkingPriceExist.IsWholeDay == true)
                 {
-                    if (request.IsExtrafee == false)
+                    if (checkParkingPriceExist.IsExtrafee == false)
                     {
-                        request.StartingTime = null;
                         request.ExtraFee = null;
-                        request.PenaltyPrice = null;
                     }
-                    if (request.HasPenaltyPrice == false)
-                    {
-                        request.PenaltyPrice = null;
-                        request.PenaltyPriceStepTime = null;
-                    }
+
                     var entityMapper = new CreateNewTimelineCommandMapper
                     {
                         Name = request.Name,
@@ -62,13 +56,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                         Description = request.Description,
                         StartTime = null,
                         EndTime = null,
-                        StartingTime = request.StartingTime,
-                        IsExtrafee = request.IsExtrafee,
                         ExtraFee = request.ExtraFee,
-                        ExtraTimeStep = request.ExtraTimeStep,
-                        HasPenaltyPrice = request.HasPenaltyPrice,
-                        PenaltyPrice = request.PenaltyPrice,
-                        PenaltyPriceStepTime = request.PenaltyPriceStepTime,
                         ParkingPriceId = request.ParkingPriceId
                     };
                     var _mapper = config.CreateMapper();
@@ -169,17 +157,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                             TimeSpan timeSpan = TimeSpan.ParseExact(resEndTime.ToString(), @"d\.hh\:mm\:ss", CultureInfo.InvariantCulture);
                             request.EndTime = timeSpan.ToString(@"hh\:mm\:ss");
                         }
-                        if (request.IsExtrafee == false)
+                        if (checkParkingPriceExist.IsExtrafee == false)
                         {
-                            request.StartingTime = null;
                             request.ExtraFee = null;
-                            request.PenaltyPrice = null;
                         }
-                        if (request.HasPenaltyPrice == false)
-                        {
-                            request.PenaltyPrice = null;
-                            request.PenaltyPriceStepTime = null;
-                        }
+
                         var entityMapper2 = new CreateNewTimelineCommandMapper
                         {
                             Name = request.Name,
@@ -187,13 +169,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                             Description = request.Description,
                             StartTime = TimeSpan.Parse(request.StartTime),
                             EndTime = TimeSpan.Parse(request.EndTime),
-                            StartingTime = request.StartingTime,
-                            IsExtrafee = request.IsExtrafee,
                             ExtraFee = request.ExtraFee,
-                            ExtraTimeStep = request.ExtraTimeStep,
-                            HasPenaltyPrice = request.HasPenaltyPrice,
-                            PenaltyPrice = request.PenaltyPrice,
-                            PenaltyPriceStepTime = request.PenaltyPriceStepTime,
                             ParkingPriceId = request.ParkingPriceId
                         };
                         var _mapper2 = config.CreateMapper();
@@ -233,17 +209,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                             .AddMinutes(request.EndTime.Value.Minute)
                             .AddSeconds(request.EndTime.Value.Second);
                     }*/
-                    if (request.IsExtrafee == false)
+                    if (checkParkingPriceExist.IsExtrafee == false)
                     {
-                        request.StartingTime = null;
                         request.ExtraFee = null;
-                        request.PenaltyPrice = null;
                     }
-                    if (request.HasPenaltyPrice == false)
-                    {
-                        request.PenaltyPrice = null;
-                        request.PenaltyPriceStepTime = null;
-                    }
+
                     var entityMapper = new CreateNewTimelineCommandMapper
                     {
                         Name = request.Name,
@@ -251,13 +221,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                         Description = request.Description,
                         StartTime = TimeSpan.Parse(request.StartTime),
                         EndTime = TimeSpan.Parse(request.EndTime),
-                        StartingTime = request.StartingTime,
-                        IsExtrafee = request.IsExtrafee,
                         ExtraFee = request.ExtraFee,
-                        ExtraTimeStep = request.ExtraTimeStep,
-                        HasPenaltyPrice = request.HasPenaltyPrice,
-                        PenaltyPrice = request.PenaltyPrice,
-                        PenaltyPriceStepTime = request.PenaltyPriceStepTime,
                         ParkingPriceId = request.ParkingPriceId
                     };
                     var _mapper = config.CreateMapper();

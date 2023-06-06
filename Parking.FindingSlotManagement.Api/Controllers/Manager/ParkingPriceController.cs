@@ -7,7 +7,6 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorMan
 using Parking.FindingSlotManagement.Application.Features.Manager.PackagePrice.PackagePriceManagement.Commands.DisableOrEnablePackagePrice;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingPrice.Commands.CreateParkingPrice;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingPrice.Commands.DisableOrEnableParkingPrice;
-using Parking.FindingSlotManagement.Application.Features.Manager.ParkingPrice.Commands.UpdateParkingPrice;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingPrice.Queries.GetAllParkingPrice;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using System.Drawing.Printing;
@@ -98,7 +97,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
                 return StatusCode((int)ResponseCode.BadRequest, errorResponse);
             }
         }
-        /// <summary>
+        /*/// <summary>
         /// Api for Manager to modify the parking price
         /// </summary>
         /// <remarks>
@@ -132,7 +131,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
                 return StatusCode((int)ResponseCode.BadRequest, errorResponse);
             }
         }
-
+*/
 
         /// <summary>
         /// Api for Manager
