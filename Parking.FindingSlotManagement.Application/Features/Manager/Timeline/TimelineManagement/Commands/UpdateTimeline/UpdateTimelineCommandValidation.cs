@@ -17,9 +17,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                 .GreaterThan(0).WithMessage("{Giá tiền của tiếng khởi điểm} phải lớn hơn 0");
             RuleFor(c => c.Description)
                .MaximumLength(250).WithMessage("{Mô tả} không được nhập quá 250 kí tự");
-            RuleFor(c => c.StartingTime)
-                .GreaterThanOrEqualTo(0).WithMessage("{Số tiếng khởi điểm} phải lớn hơn 0")
-                .LessThan(24).WithMessage("{Số tiếng khởi điểm} phải nhỏ hơn hoặc bằng 24");
         }
     }
 }

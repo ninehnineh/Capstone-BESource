@@ -51,7 +51,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                 }
                 if (request.StartTime != null || request.EndTime != null || request.StartTime != null && request.EndTime != null)
                 {
-                    
+
                     if (string.IsNullOrEmpty(request.StartTime.ToString()) == null)
                     {
                         res_Start = (TimeSpan)checkTimelineExist.StartTime;
@@ -60,7 +60,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                     {
                         res_End = (TimeSpan)checkTimelineExist.EndTime;
                     }
-/*                    if (res_Start.Value < DateTime.UtcNow.Date)
+/*                    if (res_Start < DateTime.UtcNow.Date)
                     {
                         return new ServiceResponse<string>
                         {
@@ -68,8 +68,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                             StatusCode = 400,
                             Success = false,
                         };
-                    }*/
-                    /*if (res_End > DateTime.UtcNow.Date.AddDays(2))
+                    }
+                    if (res_End > DateTime.UtcNow.Date.AddDays(2))
                     {
                         return new ServiceResponse<string>
                         {
@@ -77,8 +77,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                             StatusCode = 400,
                             Success = false,
                         };
-                    }*/
-                   /* if (res_End.Value.TimeOfDay < res_Start.Value.TimeOfDay)
+                    }
+                    if (res_End.Value.TimeOfDay < res_Start.Value.TimeOfDay)
                     {
                         res_End = res_Start.Value.AddDays(1).Date
                             .AddHours(res_End.Value.Hour)
@@ -154,7 +154,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                     }
 
                 }
-                if (!string.IsNullOrEmpty(request.IsExtrafee.ToString()))
+                /*if (!string.IsNullOrEmpty(request.IsExtrafee.ToString()))
                 {
                     if (request.IsExtrafee == false)
                     {
@@ -185,9 +185,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                     {
                         checkTimelineExist.ExtraTimeStep = request.ExtraTimeStep;
                     }
-                }
+                }*/
 
-                if (!string.IsNullOrEmpty(request.HasPenaltyPrice.ToString()))
+                /*if (!string.IsNullOrEmpty(request.HasPenaltyPrice.ToString()))
                 {
                     if (request.HasPenaltyPrice == false)
                     {
@@ -218,6 +218,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                     {
                         checkTimelineExist.PenaltyPriceStepTime = request.PenaltyPriceStepTime;
                     }
+                }*/
+                if(!string.IsNullOrEmpty(request.ExtraFee.ToString()))
+                {
+                    checkTimelineExist.ExtraFee = request.ExtraFee;
                 }
                 await _timelineRepository.Update(checkTimelineExist);
                 return new ServiceResponse<string>

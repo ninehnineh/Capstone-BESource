@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+﻿/*using FluentValidation;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingPrice.Commands.DisableOrEnableParkingPrice;
 using System;
@@ -39,3 +39,4 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
         }
     }
 }
+*/
