@@ -7,7 +7,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Account.StaffAc
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using System.Net;
 
-namespace Parking.FindingSlotManagement.Api.Controllers.Manager
+namespace Parking.FindingSlotManagement.Api.Controllers.Admin
 {
     [Route("api/staff-account-management")]
     [ApiController]
@@ -22,7 +22,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
             _messageHub = messageHub;
         }
         /// <summary>
-        /// API For Manager
+        /// API For Admin
         /// </summary>
         /// <remarks>
         /// SignalR: LoadStaffAccounts
@@ -40,9 +40,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
                 if (res.Message == "Thành công")
                 {
                     await _messageHub.Clients.All.SendAsync("LoadStaffAccounts");
-                    return StatusCode((int)res.StatusCode, res);
+                    return StatusCode(res.StatusCode, res);
                 }
-                return StatusCode((int)res.StatusCode, res);
+                return StatusCode(res.StatusCode, res);
             }
             catch (Exception ex)
             {
