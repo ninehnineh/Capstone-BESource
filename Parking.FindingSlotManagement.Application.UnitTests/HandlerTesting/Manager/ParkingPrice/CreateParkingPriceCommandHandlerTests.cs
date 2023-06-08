@@ -22,12 +22,15 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
         private readonly Mock<IMapper> _mapperMock;
         private readonly CreateParkingPriceCommandValidation _validator;
         private readonly Mock<IUserRepository> _userRepositoryMock;
+        private readonly Mock<ITrafficRepository> _trafficRepositoryMock;
         public CreateParkingPriceCommandHandlerTests()
         {
             _userRepositoryMock = new Mock<IUserRepository>();
             _parkingPriceRepositoryMock = new Mock<IParkingPriceRepository>();
+            _trafficRepositoryMock = new Mock<ITrafficRepository>();
             _mapperMock = new Mock<IMapper>();
-            _validator = new CreateParkingPriceCommandValidation(_parkingPriceRepositoryMock.Object, _userRepositoryMock.Object);
+            _validator = new CreateParkingPriceCommandValidation(_parkingPriceRepositoryMock.Object,
+                _userRepositoryMock.Object, _trafficRepositoryMock.Object);
         }
 
         [Fact]
