@@ -42,6 +42,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.ParkingPrice.Qu
 using Parking.FindingSlotManagement.Application.Features.Manager.Timeline.TimelineManagement.Commands.CreateNewTimeline;
 using Parking.FindingSlotManagement.Application.Features.Manager.Timeline.TimelineManagement.Queries.GetListTimelineByParkingPriceId;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands;
+using Parking.FindingSlotManagement.Application.Features.Customer.ParkingNearest.Queries.GetListParkingNearestYou;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -92,6 +93,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
 
             #region Parking Mapping
             CreateMap<Domain.Entities.Parking, CreateNewParkingCommand>().ReverseMap();
+            CreateMap<Domain.Entities.Parking, GetListParkingNearestYouQueryResponse>().ReverseMap();
             #endregion
 
             #region StaffParking Mapping

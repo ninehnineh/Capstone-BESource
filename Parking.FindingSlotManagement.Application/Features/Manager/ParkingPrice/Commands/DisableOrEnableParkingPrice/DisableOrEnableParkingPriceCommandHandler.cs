@@ -23,9 +23,24 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
             try
             {
                 var parkingPrice = await _parkingPriceRepository
-                    .GetItemWithCondition(x => x.ParkingPriceId == request.ParkingPriceId, null, false);
-
-                parkingPrice.IsActive = !parkingPrice.IsActive;
+                    .GetById(request.ParkingPriceId);
+                if (parkingPrice == null)
+                {
+                    return new ServiceResponse<string>
+                    {
+                        Message = "Không tìm thấy gói.",
+                        StatusCode = 200,
+                        Success = true
+                    };
+                }
+                if (parkingPrice.IsActive == false)
+                {
+                    parkingPrice.IsActive = true;
+                }
+                else if (parkingPrice.IsActive == true)
+                {
+                    parkingPrice.IsActive = false;
+                }
                 await _parkingPriceRepository.Save();
 
                 return new ServiceResponse<string>

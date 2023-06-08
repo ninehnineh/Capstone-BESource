@@ -347,11 +347,14 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("Stars")
-                        .HasColumnType("int");
+                    b.Property<float?>("Stars")
+                        .HasColumnType("real");
 
                     b.Property<int?>("StarsCount")
                         .HasColumnType("int");
+
+                    b.Property<float?>("TotalStars")
+                        .HasColumnType("real");
 
                     b.HasKey("ParkingId");
 

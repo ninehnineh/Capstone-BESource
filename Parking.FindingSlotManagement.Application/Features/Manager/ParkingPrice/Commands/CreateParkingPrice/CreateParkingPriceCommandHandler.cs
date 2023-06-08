@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Commands.CreateNewFloor;
+using Parking.FindingSlotManagement.Application.Mapping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,20 +16,30 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
     public class CreateParkingPriceCommandHandler : IRequestHandler<CreateParkingPriceCommand, ServiceResponse<int>>
     {
         private readonly IParkingPriceRepository _parkingPriceRepository;
-        private readonly IMapper _mapper;
+        MapperConfiguration config = new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile(new MappingProfile());
+        });
 
-        public CreateParkingPriceCommandHandler(IParkingPriceRepository parkingPriceRepository,
-            IMapper mapper)
+        public CreateParkingPriceCommandHandler(IParkingPriceRepository parkingPriceRepository)
         {
             _parkingPriceRepository = parkingPriceRepository;
-            _mapper = mapper;
         }
 
         public async Task<ServiceResponse<int>> Handle(CreateParkingPriceCommand request, CancellationToken cancellationToken)
         {
             try
             {
-
+                if(request.HasPenaltyPrice == false)
+                {
+                    request.PenaltyPrice = null;
+                    request.PenaltyPriceStepTime = null;
+                }
+                if(request.IsExtrafee == false)
+                {
+                    request.ExtraTimeStep = null;
+                }
+                var _mapper = config.CreateMapper();
                 var entity = _mapper.Map<Domain.Entities.ParkingPrice>(request);
 
                 entity.IsActive = true;
