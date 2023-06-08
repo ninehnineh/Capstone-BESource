@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using System;
 using System.Collections.Generic;
@@ -121,38 +121,37 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
 
                         checkTimelineExist.StartTime = res_Start;
                         checkTimelineExist.EndTime = res_End;
-                    }
-                    else
-                    {
-                        /*if (res_Start.Value < DateTime.UtcNow.Date)
-                        {
-                            return new ServiceResponse<string>
-                            {
-                                Message = "Ngày giờ bắt đầu phải bắt đầu trong khoảng từ 0h ngày hôm nay.",
-                                StatusCode = 400,
-                                Success = false,
-                            };
-                        }
-                        if (res_End > DateTime.UtcNow.Date.AddDays(2))
-                        {
-                            return new ServiceResponse<string>
-                            {
-                                Message = "Ngày giờ kết thúc không được vượt quá 1 ngày. Chỉ được set giờ cho đến ngày hôm sau.",
-                                StatusCode = 400,
-                                Success = false,
-                            };
-                        }
-                        if (res_End.Value.TimeOfDay < res_Start.Value.TimeOfDay)
-                        {
-                            res_End = res_Start.Value.AddDays(1).Date
-                                .AddHours(res_End.Value.Hour)
-                                .AddMinutes(res_End.Value.Minute)
-                                .AddSeconds(res_End.Value.Second);
-                        }*/
+                   }
+                   else
+                   {
+//                        /*if (res_Start.Value < DateTime.UtcNow.Date)
+//                        {
+//                            return new ServiceResponse<string>
+//                            {
+//                                Message = "Ngày giờ bắt đầu phải bắt đầu trong khoảng từ 0h ngày hôm nay.",
+//                                StatusCode = 400,
+//                                Success = false,
+//                            };
+//                        }
+//                        if (res_End > DateTime.UtcNow.Date.AddDays(2))
+//                        {
+//                            return new ServiceResponse<string>
+//                            {
+//                                Message = "Ngày giờ kết thúc không được vượt quá 1 ngày. Chỉ được set giờ cho đến ngày hôm sau.",
+//                                StatusCode = 400,
+//                                Success = false,
+//                            };
+//                        }
+//                        if (res_End.Value.TimeOfDay < res_Start.Value.TimeOfDay)
+//                        {
+//                            res_End = res_Start.Value.AddDays(1).Date
+//                                .AddHours(res_End.Value.Hour)
+//                                .AddMinutes(res_End.Value.Minute)
+//                                .AddSeconds(res_End.Value.Second);
+//                        }*/
                         checkTimelineExist.StartTime = res_Start;
-                        checkTimelineExist.EndTime = res_End;
-                    }
-
+                       checkTimelineExist.EndTime = res_End;
+                 }
                 }
                 /*if (!string.IsNullOrEmpty(request.IsExtrafee.ToString()))
                 {
@@ -232,11 +231,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
                 };
 
             }
-            catch (Exception ex)
+           catch (Exception ex)
             {
 
-                throw new Exception(ex.Message);
-            }
+              throw new Exception(ex.Message);
+           }
         }
     }
 }

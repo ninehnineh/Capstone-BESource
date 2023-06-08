@@ -19,7 +19,5 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         public string? PaymentMethod { get; set; }
         public int VehicleInforId { get; set; }
         public int UserId { get; set; }
-
-
     }
 }

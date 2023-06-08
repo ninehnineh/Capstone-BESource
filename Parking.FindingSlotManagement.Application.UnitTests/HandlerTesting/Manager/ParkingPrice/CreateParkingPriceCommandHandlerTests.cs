@@ -23,6 +23,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
         private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<ITrafficRepository> _trafficRepositoryMock;
         private readonly CreateParkingPriceCommandHandler _handler;
+
         public CreateParkingPriceCommandHandlerTests()
         {
             _userRepositoryMock = new Mock<IUserRepository>();
