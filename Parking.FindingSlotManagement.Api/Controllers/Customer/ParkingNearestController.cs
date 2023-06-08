@@ -7,7 +7,7 @@ using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Customer
 {
-    [Route("api/[controller]")]
+    [Route("api/parking-nearest")]
     [ApiController]
     public class ParkingNearestController : ControllerBase
     {
