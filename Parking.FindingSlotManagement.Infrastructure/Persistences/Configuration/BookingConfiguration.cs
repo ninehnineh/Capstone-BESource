@@ -30,7 +30,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
 
             builder.Property(e => e.ParkingSlotId).HasColumnName("ParkingSlotID");
 
-            builder.Property(e => e.DateBook).HasColumnType("date");
+            builder.Property(e => e.DateBook).HasColumnType("datetime2");
 
             //builder.Property(e => e.StartTime).HasColumnType("datetime2");
 
@@ -62,11 +62,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
             builder.Property(e => e.Status)
                 .HasMaxLength(30);
 
-            builder.Property(e => e.QrcodeText)
-                .HasMaxLength(225)
-                .IsUnicode(false)
-                .HasColumnName("QRCodeText");
-
             builder.Property(e => e.TmnCodeVnPay)
                 .HasMaxLength(20)
                 .IsUnicode(false);
@@ -86,6 +81,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.VehicleInforId)
                 .HasConstraintName("FK__Booking__Vehicle__4F7CD00D");
+
+            builder.HasOne(x => x.ParkingSlot)
+                .WithMany(p => p.Bookings)
+                .HasForeignKey(x => x.ParkingSlotId)
+                .HasConstraintName("FK__Booki__ParkSlo");
         }
     }
 }

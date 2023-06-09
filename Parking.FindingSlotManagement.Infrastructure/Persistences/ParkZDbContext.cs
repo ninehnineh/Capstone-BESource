@@ -24,7 +24,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences
         public DbSet<FieldWorkImg> FieldWorkImgs { get; set; } = null!;
         public DbSet<FavoriteAddress> FavoriteAddresses { get; set; } = null!;
         public DbSet<Floor> Floors { get; set; } = null!;
-        public DbSet<Notification> Notifications { get; set; } = null!;
         public DbSet<TimeLine> TimeLines { get; set; } = null!;
         public DbSet<Domain.Entities.Parking> Parkings { get; set; } = null!;
         public DbSet<ParkingHasPrice> ParkingHasPrices { get; set; } = null!;
