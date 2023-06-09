@@ -13,13 +13,10 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
     {
         public void Configure(EntityTypeBuilder<ParkingSlot> builder)
         {
-            builder.HasIndex(e => e.BookingId, "IX_ParkingSlots_BookingID");
 
             builder.HasIndex(e => e.FloorId, "IX_ParkingSlots_FloorID");
 
             builder.HasIndex(e => e.TrafficId, "IX_ParkingSlots_TrafficID");
-
-            builder.Property(e => e.BookingId).HasColumnName("BookingID");
 
             builder.Property(e => e.FloorId).HasColumnName("FloorID");
 
@@ -30,11 +27,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
 
             builder.Property(e => e.TrafficId).HasColumnName("TrafficID");
 
-            builder.HasOne(d => d.Booking)
-                .WithMany(p => p.ParkingSlots)
-                .HasPrincipalKey(p => p.BookingId)
-                .HasForeignKey(d => d.BookingId)
-                .HasConstraintName("FK__ParkingSl__Booki__5629CD9C");
+            //builder.HasOne(d => d.Booking)
+            //    .WithMany(p => p.ParkingSlots)
+            //    .HasPrincipalKey(p => p.BookingId)
+            //    .HasForeignKey(d => d.BookingId)
+            //    .HasConstraintName("FK__ParkingSl__Booki__5629CD9C");
 
             builder.HasOne(d => d.Floor)
                 .WithMany(p => p.ParkingSlots)

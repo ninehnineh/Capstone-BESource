@@ -1,14 +1,12 @@
-﻿using MediatR;
-using Parking.FindingSlotManagement.Application.Models.VehicleInfor;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands
+namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CreateBooking
 {
-    public class CreateBookingCommand : IRequest<ServiceResponse<string>>
+    public class BookingDto
     {
         public int ParkingSlotId { get; set; }
         public DateTime StartTime { get; set; }
