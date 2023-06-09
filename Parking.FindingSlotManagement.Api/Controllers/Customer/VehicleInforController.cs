@@ -93,7 +93,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
                 var errorResponse = new ErrorResponseModel(ResponseCode.BadRequest, "Validation Error: " + message.Remove(0, 31));
                 return StatusCode((int)ResponseCode.BadRequest, errorResponse);
             }
-        }/// <summary>
+        }
+        /// <summary>
          /// API For Customer
          /// </summary>
          /// <remarks>
