@@ -1,8 +1,11 @@
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Infrastructure.Firebase.PushService;
 using Parking.FindingSlotManagement.Infrastructure.Mail;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using Parking.FindingSlotManagement.Infrastructure.Repositories;
@@ -46,6 +49,15 @@ namespace Parking.FindingSlotManagement.Infrastructure
             services.AddScoped<IParkingSpotImageRepository, ParkingSpotImageRepository>();
             services.AddScoped<IParkingPriceRepository, ParkingPriceRepository>();
             services.AddScoped<ITimelineRepository, TimelineRepository>();
+
+            FirebaseApp.Create(new AppOptions
+            {
+                Credential = GoogleCredential
+                .FromFile(@"..\Parking.FindingSlotManagement.Infrastructure\Firebase\parkz-f1bd0-firebase-adminsdk-rjod0-8d0ba17bb5.json")
+            });
+
+            services.AddScoped<IFireBaseMessageServices, FireBaseMessageServices>();
+
             return services;
         }
     }
