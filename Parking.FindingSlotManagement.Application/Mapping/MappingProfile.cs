@@ -43,6 +43,8 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Timeli
 using Parking.FindingSlotManagement.Application.Features.Manager.Timeline.TimelineManagement.Queries.GetListTimelineByParkingPriceId;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands;
 using Parking.FindingSlotManagement.Application.Features.Customer.ParkingNearest.Queries.GetListParkingNearestYou;
+using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfoForGuest.VehicleInfoForGuestManagement.Commands.CreateVehicleInfoForGuest;
+using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfoForGuest.VehicleInfoForGuestManagement.Queries.GetVehicleInfoForGuestById;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -136,6 +138,8 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<VehicleInfor, GetVehicleInforByIdResponse>().ReverseMap();
             CreateMap<VehicleInfor, GetListVehicleInforByUserIdResponse>()
                 .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.Traffic.Name)).ReverseMap();
+            CreateMap<VehicleInfor, VehicleInfoForGuestCommand>().ReverseMap();
+            CreateMap<VehicleInfor, GetVehicleInfoForGuestByIdResponse>().ReverseMap();
             #endregion
 
             #region ParkingHasPrice Mapping
