@@ -45,6 +45,7 @@ using Parking.FindingSlotManagement.Application.Features.Customer.ParkingNearest
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CreateBooking;
 using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfoForGuest.VehicleInfoForGuestManagement.Commands.CreateVehicleInfoForGuest;
 using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfoForGuest.VehicleInfoForGuestManagement.Queries.GetVehicleInfoForGuestById;
+using Parking.FindingSlotManagement.Application.Features.Customer.Authentication.AuthenticationManagement.Commands.CustomerRegister;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -59,6 +60,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<User, RequestResponse>().ReverseMap();
             CreateMap<User, NonCensorshipManagerAccountResponse>().ReverseMap();
             CreateMap<User, CreateNewStaffAccountCommand>().ReverseMap();
+            CreateMap<User, CustomerRegisterCommand>().ReverseMap();
             #endregion
 
             #region Traffic Mapping

@@ -48,6 +48,18 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .IsUnicode(false)
                 .IsFixedLength();
 
+            builder.Property(e => e.IdCardNo)
+                .HasMaxLength(20);
+
+            builder.Property(e => e.IdCardDate)
+                .HasColumnType("date");
+
+            builder.Property(e => e.IdCardIssuedBy)
+                .HasMaxLength(255);
+
+            builder.Property(e => e.Address)
+                .HasMaxLength(255);
+
             builder.Property(e => e.RoleId).HasColumnName("RoleID");
 
             builder.HasOne(d => d.Manager)

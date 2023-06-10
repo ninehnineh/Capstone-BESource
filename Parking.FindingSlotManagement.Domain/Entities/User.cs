@@ -22,6 +22,10 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public bool? IsCensorship { get; set; }
         public int? ManagerId { get; set; }
         public int? RoleId { get; set; }
+        public string? IdCardNo { get; set; }
+        public DateTime? IdCardDate { get; set; }
+        public string? IdCardIssuedBy { get; set; }
+        public string? Address { get; set; }
 
         public virtual User? Manager { get; set; }
         public virtual Role? Role { get; set; }
