@@ -18,7 +18,6 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public DateTime? CheckinTime { get; set; }
         public DateTime? CheckoutTime { get; set; }
         public decimal? ActualPrice { get; set; }
-        public string? QrcodeText { get; set; }
         public string? Status { get; set; }
         public string? GuestName { get; set; }
         public string? GuestPhone { get; set; }
@@ -31,7 +30,6 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public virtual User? User { get; set; }
         public int? VehicleInforId { get; set; }
         public virtual VehicleInfor? VehicleInfor { get; set; }
-        public virtual ICollection<Notification> Notifications { get; set; }
-        public virtual ICollection<ParkingSlot> ParkingSlots { get; set; }
+        public ParkingSlot ParkingSlot { get; set; }
     }
 }
