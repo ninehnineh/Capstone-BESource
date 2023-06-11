@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Models;
@@ -15,10 +16,12 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Authentica
     public class CustomerLoginQueryHandler : IRequestHandler<CustomerLoginQuery, ServiceResponse<string>>
     {
         private readonly IUserRepository _userRepository;
+        private readonly IConfiguration _configuration;
         private readonly JwtSettings _jwtSettings;
-        public CustomerLoginQueryHandler(IUserRepository userRepository, IOptions<JwtSettings> jwtSettings)
+        public CustomerLoginQueryHandler(IUserRepository userRepository, IOptions<JwtSettings> jwtSettings, IConfiguration configuration)
         {
             _userRepository = userRepository;
+            _configuration = configuration;
             _jwtSettings = jwtSettings.Value;
         }
         public async Task<ServiceResponse<string>> Handle(CustomerLoginQuery request, CancellationToken cancellationToken)
@@ -50,7 +53,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Authentica
                 }
                 if (checkAccountExist.RoleId == 3 && checkAccountExist.IsActive == true)
                 {
-                    TokenManage token = new TokenManage(_jwtSettings);
+                    TokenManage token = new TokenManage(_jwtSettings, _configuration);
 
                     return new ServiceResponse<string>
                     {

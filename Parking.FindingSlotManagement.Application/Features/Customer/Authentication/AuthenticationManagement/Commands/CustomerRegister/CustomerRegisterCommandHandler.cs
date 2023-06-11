@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Customer.Authentication.AuthenticationManagement.Queries.CustomerLogin;
@@ -18,14 +19,16 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Authentica
     public class CustomerRegisterCommandHandler : IRequestHandler<CustomerRegisterCommand, ServiceResponse<string>>
     {
         private readonly IUserRepository _userRepository;
+        private readonly IConfiguration _configuration;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MappingProfile());
         });
         private readonly JwtSettings _jwtSettings;
-        public CustomerRegisterCommandHandler(IUserRepository userRepository, IOptions<JwtSettings> jwtSettings)
+        public CustomerRegisterCommandHandler(IUserRepository userRepository, IOptions<JwtSettings> jwtSettings, IConfiguration configuration)
         {
             _userRepository = userRepository;
+            _configuration = configuration;
             _jwtSettings = jwtSettings.Value;
         }
         public async Task<ServiceResponse<string>> Handle(CustomerRegisterCommand request, CancellationToken cancellationToken)
@@ -52,7 +55,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Authentica
                     x => x.Role
                 };
                 var checkAccountExist = await _userRepository.GetItemWithCondition(x => x.UserId == entity.UserId, includes);
-                TokenManage token = new TokenManage(_jwtSettings);
+                TokenManage token = new TokenManage(_jwtSettings, _configuration);
 
                 return new ServiceResponse<string>
                 {
