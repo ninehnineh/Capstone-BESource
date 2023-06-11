@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -9,6 +10,7 @@ using Parking.FindingSlotManagement.Infrastructure.Hubs;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Customer
 {
+    [Authorize(Roles = "Customer")]
     [Route("api/customer-booking")]
     [ApiController]
     public class BookingController : ControllerBase
@@ -22,7 +24,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
             _mediator = mediator;
             _hubContext = hubContext;
         }
-
+        /// <summary>
+        /// API For Customer
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<ServiceResponse<int>>> CreateBooking([FromBody] CreateBookingCommand command)
         {
@@ -49,7 +53,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
                 throw new Exception(ex.Message);
             }
         }
-
+        /// <summary>
+        /// API For Customer
+        /// </summary>
         [HttpPost("cancel-booking")]
         public async Task<ActionResult<ServiceResponse<string>>> CancelBooking([FromBody] CancelBookingCommand command)
         {
