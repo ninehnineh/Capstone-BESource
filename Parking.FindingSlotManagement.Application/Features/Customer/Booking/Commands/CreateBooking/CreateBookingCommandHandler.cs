@@ -206,9 +206,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     var bodyManager = _configuration.GetSection("MessageBody_Manager").GetSection("Success").Value;
 
                     var includeUser = new List<Expression<Func<StaffParking, object>>>
-                {
-                    x => x.User!,
-                };
+                    {
+                        x => x.User!,
+                    };
 
                     var deviceToken = "";
                     var staffParking = await _staffParkingRepository
@@ -220,7 +220,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         var pushNotificationModel = new PushNotificationWebModel
                         {
                             Title = titleManager,
-                            Message = bodyManager,
+                            Message = bodyManager + "Vị trí "+floor.FloorName + "-" + parkingSlot.Name,
                             TokenWeb = manager.Devicetoken,
                         };
                         await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
@@ -233,7 +233,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                             var pushNotificationModel = new PushNotificationWebModel
                             {
                                 Title = titleManager,
-                                Message = bodyManager,
+                                Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
                                 TokenWeb = deviceToken,
                             };
                             await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
@@ -246,7 +246,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     var pushNotificationMobile = new PushNotificationMobileModel
                     {
                         Title = titleCustomer,
-                        Message = bodyCustomer,
+                        Message = bodyCustomer + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
                         TokenMobile = request.DeviceToKenMobile,
                     };
 

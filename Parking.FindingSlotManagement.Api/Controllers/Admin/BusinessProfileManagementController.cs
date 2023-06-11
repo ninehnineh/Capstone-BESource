@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -23,6 +24,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             _mediator = mediator;
             _messageHub = messageHub;
         }
+
         /// <summary>
         /// API For Admin
         /// </summary>
