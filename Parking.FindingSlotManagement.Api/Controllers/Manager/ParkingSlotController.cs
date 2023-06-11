@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using MediatR.Registration;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -9,6 +10,7 @@ using Parking.FindingSlotManagement.Infrastructure.Hubs;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 {
+    [Authorize(Roles = "Manager")]
     [Route("api/parkingSlot")]
     [ApiController]
     public class ParkingSlotController : ControllerBase

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -12,6 +13,7 @@ using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Customer
 {
+    [Authorize(Roles = "Customer")]
     [Route("api/vehicle-infor-guest")]
     [ApiController]
     public class VehicleInforForGuestController : ControllerBase

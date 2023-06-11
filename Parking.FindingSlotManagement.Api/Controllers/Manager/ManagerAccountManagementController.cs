@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Parking.FindingSlotManagement.Application;
@@ -6,6 +7,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Account.Manager
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 {
+    [Authorize(Roles = "Manager")]
     [Route("api/my-manager-account")]
     [ApiController]
     public class ManagerAccountManagementController : ControllerBase
