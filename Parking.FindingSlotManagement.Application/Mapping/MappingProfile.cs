@@ -48,6 +48,7 @@ using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfoFor
 using Parking.FindingSlotManagement.Application.Features.Customer.Authentication.AuthenticationManagement.Commands.CustomerRegister;
 using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.StaffAccountManagement.Queries.GetListStaffAccount;
 using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.StaffAccountManagement.Queries.GetStaffAccountById;
+using Parking.FindingSlotManagement.Application.Features.Manager.Account.RegisterCensorshipBusinessAccount.Commands.RegisterBusinessAccount;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -67,6 +68,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<User, GetStaffAccountByIdResponse>()
                 .ForMember(dto => dto.RoleName, act => act.MapFrom(obj => obj.Role.Name))
                 .ReverseMap();
+            CreateMap<User, UserEntity>().ReverseMap();
             #endregion
 
             #region Traffic Mapping
@@ -82,6 +84,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ReverseMap();
             CreateMap<BusinessProfile, CreateNewBusinessProfileCommand>().ReverseMap();
             CreateMap<BusinessProfile, GetBusinessProfileResponse>().ReverseMap();
+            CreateMap<BusinessProfile, BusinessProfileEntity>().ReverseMap();
             #endregion
 
             #region VnPay Mapping
