@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -11,6 +12,7 @@ using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Admin
 {
+    [Authorize(Roles = "Admin")]
     [Route("api/business-profile-management")]
     [ApiController]
     public class BusinessProfileManagementController : ControllerBase
@@ -23,6 +25,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             _mediator = mediator;
             _messageHub = messageHub;
         }
+
         /// <summary>
         /// API For Admin
         /// </summary>

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -8,6 +9,7 @@ using Parking.FindingSlotManagement.Infrastructure.Hubs;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 {
+    [Authorize(Roles = "Manager")]
     [Route("api/booking-management")]
     [ApiController]
     public class BookingManagementController : ControllerBase
@@ -21,7 +23,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
             _mediator = mediator;
             _hubContext = hubContext;
         }
-
+        /// <summary>
+        /// API for Manager
+        /// </summary>
         [HttpPost("approve-booking")]
         public async Task<ActionResult<ServiceResponse<string>>> ApproveBooking([FromBody] ApproveBookingCommand command)
         {

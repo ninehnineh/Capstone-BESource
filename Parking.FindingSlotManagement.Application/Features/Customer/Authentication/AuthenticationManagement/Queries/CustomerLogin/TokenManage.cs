@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis.Options;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Parking.FindingSlotManagement.Application.Models;
 using Parking.FindingSlotManagement.Domain.Entities;
@@ -12,7 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Infrastructure.Repositories.AuthenticationRepositories
+namespace Parking.FindingSlotManagement.Application.Features.Customer.Authentication.AuthenticationManagement.Queries.CustomerLogin
 {
     public class TokenManage
     {
@@ -54,4 +52,3 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories.Authenticati
         }
     }
 }
-

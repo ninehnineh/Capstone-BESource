@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -30,6 +31,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remarks>
         /// SignalR: LoadParkingSpotImage
         /// </remarks>
+        [Authorize(Roles = "Manager")]
         [HttpPost(Name = "CreateNewParkingSpotImage")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
@@ -64,6 +66,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remarks>
         /// SignalR: LoadParkingSpotImage
         /// </remarks>
+        [Authorize(Roles = "Manager")]
         [HttpDelete("{parkingSpotImageId}", Name = "DeleteParkingSpotImage")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -93,6 +96,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remarks>
         /// SignalR: LoadParkingSpotImage
         /// </remarks>
+        [Authorize(Roles = "Manager")]
         [HttpPut("{parkingSpotImageId}", Name = "UpdateParkingSpotImage")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -122,8 +126,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
             }
         }
         /// <summary>
-        /// API For Manager, Customer, Staff
+        /// API For Manager, Customer, Keeper
         /// </summary>
+        [Authorize(Roles = "Manager,Customer,Keeper")]
         [HttpGet("{parkingId}", Name = "GetListParkingSpotImage")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]

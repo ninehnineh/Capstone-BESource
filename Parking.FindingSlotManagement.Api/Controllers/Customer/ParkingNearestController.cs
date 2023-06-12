@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Parking.FindingSlotManagement.Application;
@@ -7,6 +8,7 @@ using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Customer
 {
+    [Authorize(Roles = "Customer")]
     [Route("api/parking-nearest")]
     [ApiController]
     public class ParkingNearestController : ControllerBase

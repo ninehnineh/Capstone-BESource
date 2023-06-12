@@ -17,17 +17,14 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
     public class ApproveBookingCommandHandler : IRequestHandler<ApproveBookingCommand, ServiceResponse<string>>
     {
         private readonly IBookingRepository _bookingRepository;
-        private readonly IParkingSlotRepository _parkingSlotRepository;
         private readonly IConfiguration _configuration;
         private readonly IFireBaseMessageServices _fireBaseMessageServices;
 
         public ApproveBookingCommandHandler(IBookingRepository bookingRepository,
-            IParkingSlotRepository parkingSlotRepository,
             IConfiguration configuration,
             IFireBaseMessageServices fireBaseMessageServices)
         {
             _bookingRepository = bookingRepository;
-            _parkingSlotRepository = parkingSlotRepository;
             _configuration = configuration;
             _fireBaseMessageServices = fireBaseMessageServices;
         }
@@ -39,6 +36,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                 var include = new List<Expression<Func<Domain.Entities.Booking, object>>>
                 {
                     x => x.ParkingSlot,
+                    x => x.User,
+                    x => x.ParkingSlot,
+                    x => x.ParkingSlot.Floor
                 };
 
                 var booking = await _bookingRepository
@@ -52,16 +52,16 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                     .GetSection("Accept").Value;
                 var bodyCustomer = _configuration.GetSection("MessageBody_Customer")
                     .GetSection("Accept").Value;
-                //var DeviceToken = parkingSlot.Booking.User.Devicetoken;
+                var DeviceToken = booking.User.Devicetoken;
 
-                //var pushNotificationMobile = new PushNotificationMobileModel
-                //{
-                //    Title = titleCustomer,
-                //    Message = bodyCustomer,
-                //    TokenMobile = DeviceToken,
-                //};
+                var pushNotificationMobile = new PushNotificationMobileModel
+                {
+                    Title = titleCustomer,
+                    Message = bodyCustomer + "Vị trí đặt ở " + booking.ParkingSlot.Floor.FloorName + "-" + booking.ParkingSlot.Name,
+                    TokenMobile = DeviceToken,
+                };
 
-                //await _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
+                await _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
 
                 return new ServiceResponse<string>
                 {

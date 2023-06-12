@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Parking.FindingSlotManagement.Application;
@@ -7,6 +8,7 @@ using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Customer
 {
+    [Authorize(Roles = "Customer")]
     [Route("api/rating-stars")]
     [ApiController]
     public class RatingManagementController : ControllerBase
@@ -17,6 +19,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
         {
             _mediator = mediator;
         }
+        /// <summary>
+        /// API For Customer
+        /// </summary>
         [HttpPut(Name = "UpdateRating")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]

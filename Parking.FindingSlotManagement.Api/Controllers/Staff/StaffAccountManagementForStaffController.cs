@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Parking.FindingSlotManagement.Application;
@@ -6,6 +7,7 @@ using Parking.FindingSlotManagement.Application.Features.Staff.Accounts.StaffAcc
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Staff
 {
+    [Authorize(Roles = "Staff")]
     [Route("api/my-staff-account")]
     [ApiController]
     public class StaffAccountManagementForStaffController : ControllerBase

@@ -87,7 +87,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories.Authenticati
 
             if (user.Role!.Name!.Equals("Staff") && user!.IsActive == true)
             {
-                TokenManage token = new TokenManage(_jwtSettings);
+                TokenManage token = new TokenManage(_jwtSettings, _configuration);
 
                 response.Success = true;
                 response.Message = $"Chào mừng {user.Name}";
