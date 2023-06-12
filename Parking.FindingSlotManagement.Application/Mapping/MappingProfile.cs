@@ -46,6 +46,8 @@ using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Comman
 using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfoForGuest.VehicleInfoForGuestManagement.Commands.CreateVehicleInfoForGuest;
 using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfoForGuest.VehicleInfoForGuestManagement.Queries.GetVehicleInfoForGuestById;
 using Parking.FindingSlotManagement.Application.Features.Customer.Authentication.AuthenticationManagement.Commands.CustomerRegister;
+using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.StaffAccountManagement.Queries.GetListStaffAccount;
+using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.StaffAccountManagement.Queries.GetStaffAccountById;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -61,6 +63,10 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<User, NonCensorshipManagerAccountResponse>().ReverseMap();
             CreateMap<User, CreateNewStaffAccountCommand>().ReverseMap();
             CreateMap<User, CustomerRegisterCommand>().ReverseMap();
+            CreateMap<User, GetListStaffAccountResponse>().ReverseMap();
+            CreateMap<User, GetStaffAccountByIdResponse>()
+                .ForMember(dto => dto.RoleName, act => act.MapFrom(obj => obj.Role.Name))
+                .ReverseMap();
             #endregion
 
             #region Traffic Mapping
