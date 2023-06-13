@@ -48,7 +48,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Staf
                 {
                     return new ServiceResponse<GetStaffAccountByIdResponse>
                     {
-                        Message = "Tài khoản không phải staff",
+                        Message = "Tài khoản không phải staff.",
                         Success = true,
                         StatusCode = 400
                     };
@@ -57,7 +57,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Staf
                 {
                     Data = entity,
                     Success = true,
-                    StatusCode = 200
+                    StatusCode = 200,
+                    Message = "Thành công"
                 };
              }
             catch (Exception ex)

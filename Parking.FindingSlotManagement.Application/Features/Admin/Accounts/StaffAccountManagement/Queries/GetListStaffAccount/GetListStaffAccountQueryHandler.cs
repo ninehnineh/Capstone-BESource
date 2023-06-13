@@ -41,7 +41,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Staf
                 {
                     return new ServiceResponse<IEnumerable<GetListStaffAccountResponse>>
                     {
-                        Message = " Không tìm thấy tài khoản.",
+                        Message = "Không tìm thấy tài khoản.",
                         StatusCode = 200,
                         Success = true
                     };
