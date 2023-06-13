@@ -7,7 +7,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Account.Manager
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 {
-    [Authorize(Roles = "Manager")]
+    [Authorize(Roles = "Manager,Keeper")]
     [Route("api/my-manager-account")]
     [ApiController]
     public class ManagerAccountManagementController : ControllerBase

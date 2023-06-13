@@ -49,6 +49,9 @@ using Parking.FindingSlotManagement.Application.Features.Customer.Authentication
 using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.StaffAccountManagement.Queries.GetListStaffAccount;
 using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.StaffAccountManagement.Queries.GetStaffAccountById;
 using Parking.FindingSlotManagement.Application.Features.Manager.Account.RegisterCensorshipBusinessAccount.Commands.RegisterBusinessAccount;
+using Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccount.KeeperAccountManagement.Commands.CreateNewAccountForKeeper;
+using Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccount.KeeperAccountManagement.Queries.GetListKeeperByManagerId;
+using Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccount.KeeperAccountManagement.Queries.GetKeeperById;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -69,6 +72,11 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.RoleName, act => act.MapFrom(obj => obj.Role.Name))
                 .ReverseMap();
             CreateMap<User, UserEntity>().ReverseMap();
+            CreateMap<User, CreateNewAccountForKeeperCommand>().ReverseMap();
+            CreateMap<User, GetListKeeperByManagerIdResponse>().ReverseMap();
+            CreateMap<User, GetKeeperByIdResponse>()
+                .ForMember(dto => dto.RoleName, act => act.MapFrom(obj => obj.Role.Name))
+                .ReverseMap();
             #endregion
 
             #region Traffic Mapping
