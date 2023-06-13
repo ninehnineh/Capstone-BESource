@@ -36,15 +36,16 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Authentica
             try
             {
                 var checkUserExist = await _userRepository.GetItemWithCondition(x => x.Phone.Equals(request.Phone));
-                if(checkUserExist != null)
+                if(checkUserExist != null && checkUserExist.RoleId == 3)
                 {
                     return new ServiceResponse<string>
                     {
                         Message = "Số điện thoại đã được đăng kí.",
-                        StatusCode = 200,
+                        StatusCode = 400,
                         Success = true
                     };
                 }
+
                 var _mapper = config.CreateMapper();
                 var entity = _mapper.Map<User>(request);
                 entity.IsActive = true;
@@ -61,7 +62,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Authentica
                 {
                     Success = true,
                     Message = "Thành công",
-                    StatusCode = 200,
+                    StatusCode = 201,
                     Data = token.GenerateToken(checkAccountExist).ToString()!,
                 };
             }
