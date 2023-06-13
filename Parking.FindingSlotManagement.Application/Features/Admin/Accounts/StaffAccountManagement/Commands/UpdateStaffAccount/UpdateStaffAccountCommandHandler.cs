@@ -36,6 +36,17 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Staf
                 }
                 if(!string.IsNullOrEmpty(request.Email))
                 {
+                    var checkEmailExist = await _userRepository.GetItemWithCondition(x => x.Email.Equals(request.Email));
+                    if (checkEmailExist != null)
+                    {
+                        return new ServiceResponse<string>
+                        {
+                            StatusCode = 200,
+                            Success = true,
+                            Count = 0,
+                            Message = "Email đã tồn tại. Vui lòng nhập email khác!!!"
+                        };
+                    }
                     checkExist.Email = request.Email;
                 }
                 if(!string.IsNullOrEmpty(request.Avatar))
