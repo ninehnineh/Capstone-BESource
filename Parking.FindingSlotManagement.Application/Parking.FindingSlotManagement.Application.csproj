@@ -43,7 +43,6 @@
     <Folder Include="Features\Customer\Booking\Queries\" />
     <Folder Include="Features\Manager\Account\ManagerAccountManagement\Queries\" />
     <Folder Include="Features\Manager\Account\StaffAccountManagement\Queries\" />
-    <Folder Include="Features\Manager\Parkings\ParkingManagement\Queries\" />
     <Folder Include="Features\Manager\StaffPakings\StaffParkingManagement\Queries\" />
     <Folder Include="Features\Staff\Accounts\StaffAccountManagement\Queries\" />
   </ItemGroup>

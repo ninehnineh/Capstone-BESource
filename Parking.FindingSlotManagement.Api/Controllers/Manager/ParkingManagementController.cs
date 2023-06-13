@@ -8,6 +8,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Parkin
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.DisableOrEnableParking;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.UpdateLocationOfParking;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.UpdateParking;
+using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetListParkingByManagerId;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using System.Net;
 
@@ -155,6 +156,31 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
                 }
                 var errorResponse = new ErrorResponseModel(ResponseCode.BadRequest, "Validation Error: " + message.Remove(0, 31));
                 return StatusCode((int)ResponseCode.BadRequest, errorResponse);
+            }
+        }
+
+        /// <summary>
+        /// API For Manager
+        /// </summary>
+        /// 
+        [HttpGet(Name = "GetListParkingByManagerId")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<GetListParkingByManagerIdResponse>>>> GetListParkingByManagerId(int managerId, [FromQuery] int pageNo, [FromQuery] int pageSize)
+        {
+            try
+            {
+                var query = new GetListParkingByManagerIdQuery() { ManagerId = managerId, PageNo = pageNo, PageSize = pageSize };
+                var res = await _mediator.Send(query);
+
+                return StatusCode((int)res.StatusCode, res);
+
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
     }

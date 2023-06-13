@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccount.KeeperAccountManagement.Commands.CreateNewAccountForKeeper;
+using Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccount.KeeperAccountManagement.Commands.DisableOrEnableKeeperAccount;
 using Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccount.KeeperAccountManagement.Queries.GetKeeperById;
 using Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccount.KeeperAccountManagement.Queries.GetListKeeperByManagerId;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
@@ -82,6 +83,37 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
             }
             catch (Exception ex)
             {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Manager
+        /// </summary>
+        /// <remarks>
+        /// SignalR: LoadKeeperAccounts
+        /// </remarks>
+        /// 
+        [Authorize(Roles = "Manager")]
+        [HttpDelete("{keeperId}", Name = "DisableOrEnableKeeperAccount")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<ServiceResponse<string>>> DisableOrEnableKeeperAccount(int keeperId)
+        {
+            try
+            {
+                var command = new DisableOrEnableKeeperAccountCommand() { UserId = keeperId };
+                var res = await _mediator.Send(command);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                await _messageHub.Clients.All.SendAsync("LoadKeeperAccounts");
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }

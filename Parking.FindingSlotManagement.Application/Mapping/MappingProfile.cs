@@ -52,6 +52,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Account.Registe
 using Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccount.KeeperAccountManagement.Commands.CreateNewAccountForKeeper;
 using Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccount.KeeperAccountManagement.Queries.GetListKeeperByManagerId;
 using Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccount.KeeperAccountManagement.Queries.GetKeeperById;
+using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetListParkingByManagerId;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -115,6 +116,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #region Parking Mapping
             CreateMap<Domain.Entities.Parking, CreateNewParkingCommand>().ReverseMap();
             CreateMap<Domain.Entities.Parking, GetListParkingNearestYouQueryResponse>().ReverseMap();
+            CreateMap<Domain.Entities.Parking, GetListParkingByManagerIdResponse>().ReverseMap();
             #endregion
 
             #region StaffParking Mapping
