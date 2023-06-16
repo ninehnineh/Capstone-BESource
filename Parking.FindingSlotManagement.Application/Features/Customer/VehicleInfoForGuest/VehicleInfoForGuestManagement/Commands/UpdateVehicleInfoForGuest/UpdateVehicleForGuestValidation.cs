@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfoForGuest.VehicleInfoForGuestManagement.Commands.UpdateVehicleInfoForGuest
 {
-    public class UpdateVehicleInfoForGuestCommandValidation : AbstractValidator<UpdateVehicleInfoForGuestCommand>
+    public class UpdateVehicleForGuestValidation : AbstractValidator<UpdateVehicleInfoForGuestCommand>
     {
-        public UpdateVehicleInfoForGuestCommandValidation()
+        public UpdateVehicleForGuestValidation()
         {
             RuleFor(p => p.LicensePlate)
                 .MaximumLength(15).WithMessage("{Biển số xe} không được nhập quá 15 kí tự");
