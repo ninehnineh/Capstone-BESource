@@ -122,15 +122,15 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// </summary>
         /// 
         [Authorize(Roles = "Manager,Keeper")]
-        [HttpGet("{keeperId}", Name = "GetKeeperAccountById")]
+        [HttpGet("{userId}", Name = "GetAccountById")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ServiceResponse<GetKeeperByIdResponse>>> GetKeeperAccountById(int keeperId)
+        public async Task<ActionResult<ServiceResponse<GetKeeperByIdResponse>>> GetAccountById(int userId)
         {
             try
             {
-                var query = new GetKeeperByIdQuery { UserId = keeperId };
+                var query = new GetKeeperByIdQuery { UserId = userId };
                 var res = await _mediator.Send(query);
                 if (res.Message != "Thành công")
                 {
