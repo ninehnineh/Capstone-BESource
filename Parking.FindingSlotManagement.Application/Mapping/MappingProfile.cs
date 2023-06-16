@@ -53,6 +53,8 @@ using Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccount.K
 using Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccount.KeeperAccountManagement.Queries.GetListKeeperByManagerId;
 using Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccount.KeeperAccountManagement.Queries.GetKeeperById;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetListParkingByManagerId;
+using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetParkingById;
+using Parking.FindingSlotManagement.Application.Features.Customer.Parking.Queries.GetListParkingDesByRating;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -117,6 +119,10 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<Domain.Entities.Parking, CreateNewParkingCommand>().ReverseMap();
             CreateMap<Domain.Entities.Parking, GetListParkingNearestYouQueryResponse>().ReverseMap();
             CreateMap<Domain.Entities.Parking, GetListParkingByManagerIdResponse>().ReverseMap();
+            CreateMap<Domain.Entities.Parking, ParkingEntity>().ReverseMap();
+            CreateMap<Domain.Entities.Parking, ParkingShowInCusDto>()
+                .ForMember(dto => dto.Avatar, act => act.MapFrom(obj => obj.ParkingSpotImages.FirstOrDefault().ImgPath))
+                .ReverseMap();
             #endregion
 
             #region StaffParking Mapping

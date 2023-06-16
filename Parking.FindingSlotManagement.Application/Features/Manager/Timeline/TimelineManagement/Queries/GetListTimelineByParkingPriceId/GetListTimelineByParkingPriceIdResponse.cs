@@ -13,6 +13,5 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
         public decimal Price { get; set; }
         public TimeSpan? StartTime { get; set; }
         public TimeSpan? EndTime { get; set; }
-        public int? StartingTime { get; set; }
     }
 }
