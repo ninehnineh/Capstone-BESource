@@ -16,5 +16,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
         public float? Stars { get; set; }
         public int? MotoSpot { get; set; }
         public int? CarSpot { get; set; }
+        public string Avatar { get; set; }
     }
 }
