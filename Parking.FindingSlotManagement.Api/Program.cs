@@ -10,7 +10,6 @@ using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.Security.Claims;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -103,7 +102,7 @@ app.UseSwaggerUI(c =>
 
 app.UseHttpsRedirection();
 
-app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+app.UseCors();
 app.UseRouting();
 
 app.UseMiddleware<LogMiddleware>();

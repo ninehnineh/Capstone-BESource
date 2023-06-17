@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="EntityFramework" Version="6.4.4" />
     <PackageReference Include="FirebaseAdmin" Version="2.3.0" />
     <PackageReference Include="FirebaseAuthentication.net" Version="3.7.2" />
     <PackageReference Include="FluentValidation" Version="11.5.2" />
@@ -40,7 +41,6 @@
 
   <ItemGroup>
     <Folder Include="Features\Admin\Accounts\NonCensorshipManagerAccount\Commands\" />
-    <Folder Include="Features\Customer\Booking\Queries\" />
     <Folder Include="Features\Manager\Account\ManagerAccountManagement\Queries\" />
     <Folder Include="Features\Manager\Account\StaffAccountManagement\Queries\" />
     <Folder Include="Features\Manager\Parkings\ParkingManagement\Queries\" />

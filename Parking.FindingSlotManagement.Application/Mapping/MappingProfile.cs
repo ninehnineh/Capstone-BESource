@@ -46,6 +46,7 @@ using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Comman
 using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfoForGuest.VehicleInfoForGuestManagement.Commands.CreateVehicleInfoForGuest;
 using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfoForGuest.VehicleInfoForGuestManagement.Queries.GetVehicleInfoForGuestById;
 using Parking.FindingSlotManagement.Application.Features.Customer.Authentication.AuthenticationManagement.Commands.CustomerRegister;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetAvailableSlots;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -158,6 +159,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
 
             #region Parkingslots Mapping
             CreateMap<ParkingSlot, CreateParkingSlotsCommand>().ReverseMap();
+            CreateMap<ParkingSlot, GetAvailableSlotsResponse>().ReverseMap();
             #endregion
 
             #region Timeline Mapping
