@@ -44,24 +44,61 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                 var booking = await _bookingRepository
                     .GetItemWithCondition(x => x.BookingId == request.BookingId, include, false);
 
-                booking.Status = BookingStatus.Success.ToString();
-
-                await _bookingRepository.Save();
-
-                var titleCustomer = _configuration.GetSection("MessageTitle_Customer")
-                    .GetSection("Accept").Value;
-                var bodyCustomer = _configuration.GetSection("MessageBody_Customer")
-                    .GetSection("Accept").Value;
-                var DeviceToken = booking.User.Devicetoken;
-
-                var pushNotificationMobile = new PushNotificationMobileModel
+                if (booking == null)
                 {
-                    Title = titleCustomer,
-                    Message = bodyCustomer + "Vị trí đặt ở " + booking.ParkingSlot.Floor.FloorName + "-" + booking.ParkingSlot.Name,
-                    TokenMobile = DeviceToken,
-                };
+                    return new ServiceResponse<string>
+                    {
+                        Message = "Chỗ đặt không tồn tại.",
+                        StatusCode = 200,
+                        Success = true
+                    };
+                }
 
-                await _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
+                var listBooking = await _bookingRepository
+                    .GetAllItemWithCondition(x => x.ParkingSlotId == booking.ParkingSlotId &&
+                    x.DateBook.Date == DateTime.UtcNow.AddHours(7).Date);
+
+                var previousBookedSlot = listBooking
+                    .Where(x => x.EndTime <= booking.StartTime).FirstOrDefault();
+
+                if (previousBookedSlot == null)
+                {
+                    //booking.CheckinTime = request.CheckInTime;
+
+                    booking.Status = BookingStatus.Success.ToString();
+
+                    await _bookingRepository.Save();
+
+                    var titleCustomer = _configuration.GetSection("MessageTitle_Customer")
+                        .GetSection("Accept").Value;
+                    var bodyCustomer = _configuration.GetSection("MessageBody_Customer")
+                        .GetSection("Accept").Value;
+                    //var DeviceToken = booking.User.Devicetoken;
+
+                    var pushNotificationMobile = new PushNotificationMobileModel
+                    {
+                        Title = titleCustomer,
+                        Message = bodyCustomer + "Vị trí đặt ở " + booking.ParkingSlot.Floor.FloorName + "-" + booking.ParkingSlot.Name,
+                        //TokenMobile = DeviceToken,
+                    };
+
+                    await _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
+
+                    return new ServiceResponse<string>
+                    {
+                        Message = "Thành công",
+                        StatusCode = 201,
+                        Success = true,
+                    };
+                }
+                else if (previousBookedSlot.CheckoutTime != null &&
+                    previousBookedSlot.EndTime < DateTime.UtcNow.AddHours(7))
+                {
+                    return new ServiceResponse<string>
+                    {
+                        Message = "Chỗ đặt hiện tại đang bận, vui lòng chuyển chỗ",
+                    };
+                }
 
                 return new ServiceResponse<string>
                 {

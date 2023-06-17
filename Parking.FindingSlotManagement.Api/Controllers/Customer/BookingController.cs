@@ -1,16 +1,17 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CancelBooking;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CreateBooking;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.PaymentMethod;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetAvailableSlot;
+using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.CheckIn;
+using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Customer
 {
-    [Authorize(Roles = "Customer")]
     [Route("api/customer-booking")]
     [ApiController]
     public class BookingController : ControllerBase
@@ -65,6 +66,60 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
                 if (res.Message == "Thành công")
                 {
                     return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        [HttpPost("check-in")]
+        public async Task<ActionResult<ServiceResponse<string>>> CheckIn([FromBody] CheckInCommand command)
+        {
+            try
+            {
+                var res = await _mediator.Send(command);
+                if (res.Message == "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        [HttpGet("get-available-slots")]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<ParkingSlot>>>> Get([FromQuery] GetAvailableSlotsQuery query)
+        {
+            try
+            {
+                var res = await _mediator.Send(query);
+                if (res.Message == "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        [HttpPut("update-payment-method")]
+        public async Task<ActionResult<ServiceResponse<string>>> UpdatePaymentMethod([FromBody] PaymentMethodCommand command)
+        {
+            try
+            {
+                var res = await _mediator.Send(command);
+                if (res.Message == "Thành công")
+                {
+                    return NoContent();
                 }
                 return StatusCode((int)res.StatusCode, res);
             }
