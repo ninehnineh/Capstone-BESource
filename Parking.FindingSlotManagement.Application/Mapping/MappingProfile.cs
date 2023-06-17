@@ -47,6 +47,15 @@ using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfoFor
 using Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfoForGuest.VehicleInfoForGuestManagement.Queries.GetVehicleInfoForGuestById;
 using Parking.FindingSlotManagement.Application.Features.Customer.Authentication.AuthenticationManagement.Commands.CustomerRegister;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetAvailableSlots;
+using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.StaffAccountManagement.Queries.GetListStaffAccount;
+using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.StaffAccountManagement.Queries.GetStaffAccountById;
+using Parking.FindingSlotManagement.Application.Features.Manager.Account.RegisterCensorshipBusinessAccount.Commands.RegisterBusinessAccount;
+using Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccount.KeeperAccountManagement.Commands.CreateNewAccountForKeeper;
+using Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccount.KeeperAccountManagement.Queries.GetListKeeperByManagerId;
+using Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccount.KeeperAccountManagement.Queries.GetKeeperById;
+using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetListParkingByManagerId;
+using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetParkingById;
+using Parking.FindingSlotManagement.Application.Features.Customer.Parking.Queries.GetListParkingDesByRating;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -62,6 +71,16 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<User, NonCensorshipManagerAccountResponse>().ReverseMap();
             CreateMap<User, CreateNewStaffAccountCommand>().ReverseMap();
             CreateMap<User, CustomerRegisterCommand>().ReverseMap();
+            CreateMap<User, GetListStaffAccountResponse>().ReverseMap();
+            CreateMap<User, GetStaffAccountByIdResponse>()
+                .ForMember(dto => dto.RoleName, act => act.MapFrom(obj => obj.Role.Name))
+                .ReverseMap();
+            CreateMap<User, UserEntity>().ReverseMap();
+            CreateMap<User, CreateNewAccountForKeeperCommand>().ReverseMap();
+            CreateMap<User, GetListKeeperByManagerIdResponse>().ReverseMap();
+            CreateMap<User, GetKeeperByIdResponse>()
+                .ForMember(dto => dto.RoleName, act => act.MapFrom(obj => obj.Role.Name))
+                .ReverseMap();
             #endregion
 
             #region Traffic Mapping
@@ -77,6 +96,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ReverseMap();
             CreateMap<BusinessProfile, CreateNewBusinessProfileCommand>().ReverseMap();
             CreateMap<BusinessProfile, GetBusinessProfileResponse>().ReverseMap();
+            CreateMap<BusinessProfile, BusinessProfileEntity>().ReverseMap();
             #endregion
 
             #region VnPay Mapping
@@ -99,6 +119,11 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #region Parking Mapping
             CreateMap<Domain.Entities.Parking, CreateNewParkingCommand>().ReverseMap();
             CreateMap<Domain.Entities.Parking, GetListParkingNearestYouQueryResponse>().ReverseMap();
+            CreateMap<Domain.Entities.Parking, GetListParkingByManagerIdResponse>().ReverseMap();
+            CreateMap<Domain.Entities.Parking, ParkingEntity>().ReverseMap();
+            CreateMap<Domain.Entities.Parking, ParkingShowInCusDto>()
+                .ForMember(dto => dto.Avatar, act => act.MapFrom(obj => obj.ParkingSpotImages.FirstOrDefault().ImgPath))
+                .ReverseMap();
             #endregion
 
             #region StaffParking Mapping

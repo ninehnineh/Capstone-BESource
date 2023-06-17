@@ -85,7 +85,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             {
                 var parkingSlot = await _parkingSlotRepository
                     .GetById(request.BookingDto.ParkingSlotId);
-
                 if (parkingSlot == null)
                 {
                     return new ServiceResponse<string>
@@ -133,6 +132,33 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 //var vnpay = await _vnPayRepository
                 //    .GetItemWithCondition(x => x.ManagerId == managerId);
                 //entity.TmnCodeVnPay = vnpay.TmnCode;
+                /*List<Expression<Func<Domain.Entities.Booking, object>>> includes2 = new List<Expression<Func<Domain.Entities.Booking, object>>>
+                {
+                    x => x.ParkingSlot,
+                    x => x.ParkingSlot.Floor
+                };
+                var lstBooking = await _bookingRepository.GetAllItemWithCondition(x => x.ParkingSlotId == request.BookingDto.ParkingSlotId && x.ParkingSlot.FloorId == floor.FloorId && x.ParkingSlot.Floor.ParkingId == floor.ParkingId && x.DateBook.Date == DateTime.UtcNow.Date && x.Status != BookingStatus.Cancel.ToString(), includes2, null, true);
+                List<int> lstParkingSlotIdExist = new();
+                if(lstBooking.Count() > 0)
+                {
+                    foreach (var item in lstBooking)
+                    {
+                        if(request.BookingDto.StartTime < item.EndTime && request.BookingDto.EndTime > item.StartTime)
+                        {
+                            if(lstParkingSlotIdExist.Where(x => x.Equals(item.ParkingSlotId)).Count() <= 0)
+                            {
+                                lstParkingSlotIdExist.Add(item.ParkingSlotId);
+                            }
+                            
+                        }
+                    }
+                }
+                List<Expression<Func<Domain.Entities.ParkingSlot, object>>> includes3 = new List<Expression<Func<Domain.Entities.ParkingSlot, object>>>
+                {
+                    x => x.Floor,
+                };
+                var lstParkingSlot = await _parkingSlotRepository.GetAllItemWithCondition(x => x.FloorId == floor.FloorId && x.Floor.ParkingId == floor.ParkingId, includes3, null, true);
+                var filterParkingSlot = lstParkingSlot.Where(item => !lstParkingSlotIdExist.Contains(item.ParkingSlotId)).ToList();*/
 
                 // Set TotalPrice
 

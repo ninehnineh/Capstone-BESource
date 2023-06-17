@@ -61,7 +61,14 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Internal server error: " + ex.Message);
+                IEnumerable<string> list1 = new List<string> { "Severity: Error" };
+                string message = "";
+                foreach (var item in list1)
+                {
+                    message = ex.Message.Replace(item, string.Empty);
+                }
+                var errorResponse = new ErrorResponseModel(ResponseCode.BadRequest, "Validation Error: " + message.Remove(0, 31));
+                return StatusCode((int)ResponseCode.BadRequest, errorResponse);
             }
         }
     }
