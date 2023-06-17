@@ -1,15 +1,10 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using NuGet.Configuration;
-using Org.BouncyCastle.Utilities;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Models.Booking;
@@ -17,17 +12,10 @@ using Parking.FindingSlotManagement.Application.Models.PushNotification;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Domain.Enum;
 using QRCoder;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http.Headers;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CreateBooking
 {
@@ -95,8 +83,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         {
             try
             {
-                
-                var parkingSlot = await _parkingSlotRepository.GetById(request.BookingDto.ParkingSlotId);
+                var parkingSlot = await _parkingSlotRepository
+                    .GetById(request.BookingDto.ParkingSlotId);
                 if (parkingSlot == null)
                 {
                     return new ServiceResponse<string>
@@ -106,7 +94,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         StatusCode = 200
                     };
                 }
-                var vehicleInfor = await _vehicleInfoRepository.GetById(request.BookingDto.VehicleInforId);
+                var vehicleInfor = await _vehicleInfoRepository
+                    .GetById(request.BookingDto.VehicleInforId);
+
                 if (vehicleInfor == null)
                 {
                     return new ServiceResponse<string>
@@ -215,11 +205,29 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
                 entity.TotalPrice = totalPrice;
 
+                var listBooking = await _bookingRepository
+                    .GetAllItemWithCondition(x => x.DateBook.Date <= DateTime.UtcNow.Date &&
+                    x.ParkingSlotId == request.BookingDto.ParkingSlotId);
+
+                DateTime Gioloinhat = new();
+
+                if (listBooking.Count() > 0)
+                {
+                    foreach (var item in listBooking)
+                    {
+                        if (Gioloinhat < item.EndTime)
+                        {
+                            Gioloinhat = item.EndTime.Value;
+                        }
+                    }
+                }
+                
                 if (parkingSlot.IsAvailable == true)
                 {
                     parkingSlot.IsAvailable = false;
                     await _parkingSlotRepository.Save();
                     entity.DateBook = DateTime.UtcNow.AddHours(7);
+
                     await _bookingRepository.Insert(entity);
 
                     var linkQRImage = await UploadQRImagess(entity.BookingId);
@@ -249,6 +257,78 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         {
                             Title = titleManager,
                             Message = bodyManager + "Vị trí "+floor.FloorName + "-" + parkingSlot.Name,
+                            TokenWeb = manager.Devicetoken,
+                        };
+                        await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
+                    }
+                    else
+                    {
+                        foreach (var item in staffParking)
+                        {
+                            deviceToken = item.User.Devicetoken!.ToString();
+                            var pushNotificationModel = new PushNotificationWebModel
+                            {
+                                Title = titleManager,
+                                Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                                TokenWeb = deviceToken,
+                            };
+                            await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
+                        }
+                    }
+
+                    var titleCustomer = _configuration.GetSection("MessageTitle_Customer").GetSection("Success").Value;
+                    var bodyCustomer = _configuration.GetSection("MessageBody_Customer").GetSection("Success").Value;
+
+                    var pushNotificationMobile = new PushNotificationMobileModel
+                    {
+                        Title = titleCustomer,
+                        Message = bodyCustomer + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                        TokenMobile = request.DeviceToKenMobile,
+                    };
+
+                    await _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
+
+                    return new ServiceResponse<string>
+                    {
+                        Data = entity.BookingId.ToString(),
+                        StatusCode = 201,
+                        Success = true,
+                    };
+                }
+                else if (parkingSlot.IsAvailable == false && request.BookingDto.StartTime >= Gioloinhat)
+                {
+
+                    entity.DateBook = DateTime.UtcNow.AddHours(7);
+
+                    await _bookingRepository.Insert(entity);
+
+                    var linkQRImage = await UploadQRImagess(entity.BookingId);
+                    var currentBooking = await _bookingRepository
+                        .GetItemWithCondition(x => x.BookingId == entity.BookingId, null!, false);
+
+                    currentBooking.QRImage = linkQRImage;
+
+                    await _bookingRepository.Save();
+
+                    var titleManager = _configuration.GetSection("MessageTitle_Manager").GetSection("Success").Value;
+                    var bodyManager = _configuration.GetSection("MessageBody_Manager").GetSection("Success").Value;
+
+                    var includeUser = new List<Expression<Func<StaffParking, object>>>
+                    {
+                        x => x.User!,
+                    };
+
+                    var deviceToken = "";
+                    var staffParking = await _staffParkingRepository
+                        .GetAllItemWithCondition(x => x.ParkingId == parkingId, includeUser);
+
+                    if (!staffParking.Any())
+                    {
+                        var manager = await _userRepository.GetById(managerId!);
+                        var pushNotificationModel = new PushNotificationWebModel
+                        {
+                            Title = titleManager,
+                            Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
                             TokenWeb = manager.Devicetoken,
                         };
                         await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
@@ -335,6 +415,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 if (startTimeDate == endTimeDate)
                 {
                     // một gói, trong ngày
+                    if (startTimePackage > endTimePackage)
+                    {
+                        endTimePackage += 24;
+                    }
                     if (startTimeBooking >= startTimePackage &&
                         startTimeBooking <= endTimePackage &&
                         endTimeBooking > startTimeBooking &&
@@ -402,12 +486,12 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                                     : package.Price + (decimal)package.ExtraFee!;
 
                                 var extraPrice = 0M;
-                                startingPoint = (int)(startTimeBooking + startingTime)!; // 6
+                                startingPoint = (int)(startTimeBooking + startingTime)!;
                                 if (startingPoint == endTimePackage)
                                 {
                                     isPass = true;
                                 }
-                                extraFeePoint = (int)(startingPoint + extraTimeStep)!; // 8
+                                extraFeePoint = (int)(startingPoint + extraTimeStep)!;
                                 while (extraFeePoint <= endTimePackage)
                                 {
                                     step++;
@@ -610,6 +694,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
             return totalPrice;
         }
+
 
         private async Task<string> UploadQRImagess(int bookingId)
         {
