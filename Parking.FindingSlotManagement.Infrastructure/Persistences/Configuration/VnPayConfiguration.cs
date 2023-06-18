@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuration
 {
-    public class VnPayConfiguration : IEntityTypeConfiguration<VnPay>
+    public class VnPayConfiguration : IEntityTypeConfiguration<Domain.Entities.VnPay>
     {
-        public void Configure(EntityTypeBuilder<VnPay> builder)
+        public void Configure(EntityTypeBuilder<Domain.Entities.VnPay> builder)
         {
             builder.ToTable("VnPay");
 

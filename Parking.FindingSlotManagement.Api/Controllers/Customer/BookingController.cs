@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CancelBooking;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.ChangeStatusToAlreadyPaid;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CreateBooking;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.PaymentMethod;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.PostPaidOnline;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetAvailableSlot;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.CheckIn;
 using Parking.FindingSlotManagement.Domain.Entities;
@@ -74,7 +76,47 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
                 throw new Exception(ex.Message);
             }
         }
-
+        /// <summary>
+        /// API For Customer
+        /// </summary>
+        [HttpPost("postpaid-online-booking")]
+        public async Task<ActionResult<ServiceResponse<string>>> PostpaidOnlineBooking([FromBody] PostPaidOnlineCommand command)
+        {
+            try
+            {
+                command.context = HttpContext;
+                var res = await _mediator.Send(command);
+                if (res.Message == "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Customer
+        /// </summary>
+        [HttpPut("change-status-paid")]
+        public async Task<ActionResult<ServiceResponse<string>>> ChangeStatusToAlreadyPaid([FromBody] ChangeStatusToAlreadyPaidCommand command)
+        {
+            try
+            {
+                var res = await _mediator.Send(command);
+                if (res.Message == "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         [HttpPost("check-in")]
         public async Task<ActionResult<ServiceResponse<string>>> CheckIn([FromBody] CheckInCommand command)
         {
