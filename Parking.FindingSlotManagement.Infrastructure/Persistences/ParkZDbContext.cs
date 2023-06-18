@@ -36,7 +36,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences
         public DbSet<Traffic> Traffics { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<VehicleInfor> VehicleInfors { get; set; } = null!;
-        public DbSet<VnPay> VnPays { get; set; } = null!;
+        public DbSet<Domain.Entities.VnPay> VnPays { get; set; } = null!;
         public DbSet<OTP> OTPs { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

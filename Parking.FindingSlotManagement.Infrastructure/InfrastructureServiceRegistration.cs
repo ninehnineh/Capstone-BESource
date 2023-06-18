@@ -11,6 +11,7 @@ using Parking.FindingSlotManagement.Infrastructure.Mail;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using Parking.FindingSlotManagement.Infrastructure.Repositories;
 using Parking.FindingSlotManagement.Infrastructure.Repositories.AuthenticationRepositories;
+using Parking.FindingSlotManagement.Infrastructure.VnPay;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -60,6 +61,7 @@ namespace Parking.FindingSlotManagement.Infrastructure
             });
 
             services.AddScoped<IFireBaseMessageServices, FireBaseMessageServices>();
+            services.AddScoped<IVnPayService, VnPayService>();
 
             return services;
         }
