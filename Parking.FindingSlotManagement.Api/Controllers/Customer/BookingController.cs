@@ -5,8 +5,11 @@ using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CancelBooking;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.ChangeStatusToAlreadyPaid;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CreateBooking;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CreateBookingWhenAlreadyPaid;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.PaymentMethod;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.PostPaidOnline;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.PrepaidLate;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.PrePaidOnline;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetAvailableSlot;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.CheckIn;
 using Parking.FindingSlotManagement.Domain.Entities;
@@ -59,11 +62,61 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
         /// <summary>
         /// API For Customer
         /// </summary>
+        [HttpPost("booking/prepaid-online-booking/already-paid")]
+        public async Task<ActionResult<ServiceResponse<int>>> CreateBookingwhenAlreadyPaid([FromBody] CreateBookingWhenAlreadyPaidCommand command)
+        {
+            try
+            {
+                var res = await _mediator.Send(command);
+                if (res.Message == "Thành công")
+                {
+                    await _hubContext.Clients.All.SendAsync("CustomerCreateBookingSuccess");
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                //IEnumerable<string> list1 = new List<string> { "Severity: Error" };
+                //string message = "";
+                //foreach (var item in list1)
+                //{
+                //    message = ex.Message.Replace(item, string.Empty);
+                //}
+                //var errorResponse = new ErrorResponseModel(ResponseCode.BadRequest, "Validation Error: " + message.Remove(0, 31));
+                //return StatusCode(500, ex.Message);
+                throw new Exception(ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Customer
+        /// </summary>
         [HttpPost("cancel-booking")]
         public async Task<ActionResult<ServiceResponse<string>>> CancelBooking([FromBody] CancelBookingCommand command)
         {
             try
             {
+                var res = await _mediator.Send(command);
+                if (res.Message == "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Customer
+        /// </summary>
+        [HttpPost("prepaid-late-booking")]
+        public async Task<ActionResult<ServiceResponse<string>>> PrepaidLateBooking([FromBody] PrepaidLateCommand command)
+        {
+            try
+            {
+                command.context = HttpContext;
                 var res = await _mediator.Send(command);
                 if (res.Message == "Thành công")
                 {
@@ -105,6 +158,27 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
         {
             try
             {
+                var res = await _mediator.Send(command);
+                if (res.Message == "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Customer
+        /// </summary>
+        [HttpPost("prepaid-online-booking")]
+        public async Task<ActionResult<ServiceResponse<string>>> PrepaidOnlineBooking([FromBody] PrePaidOnlineCommand command)
+        {
+            try
+            {
+                command.context = HttpContext;
                 var res = await _mediator.Send(command);
                 if (res.Message == "Thành công")
                 {
