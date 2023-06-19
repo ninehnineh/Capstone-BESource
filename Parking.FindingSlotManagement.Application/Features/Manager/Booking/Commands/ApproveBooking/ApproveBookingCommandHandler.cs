@@ -63,7 +63,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
 
                 if (previousBookedSlot == null)
                 {
-                    //booking.CheckinTime = request.CheckInTime;
 
                     booking.Status = BookingStatus.Success.ToString();
 
@@ -92,14 +91,16 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                     };
                 }
                 else if (previousBookedSlot.CheckoutTime != null &&
-                    previousBookedSlot.EndTime < DateTime.UtcNow.AddHours(7))
+                    previousBookedSlot.EndTime > booking.StartTime)
                 {
                     return new ServiceResponse<string>
                     {
                         Message = "Chỗ đặt hiện tại đang bận, vui lòng chuyển chỗ",
                     };
                 }
+                booking.Status = BookingStatus.Success.ToString();
 
+                await _bookingRepository.Save();
                 return new ServiceResponse<string>
                 {
                     Message = "Thành công",
