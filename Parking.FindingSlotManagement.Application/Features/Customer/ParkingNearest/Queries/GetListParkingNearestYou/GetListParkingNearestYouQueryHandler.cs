@@ -45,7 +45,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
             {
                 var includes = new List<Expression<Func<Domain.Entities.Parking, object>>>
                 {
-                    x => x.ParkingHasPrices
+                    x => x.ParkingHasPrices,
+                    x => x.ParkingSpotImages,
                 };
 
                 var lstParking = await _parkingRepository.GetAllItemWithCondition(x => x.IsActive == true && x.Latitude != null && x.Longitude != null && x.ParkingHasPrices.Count() > 0 && x.IsFull == false, includes, null, true);
