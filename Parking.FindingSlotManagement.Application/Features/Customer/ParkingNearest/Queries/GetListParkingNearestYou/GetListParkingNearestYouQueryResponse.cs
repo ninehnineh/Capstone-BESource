@@ -15,5 +15,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
         public decimal? Longitude { get; set; }
         public float? Stars { get; set; }
         public string Avatar { get; set; }
+        public bool? IsPrepayment { get; set; }
+        public bool? IsOvernight { get; set; }
     }
 }
