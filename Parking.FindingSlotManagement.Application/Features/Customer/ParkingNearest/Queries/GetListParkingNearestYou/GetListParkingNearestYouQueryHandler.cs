@@ -4,10 +4,12 @@ using Newtonsoft.Json;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Mapping;
 using Parking.FindingSlotManagement.Application.Models.CalculateDistance;
+using Parking.FindingSlotManagement.Domain.Entities;
 using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +18,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
     public class GetListParkingNearestYouQueryHandler : IRequestHandler<GetListParkingNearestYouQuery, ServiceResponse<IEnumerable<ParkingWithDistance>>>
     {
         private readonly IParkingRepository _parkingRepository;
+        private readonly ITimelineRepository _timelineRepository;
+        private readonly IParkingHasPriceRepository _parkingHasPriceRepository;
+        private readonly IParkingPriceRepository _parkingPriceRepository;
         private readonly RestClient _client;
         private readonly string _apiKey;
         private readonly HttpClient _httpClient;
@@ -24,9 +29,12 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
             cfg.AddProfile(new MappingProfile());
         });
 
-        public GetListParkingNearestYouQueryHandler(IParkingRepository parkingRepository)
+        public GetListParkingNearestYouQueryHandler(IParkingRepository parkingRepository, ITimelineRepository timelineRepository, IParkingHasPriceRepository parkingHasPriceRepository, IParkingPriceRepository parkingPriceRepository)
         {
             _parkingRepository = parkingRepository;
+            _timelineRepository = timelineRepository;
+            _parkingHasPriceRepository = parkingHasPriceRepository;
+            _parkingPriceRepository = parkingPriceRepository;
             _apiKey = "ulGtxtkmCd8rrbnU2bzRW5FBKYkbKkFL";
             _client = new RestClient("https://api.tomtom.com");
             _httpClient = new HttpClient();
@@ -35,22 +43,61 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
         {
             try
             {
-                var lstParking = await _parkingRepository.GetAllItemWithCondition(x => x.IsActive == true, null, null, true);
+                var includes = new List<Expression<Func<Domain.Entities.Parking, object>>>
+                {
+                    x => x.ParkingHasPrices
+                };
+
+                var lstParking = await _parkingRepository.GetAllItemWithCondition(x => x.IsActive == true && x.Latitude != null && x.Longitude != null && x.ParkingHasPrices.Count() > 0, includes, null, true);
                 var _mapper = config.CreateMapper();
                 var lstDto = _mapper.Map<IEnumerable<GetListParkingNearestYouQueryResponse>>(lstParking);
                 List<ParkingWithDistance> lst = new();
                 foreach (var item in lstDto)
                 {
                     var res = GetDistanceMethod(request.CurrentLatitude, request.CurrentLongtitude, (double)item.Latitude, (double)item.Longitude);
-                    if(res <= 5)
+
+                    var parkingWithDistance = new ParkingWithDistance();
+                    var lstParkingHasPrice = await _parkingHasPriceRepository.GetAllItemWithConditionByNoInclude(x => x.ParkingId == item.ParkingId);
+                    if (lstParkingHasPrice == null)
                     {
-                        var parkingWithDistance = new ParkingWithDistance
+
+                        parkingWithDistance = new ParkingWithDistance
                         {
                             GetListParkingNearestYouQueryResponse = item,
-                            Distance = res
+                            Distance = res,
+                            PriceCar = null,
+                            PriceMoto = null
                         };
                         lst.Add(parkingWithDistance);
+                        continue;
                     }
+                    foreach (var item2 in lstParkingHasPrice)
+                    {
+                        var timelineCurrent = await GetTimeLine(item2);
+                        var parkingPrice = await _parkingPriceRepository.GetById(item2.ParkingPriceId);
+                        if (parkingPrice.TrafficId == 1)
+                        {
+                            parkingWithDistance = new ParkingWithDistance
+                            {
+                                GetListParkingNearestYouQueryResponse = item,
+                                Distance = res,
+                                PriceCar = timelineCurrent.Price,
+                                PriceMoto = null
+                            };
+                        }
+                        else if (parkingPrice.TrafficId == 2)
+                        {
+                            parkingWithDistance = new ParkingWithDistance
+                            {
+                                GetListParkingNearestYouQueryResponse = item,
+                                Distance = res,
+                                PriceCar = null,
+                                PriceMoto = timelineCurrent.Price
+                            };
+                        }
+                    }
+                        
+                    lst.Add(parkingWithDistance);
                 }
                 if (lst.Count() <= 0)
                 {
@@ -63,7 +110,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
                 }
                 return new ServiceResponse<IEnumerable<ParkingWithDistance>>
                 {
-                    Data = lst,
+                    Data = lst.OrderBy(x => x.Distance).Take(5),
                     Message = "Thành công",
                     Success = true,
                     StatusCode = 200
@@ -108,5 +155,32 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
             }
             return distance;
         }*/
+        private async Task<TimeLine> GetTimeLine(ParkingHasPrice parkingHasPrice)
+        {
+            var a = TimeSpan.FromHours(DateTime.UtcNow.AddHours(7).Hour);
+            var timelinelst = await _timelineRepository.GetAllItemWithCondition(x => x.ParkingPriceId == parkingHasPrice.ParkingPriceId);
+            foreach (var item in timelinelst)
+            {
+                if (item.StartTime > item.EndTime)
+                {
+                    if (item.StartTime > a && item.EndTime >= a)
+                    {
+                        return item;
+                    }
+                    else if (item.StartTime <= a && item.EndTime < a)
+                    {
+                        return item;
+                    }
+                }
+                else
+                {
+                    if (item.StartTime <= a && item.EndTime >= a)
+                    {
+                        return item;
+                    }
+                }
+            }
+            return null;
+        }
     }
 }

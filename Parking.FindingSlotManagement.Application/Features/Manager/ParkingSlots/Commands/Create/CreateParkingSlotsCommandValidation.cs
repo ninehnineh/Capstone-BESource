@@ -68,13 +68,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlot
                     return exists != null;
                 }).WithMessage("{PropertyName} không tồn tại");
 
-            RuleFor(x => x.BookingId)
-                .GreaterThan(0)
-                .MustAsync(async (bookingId, token) =>
-                {
-                    var exists = await _bookingRepository.GetBooking((int)bookingId!);
-                    return exists != null;
-                }).WithMessage("{PropertyName} không tồn tại");
         }
     }
 }

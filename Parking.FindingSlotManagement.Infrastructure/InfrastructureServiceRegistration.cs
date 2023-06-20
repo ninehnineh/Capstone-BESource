@@ -11,6 +11,7 @@ using Parking.FindingSlotManagement.Infrastructure.Mail;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using Parking.FindingSlotManagement.Infrastructure.Repositories;
 using Parking.FindingSlotManagement.Infrastructure.Repositories.AuthenticationRepositories;
+using Parking.FindingSlotManagement.Infrastructure.VnPay;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -54,12 +55,13 @@ namespace Parking.FindingSlotManagement.Infrastructure
 
             FirebaseApp.Create(new AppOptions
             {
-                //Credential = GoogleCredential
-                //.FromFile(@"..\Parking.FindingSlotManagement.Infrastructure\Firebase\parkz-f1bd0-firebase-adminsdk-rjod0-8d0ba17bb5.json")
+                /*Credential = GoogleCredential
+                .FromFile(@"..\Parking.FindingSlotManagement.Infrastructure\Firebase\parkz-f1bd0-firebase-adminsdk-rjod0-8d0ba17bb5.json")*/
                 Credential = GoogleCredential.FromFile(@"C:\home\site\wwwroot\Firebase\parkz-f1bd0-firebase-adminsdk-rjod0-8d0ba17bb5.json")
             });
 
             services.AddScoped<IFireBaseMessageServices, FireBaseMessageServices>();
+            services.AddScoped<IVnPayService, VnPayService>();
 
             return services;
         }

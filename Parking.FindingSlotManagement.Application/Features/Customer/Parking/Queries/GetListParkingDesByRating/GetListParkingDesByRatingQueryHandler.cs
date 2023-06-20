@@ -47,7 +47,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Parking.Qu
                     x => x.ParkingHasPrices,
                     x => x.ParkingSpotImages,
                 };
-                var lstParking = await _parkingRepository.GetAllItemWithPagination(x => x.IsActive == true, includes, null, true, request.PageNo, request.PageSize);
+                var lstParking = await _parkingRepository.GetAllItemWithPagination(x => x.IsActive == true && x.Stars != null && x.Latitude != null && x.Longitude != null && x.ParkingHasPrices.Count() > 0, includes, null, true, request.PageNo, request.PageSize);
                 if(lstParking.Count() <= 0)
                 {
                     return new ServiceResponse<IEnumerable<GetListParkingDesByRatingResponse>>()
@@ -75,8 +75,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Parking.Qu
                             StatusCode = 400,
                             Success = false
                         };*/
-                        itemAdd.PriceCar = 0;
-                        itemAdd.PriceMoto = 0;
+                        itemAdd.PriceCar = null;
+                        itemAdd.PriceMoto = null;
                         lstResponse.Add(itemAdd);
                         continue;
                     }
@@ -87,10 +87,12 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Parking.Qu
                         if(parkingPrice.TrafficId == 1)
                         {
                             itemAdd.PriceCar = timelineCurrent.Price;
+                            itemAdd.PriceMoto = null;
                         }
                         else if(parkingPrice.TrafficId == 2)
                         {
                             itemAdd.PriceMoto = timelineCurrent.Price;
+                            itemAdd.PriceCar = null;
                         }
                     }
                     lstResponse.Add(itemAdd);

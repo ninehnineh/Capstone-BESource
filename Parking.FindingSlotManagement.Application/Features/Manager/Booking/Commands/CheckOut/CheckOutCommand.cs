@@ -6,7 +6,5 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
     {
         public int BookingId { get; set; }
         public int ParkingId { get; set; }
-        public int VehicleInfoId { get; set; }
-
     }
 }

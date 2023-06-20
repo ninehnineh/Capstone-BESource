@@ -58,6 +58,10 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Parkin
 using Parking.FindingSlotManagement.Application.Features.Customer.Parking.Queries.GetListParkingDesByRating;
 using Parking.FindingSlotManagement.Application.Features.Customer.Parking.Queries.GetParkingDetails;
 using Parking.FindingSlotManagement.Application.Features.Customer.Parking.Queries.GetBookingDetails;
+using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetListBookingByManagerId;
+using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetBookingById;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Queries.GetListParkingSlotByFloorId;
+using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Queries.GetListFloorByParkingId;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -121,7 +125,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
 
             #region Parking Mapping
             CreateMap<Domain.Entities.Parking, CreateNewParkingCommand>().ReverseMap();
-            CreateMap<Domain.Entities.Parking, GetListParkingNearestYouQueryResponse>().ReverseMap();
+            CreateMap<Domain.Entities.Parking, GetListParkingNearestYouQueryResponse>()
+                .ForMember(dto => dto.Avatar, act => act.MapFrom(obj => obj.ParkingSpotImages.FirstOrDefault().ImgPath))
+                .ReverseMap();
             CreateMap<Domain.Entities.Parking, GetListParkingByManagerIdResponse>().ReverseMap();
             CreateMap<Domain.Entities.Parking, ParkingEntity>().ReverseMap();
             CreateMap<Domain.Entities.Parking, ParkingShowInCusDto>()
@@ -140,6 +146,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<Floor, CreateNewFloorCommand>().ReverseMap();
             CreateMap<Floor, GetListFloorResponse>().ReverseMap();
             CreateMap<Floor, FlootDto>().ReverseMap();
+            CreateMap<Floor, GetListFloorByParkingIdResponse>().ReverseMap();
             #endregion
 
             #region TimeLine Mapping
@@ -199,6 +206,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<ParkingSlot, CreateParkingSlotsCommand>().ReverseMap();
             CreateMap<ParkingSlot, GetAvailableSlotsResponse>().ReverseMap();
             CreateMap<ParkingSlot, BookedParkingSlotDto>().ReverseMap();
+            CreateMap<ParkingSlot, GetListParkingSlotByFloorIdResponse>().ReverseMap();
             #endregion
 
             #region Timeline Mapping
@@ -209,6 +217,26 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #region Booking Mapping
             CreateMap<Booking, BookingDto>().ReverseMap();
             CreateMap<Booking, BookingDetailsDto>().ReverseMap();
+            CreateMap<Booking, GetListBookingByManagerIdResponse>()
+                .ForMember(dto => dto.CustomerName, act => act.MapFrom(obj => obj.User.Name))
+                .ForMember(dto => dto.Phone, act => act.MapFrom(obj => obj.User.Phone))
+                .ForMember(dto => dto.Position, act => act.MapFrom(obj => obj.ParkingSlot.Name))
+                .ForMember(dto => dto.LicensePlate, act => act.MapFrom(obj => obj.VehicleInfor.LicensePlate))
+                .ForMember(dto => dto.ParkingName, act => act.MapFrom(obj => obj.ParkingSlot.Floor.Parking.Name))
+                .ReverseMap();
+            CreateMap<Booking, GetBookingByIdResponse>()
+                .ForMember(dto => dto.CustomerName, act => act.MapFrom(obj => obj.User.Name))
+                .ForMember(dto => dto.CustomerPhone, act => act.MapFrom(obj => obj.User.Phone))
+                .ForMember(dto => dto.ParkingSlotName, act => act.MapFrom(obj => obj.ParkingSlot.Name))
+                .ForMember(dto => dto.FloorName, act => act.MapFrom(obj => obj.ParkingSlot.Floor.FloorName))
+                .ForMember(dto => dto.ParkingId, act => act.MapFrom(obj => obj.ParkingSlot.Floor.Parking.ParkingId))
+                .ForMember(dto => dto.ParkingName, act => act.MapFrom(obj => obj.ParkingSlot.Floor.Parking.Name))
+                .ForMember(dto => dto.LicensePlate, act => act.MapFrom(obj => obj.VehicleInfor.LicensePlate))
+                .ForMember(dto => dto.VehicleName, act => act.MapFrom(obj => obj.VehicleInfor.VehicleName))
+                .ForMember(dto => dto.Color, act => act.MapFrom(obj => obj.VehicleInfor.Color))
+                .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.VehicleInfor.Traffic.Name))
+                .ForMember(dto => dto.CustomerAvatar, act => act.MapFrom(obj => obj.User.Avatar))
+                .ReverseMap();
             #endregion
         }
     }

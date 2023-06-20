@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 {
-    public class VnPayRepository : GenericRepository<VnPay>, IVnPayRepository
+    public class VnPayRepository : GenericRepository<Domain.Entities.VnPay>, IVnPayRepository
     {
         public VnPayRepository(ParkZDbContext dbContext) : base(dbContext)
         {

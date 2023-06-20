@@ -7,7 +7,10 @@ using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.ApproveBooking;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.CheckOut;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.Done;
+using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetBookingById;
+using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetListBookingByManagerId;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
+using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 {
@@ -23,6 +26,56 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         {
             _mediator = mediator;
             _hubContext = hubContext;
+        }
+        /// <summary>
+        /// API For Manager
+        /// </summary>
+        [HttpGet(Name = "GetListBookingByManagerId")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<GetListBookingByManagerIdResponse>>>> GetListBookingByManagerId([FromQuery] int pageNo, [FromQuery] int pageSize, [FromQuery]int managerId)
+        {
+            try
+            {
+                var query = new GetListBookingByManagerIdQuery()
+                {
+                    PageNo = pageNo,
+                    PageSize = pageSize,
+                    ManagerId = managerId
+                };
+                var res = await _mediator.Send(query);
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Manager
+        /// </summary>
+        [HttpGet("{bookingId}", Name = "GetBookingById")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<GetBookingByIdResponse>>> GetBookingById(int bookingId)
+        {
+            try
+            {
+                var query = new GetBookingByIdQuery { BookingId = bookingId };
+                var res = await _mediator.Send(query);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
         }
         /// <summary>
         /// API for Manager
