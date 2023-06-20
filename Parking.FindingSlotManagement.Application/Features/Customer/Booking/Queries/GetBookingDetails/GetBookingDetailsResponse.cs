@@ -1,11 +1,14 @@
-﻿using Parking.FindingSlotManagement.Domain.Entities;
+﻿using Parking.FindingSlotManagement.Application.Models.Floor;
+using Parking.FindingSlotManagement.Application.Models.Traffic;
+using Parking.FindingSlotManagement.Application.Models.User;
+using Parking.FindingSlotManagement.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Customer.Parking.Queries.GetBookingDetails;
+namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetBookingDetails;
 
 public class GetBookingDetailsResponse
 {
@@ -30,7 +33,6 @@ public class BookingDetailsDto
     public string? TmnCodeVnPay { get; set; }
     public string? QRImage { get; set; }
 }
-
 public class VehicleInforDto
 {
     public int VehicleInforId { get; set; }
@@ -40,29 +42,10 @@ public class VehicleInforDto
 
 }
 
-public class UserBookingDto
-{
-    public int UserId { get; set; }
-    public string? Name { get; set; }
-    public string? Phone { get; set; }
-}
-
 public class BookedParkingSlotDto
 {
     public int ParkingSlotId { get; set; }
     public string? Name { get; set; }
     public TrafficDto? Traffic { get; set; }
-    public FlootDto? Floor { get; set; }
-}
-
-public class FlootDto
-{
-    public int FloorId { get; set; }
-    public string? FloorName { get; set; }
-}
-
-public class TrafficDto
-{
-    public int TrafficId { get; set; }
-    public string? Name { get; set; }
+    public FloorDto? Floor { get; set; }
 }

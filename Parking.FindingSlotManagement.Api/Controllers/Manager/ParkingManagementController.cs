@@ -15,7 +15,6 @@ using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 {
-    [Authorize(Roles = "Manager")]
     [Route("api/parkings")]
     [ApiController]
     public class ParkingManagementController : ControllerBase

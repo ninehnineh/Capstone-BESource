@@ -11,7 +11,7 @@ using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Comman
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.PrepaidLate;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.PrePaidOnline;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetAvailableSlot;
-using Parking.FindingSlotManagement.Application.Features.Customer.Parking.Queries.GetBookingDetails;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetBookingDetails;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.CheckIn;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;

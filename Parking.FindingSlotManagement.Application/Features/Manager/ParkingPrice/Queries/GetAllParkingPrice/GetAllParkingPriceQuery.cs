@@ -9,7 +9,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
 {
     public class GetAllParkingPriceQuery : IRequest<ServiceResponse<IEnumerable<GetAllParkingPriceQueryResponse>>>
     {
-        public int BusinessId { get; set; }
+        public int ManagerId { get; set; }
         public int PageNo { get; set; }
         public int PageSize { get; set; }
 

@@ -19,8 +19,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayMa
                 .NotEmpty().WithMessage("Vui lòng nhập {HashSecret}.")
                 .NotNull()
                 .MaximumLength(250).WithMessage("{HashSecret} không được nhập quá 250 kí tự");
-            RuleFor(x => x.ManagerId)
-                .NotEmpty().WithMessage("Vui lòng nhập {ManagerId}.")
+            RuleFor(x => x.BusinessId)
+                .NotEmpty().WithMessage("Vui lòng nhập {BusinessId}.")
                 .NotNull();
         }
     }

@@ -13,14 +13,20 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
     public class CreateNewParkingCommandHandler : IRequestHandler<CreateNewParkingCommand, ServiceResponse<int>>
     {
         private readonly IParkingRepository _parkingRepository;
+        private readonly IBusinessProfileRepository _businessProfileRepository;
+        private readonly IUserRepository _userRepository;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MappingProfile());
         });
 
-        public CreateNewParkingCommandHandler(IParkingRepository parkingRepository)
+        public CreateNewParkingCommandHandler(IParkingRepository parkingRepository,
+            IBusinessProfileRepository businessProfileRepository,
+            IUserRepository userRepository)
         {
             _parkingRepository = parkingRepository;
+            _businessProfileRepository = businessProfileRepository;
+            _userRepository = userRepository;
         }
         public async Task<ServiceResponse<int>> Handle(CreateNewParkingCommand request, CancellationToken cancellationToken)
         {
@@ -37,13 +43,31 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                         Count = 0
                     };
                 }
+
+                var checkBusinessExist = await _businessProfileRepository.GetItemWithCondition(x => x.UserId == request.ManagerId);
+                if(checkBusinessExist == null)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Không tìm thấy tài khoản doanh nghiệp.",
+                        Success = true,
+                        StatusCode = 200
+                    };
+                }
+
+
                 var _mapper = config.CreateMapper();
                 var parkingEntity = _mapper.Map<Domain.Entities.Parking>(request);
+                parkingEntity.BusinessId = checkBusinessExist.BusinessProfileId;
                 parkingEntity.IsActive = true;
                 parkingEntity.IsFull = false;
                 await _parkingRepository.Insert(parkingEntity);
                 parkingEntity.Code = "BX" + parkingEntity.ParkingId;
                 await _parkingRepository.Save();
+                var managerExist = await _userRepository.GetById(checkBusinessExist.UserId);
+                managerExist.ParkingId = parkingEntity.ParkingId;
+
+                await _userRepository.Save();
                 return new ServiceResponse<int>
                 {
                     Data = parkingEntity.ParkingId,

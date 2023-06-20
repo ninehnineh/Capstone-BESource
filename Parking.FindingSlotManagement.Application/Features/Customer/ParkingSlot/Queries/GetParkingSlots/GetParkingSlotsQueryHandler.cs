@@ -1,39 +1,34 @@
 ﻿using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
-using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetAvailableSlot;
-using Parking.FindingSlotManagement.Domain.Entities;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetAvailableSlots;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetAvailableSlots
+namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Queries.GetParkingSlots
 {
-    public class GetAvailableSlotsQueryHandler : IRequestHandler<GetAvailableSlotsQuery, ServiceResponse<IEnumerable<GetAvailableSlotsResponse>>>
+    public class GetParkingSlotsQueryHandler : IRequestHandler<GetParkingSlotsQuery, ServiceResponse<IEnumerable<GetParkingSlotsResponse>>>
     {
-        private readonly IBookingRepository _bookingRepository;
         private readonly IParkingSlotRepository _parkingSlotRepository;
+        private readonly IParkingRepository _parkingRepository;
         private readonly IMapper _mapper;
-        private readonly IFloorRepository _floorRepository;
+        private readonly IBookingRepository _bookingRepository;
 
-        public GetAvailableSlotsQueryHandler(IBookingRepository bookingRepository,
-            IParkingSlotRepository parkingSlotRepository,
-            IMapper mapper,
-            IFloorRepository floorRepository)
+        public GetParkingSlotsQueryHandler(IParkingSlotRepository parkingSlotRepository,
+            IParkingRepository parkingRepository,
+            IMapper mapper, 
+            IBookingRepository bookingRepository)
         {
-            _bookingRepository = bookingRepository;
             _parkingSlotRepository = parkingSlotRepository;
+            _parkingRepository = parkingRepository;
             _mapper = mapper;
-            _floorRepository = floorRepository;
+            _bookingRepository = bookingRepository;
         }
-
-        public async Task<ServiceResponse<IEnumerable<GetAvailableSlotsResponse>>> Handle(GetAvailableSlotsQuery request, CancellationToken cancellationToken)
+        public async Task<ServiceResponse<IEnumerable<GetParkingSlotsResponse>>> Handle(GetParkingSlotsQuery request, CancellationToken cancellationToken)
         {
             const string bookingStatusCancel = "Cancel";
             var bookedSlots = new List<int>();
@@ -70,6 +65,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Qu
                 var includes3 = new List<Expression<Func<Domain.Entities.ParkingSlot, object>>>
                 {
                     x => x.Floor,
+                    x => x.Traffic,
                 };
 
                 var lstParkingSlot = await _parkingSlotRepository
@@ -78,15 +74,14 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Qu
                 var filterParkingSlot = lstParkingSlot
                     .Where(item => !listParkingSlotIdExist.Contains(item.ParkingSlotId)).ToList();
 
-                var responses = _mapper.Map<IEnumerable<GetAvailableSlotsResponse>>(filterParkingSlot);
+                var responses = _mapper.Map<IEnumerable<GetParkingSlotsResponse>>(filterParkingSlot);
 
-                return new ServiceResponse<IEnumerable<GetAvailableSlotsResponse>>
+                return new ServiceResponse<IEnumerable<GetParkingSlotsResponse>>
                 {
                     Data = responses,
                     Message = "Thành công",
                     StatusCode = 200,
-                    Success = true,
-                    Count = responses.Count(),
+                    Success = true
                 };
             }
             catch (Exception ex)
