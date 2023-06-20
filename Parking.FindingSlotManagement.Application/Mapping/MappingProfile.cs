@@ -63,6 +63,7 @@ using Parking.FindingSlotManagement.Application.Models.User;
 using Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Queries.GetParkingSlots;
 using Parking.FindingSlotManagement.Application.Models.Traffic;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetListBookingByManagerId;
+using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetBookingById;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -222,6 +223,19 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.Position, act => act.MapFrom(obj => obj.ParkingSlot.Name))
                 .ForMember(dto => dto.LicensePlate, act => act.MapFrom(obj => obj.VehicleInfor.LicensePlate))
                 .ForMember(dto => dto.ParkingName, act => act.MapFrom(obj => obj.ParkingSlot.Floor.Parking.Name))
+                .ReverseMap();
+            CreateMap<Booking, GetBookingByIdResponse>()
+                .ForMember(dto => dto.CustomerName, act => act.MapFrom(obj => obj.User.Name))
+                .ForMember(dto => dto.CustomerPhone, act => act.MapFrom(obj => obj.User.Phone))
+                .ForMember(dto => dto.CustomerAvatar, act => act.MapFrom(obj => obj.User.Avatar))
+                .ForMember(dto => dto.ParkingSlotName, act => act.MapFrom(obj => obj.ParkingSlot.Name))
+                .ForMember(dto => dto.FloorName, act => act.MapFrom(obj => obj.ParkingSlot.Floor.FloorName))
+                .ForMember(dto => dto.ParkingId, act => act.MapFrom(obj => obj.ParkingSlot.Floor.Parking.ParkingId))
+                .ForMember(dto => dto.ParkingName, act => act.MapFrom(obj => obj.ParkingSlot.Floor.Parking.Name))
+                .ForMember(dto => dto.LicensePlate, act => act.MapFrom(obj => obj.VehicleInfor.LicensePlate))
+                .ForMember(dto => dto.VehicleName, act => act.MapFrom(obj => obj.VehicleInfor.VehicleName))
+                .ForMember(dto => dto.Color, act => act.MapFrom(obj => obj.VehicleInfor.Color))
+                .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.VehicleInfor.Traffic.Name))
                 .ReverseMap();
             #endregion
         }
