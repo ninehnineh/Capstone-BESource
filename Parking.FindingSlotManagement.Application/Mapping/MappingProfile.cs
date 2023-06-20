@@ -64,6 +64,8 @@ using Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Qu
 using Parking.FindingSlotManagement.Application.Models.Traffic;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetListBookingByManagerId;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetBookingById;
+using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Queries.GetListFloorByParkingId;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Queries.GetListParkingSlotByFloorId;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -147,6 +149,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<Floor, CreateNewFloorCommand>().ReverseMap();
             CreateMap<Floor, GetListFloorResponse>().ReverseMap();
             CreateMap<Floor, FloorDto>().ReverseMap();
+            CreateMap<Floor, GetListFloorByParkingIdResponse>().ReverseMap();
             #endregion
 
             #region TimeLine Mapping
@@ -207,6 +210,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<ParkingSlot, GetAvailableSlotsResponse>().ReverseMap();
             CreateMap<ParkingSlot, BookedParkingSlotDto>().ReverseMap();
             CreateMap<ParkingSlot, GetParkingSlotsResponse>().ReverseMap();
+            CreateMap<ParkingSlot, GetListParkingSlotByFloorIdResponse>().ReverseMap();
             #endregion
 
             #region Timeline Mapping
