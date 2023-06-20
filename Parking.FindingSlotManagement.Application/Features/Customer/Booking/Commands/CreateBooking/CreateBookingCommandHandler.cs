@@ -38,7 +38,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         private readonly IParkingPriceRepository _parkingPriceRepository;
         private readonly IConfiguration _configuration;
         private readonly IFireBaseMessageServices _fireBaseMessageServices;
-        private readonly IStaffParkingRepository _staffParkingRepository;
         private readonly IVehicleInfoRepository _vehicleInfoRepository;
         private readonly HttpClient _client;
 
@@ -56,7 +55,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             IParkingPriceRepository parkingPriceRepository,
             IConfiguration configuration,
             IFireBaseMessageServices fireBaseMessageServices,
-            IStaffParkingRepository staffParkingRepository,
             IVehicleInfoRepository vehicleInfoRepository)
         {
             _bookingRepository = bookingRepository;
@@ -73,7 +71,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             _parkingPriceRepository = parkingPriceRepository;
             _configuration = configuration;
             _fireBaseMessageServices = fireBaseMessageServices;
-            _staffParkingRepository = staffParkingRepository;
             _vehicleInfoRepository = vehicleInfoRepository;
             _client = new HttpClient();
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Client-ID", "886d0b92410e625");
@@ -127,7 +124,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 var parkingId = floor.ParkingId;
 
                 var parking = await _parkingRepository.GetById(parkingId!);
-                var managerId = parking.ManagerId;
 
                 //var vnpay = await _vnPayRepository
                 //    .GetItemWithCondition(x => x.ManagerId == managerId);
@@ -221,7 +217,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         }
                     }
                 }
-                
+
                 if (parkingSlot.IsAvailable == true)
                 {
                     parkingSlot.IsAvailable = false;
@@ -241,7 +237,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     var titleManager = _configuration.GetSection("MessageTitle_Manager").GetSection("Success").Value;
                     var bodyManager = _configuration.GetSection("MessageBody_Manager").GetSection("Success").Value;
 
-                    var includeUser = new List<Expression<Func<StaffParking, object>>>
+                    /*var includeUser = new List<Expression<Func<StaffParking, object>>>
                     {
                         x => x.User!,
                     };
@@ -256,7 +252,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         var pushNotificationModel = new PushNotificationWebModel
                         {
                             Title = titleManager,
-                            Message = bodyManager + "Vị trí "+floor.FloorName + "-" + parkingSlot.Name,
+                            Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
                             TokenWeb = manager.Devicetoken,
                         };
                         await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
@@ -274,6 +270,35 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                             };
                             await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
                         }
+                    }*/
+                    var deviceToken = "";
+                    var managerAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
+                    var lstStaff = managerAccount.Where(x => x.RoleId == 2);
+                    var ManagerOfParking = managerAccount.FirstOrDefault(x => x.RoleId == 1);
+                    if (lstStaff.Any())
+                    {
+                        foreach (var item in lstStaff)
+                        {
+                            deviceToken = item.Devicetoken.ToString();
+                            var pushNotificationModel = new PushNotificationWebModel
+                            {
+                                Title = titleManager,
+                                Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                                TokenWeb = deviceToken,
+                            };
+                            await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
+                        }
+                    }
+                    else
+                    {
+                        var manager = await _userRepository.GetById(ManagerOfParking.UserId!);
+                        var pushNotificationModel = new PushNotificationWebModel
+                        {
+                            Title = titleManager,
+                            Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                            TokenWeb = manager.Devicetoken,
+                        };
+                        await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
                     }
 
                     var titleCustomer = _configuration.GetSection("MessageTitle_Customer").GetSection("Success").Value;
@@ -313,7 +338,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     var titleManager = _configuration.GetSection("MessageTitle_Manager").GetSection("Success").Value;
                     var bodyManager = _configuration.GetSection("MessageBody_Manager").GetSection("Success").Value;
 
-                    var includeUser = new List<Expression<Func<StaffParking, object>>>
+                    /*var includeUser = new List<Expression<Func<StaffParking, object>>>
                     {
                         x => x.User!,
                     };
@@ -346,6 +371,35 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                             };
                             await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
                         }
+                    }*/
+                    var deviceToken = "";
+                    var managerAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
+                    var lstStaff = managerAccount.Where(x => x.RoleId == 2);
+                    var ManagerOfParking = managerAccount.FirstOrDefault(x => x.RoleId == 1);
+                    if (lstStaff.Any())
+                    {
+                        foreach (var item in lstStaff)
+                        {
+                            deviceToken = item.Devicetoken.ToString();
+                            var pushNotificationModel = new PushNotificationWebModel
+                            {
+                                Title = titleManager,
+                                Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                                TokenWeb = deviceToken,
+                            };
+                            await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
+                        }
+                    }
+                    else
+                    {
+                        var manager = await _userRepository.GetById(ManagerOfParking.UserId!);
+                        var pushNotificationModel = new PushNotificationWebModel
+                        {
+                            Title = titleManager,
+                            Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                            TokenWeb = manager.Devicetoken,
+                        };
+                        await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
                     }
 
                     var titleCustomer = _configuration.GetSection("MessageTitle_Customer").GetSection("Success").Value;
@@ -419,11 +473,21 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     {
                         endTimePackage += 24;
                     }
+                    //if (startTimeBooking < startTimePackage)
+                    //{
+                    //    startTimeBooking += 24;
+                    //    endTimeBooking += 24;
+                    //}
                     if (startTimeBooking >= startTimePackage &&
                         startTimeBooking <= endTimePackage &&
                         endTimeBooking > startTimeBooking &&
                         endTimeBooking >= startTimePackage &&
-                        endTimeBooking <= endTimePackage)
+                        endTimeBooking <= endTimePackage ||
+                        (startTimeBooking + 24) >= startTimePackage &&
+                        (startTimeBooking + 24) <= endTimePackage &&
+                        (endTimeBooking + 24)> (startTimeBooking + 24) &&
+                        (endTimeBooking + 24) >= startTimePackage &&
+                        (endTimeBooking + 24) <= endTimePackage)
                     {
                         if (package.StartTime > package.EndTime)
                         {

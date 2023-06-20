@@ -17,6 +17,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                     .IsUnique()
                     .HasFilter("([UserID] IS NOT NULL)");
 
+            builder.ToTable("Business");
+
             builder.Property(e => e.Address).HasMaxLength(255);
 
             builder.Property(e => e.BackIdentification)

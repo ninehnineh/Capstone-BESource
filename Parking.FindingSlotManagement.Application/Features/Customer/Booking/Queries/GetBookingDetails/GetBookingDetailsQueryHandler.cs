@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Models.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Customer.Parking.Queries.GetBookingDetails
+namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetBookingDetails
 {
     public class GetBookingDetailsQueryHandler : IRequestHandler<GetBookingDetailsQuery, ServiceResponse<GetBookingDetailsResponse>>
     {

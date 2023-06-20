@@ -22,6 +22,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
         private readonly CreateParkingPriceCommandValidation _validator;
         private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<ITrafficRepository> _trafficRepositoryMock;
+        private readonly Mock<IBusinessProfileRepository> _businessProfileRepositoryMock;
         private readonly CreateParkingPriceCommandHandler _handler;
 
         public CreateParkingPriceCommandHandlerTests()
@@ -29,8 +30,10 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             _userRepositoryMock = new Mock<IUserRepository>();
             _parkingPriceRepositoryMock = new Mock<IParkingPriceRepository>();
             _trafficRepositoryMock = new Mock<ITrafficRepository>();
+            _businessProfileRepositoryMock= new Mock<IBusinessProfileRepository>();
             _handler = new CreateParkingPriceCommandHandler(_parkingPriceRepositoryMock.Object);
-            _validator = new CreateParkingPriceCommandValidation(_parkingPriceRepositoryMock.Object, _userRepositoryMock.Object, _trafficRepositoryMock.Object);
+            _validator = new CreateParkingPriceCommandValidation(_parkingPriceRepositoryMock.Object,
+                _userRepositoryMock.Object, _trafficRepositoryMock.Object, _businessProfileRepositoryMock.Object);
         }
 
         [Fact]

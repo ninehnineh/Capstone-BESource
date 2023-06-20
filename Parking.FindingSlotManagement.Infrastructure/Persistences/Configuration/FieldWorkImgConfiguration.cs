@@ -22,7 +22,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
             builder.HasOne(d => d.BusinessProfile)
                 .WithMany(p => p.FieldWorkImgs)
                 .HasForeignKey(d => d.BusinessProfileId)
-                .HasConstraintName("FK_FieldWorkImg_BusinessProfiles");
+                .HasConstraintName("FK_FieldWorkImg_Business");
         }
     }
 }

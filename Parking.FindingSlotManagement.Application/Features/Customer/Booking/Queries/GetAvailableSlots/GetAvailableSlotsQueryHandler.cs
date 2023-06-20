@@ -78,15 +78,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Qu
                 var filterParkingSlot = lstParkingSlot
                     .Where(item => !listParkingSlotIdExist.Contains(item.ParkingSlotId)).ToList();
 
-                var mapper = _mapper.Map<IEnumerable<GetAvailableSlotsResponse>>(filterParkingSlot);
+                var responses = _mapper.Map<IEnumerable<GetAvailableSlotsResponse>>(filterParkingSlot);
 
                 return new ServiceResponse<IEnumerable<GetAvailableSlotsResponse>>
                 {
-                    Data = mapper,
+                    Data = responses,
                     Message = "Thành công",
                     StatusCode = 200,
                     Success = true,
-                    Count = mapper.Count(),
+                    Count = responses.Count(),
                 };
             }
             catch (Exception ex)

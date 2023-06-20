@@ -13,20 +13,35 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
     {
         private readonly IParkingPriceRepository _parkingPriceRepository;
         private readonly IMapper _mapper;
+        private readonly IBusinessProfileRepository _businessProfileRepository;
 
         public GetAllParkingPriceQueryHandler(IParkingPriceRepository parkingPriceRepository,
-            IMapper mapper)
+            IMapper mapper,
+            IBusinessProfileRepository businessProfileRepository)
         {
             _parkingPriceRepository = parkingPriceRepository;
             _mapper = mapper;
+            _businessProfileRepository = businessProfileRepository;
         }
 
         public async Task<ServiceResponse<IEnumerable<GetAllParkingPriceQueryResponse>>> Handle(GetAllParkingPriceQuery request, CancellationToken cancellationToken)
         {
             try
             {
+                var business = await _businessProfileRepository.GetItemWithCondition(x => x.UserId == request.ManagerId);
+
+                if (business == null)
+                {
+                    return new ServiceResponse<IEnumerable<GetAllParkingPriceQueryResponse>>
+                    {
+                        Message = "Không tìm thấy",
+                        StatusCode = 200,
+                        Success = true
+                    };
+                }
+
                 var parkingPrices = await _parkingPriceRepository
-                    .GetAllItemWithPagination(x => x.UserId == request.BusinessId, 
+                    .GetAllItemWithPagination(x => x.BusinessId == business.BusinessProfileId,
                                                 null, x => x.ParkingPriceId, true,
                                                 request.PageNo,
                                                 request.PageSize);

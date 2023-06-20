@@ -9,9 +9,9 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Queries.GetVnPayByManagerId
+namespace Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Queries.GetVnPayByBusinessId
 {
-    public class GetVnPayByManagerIdQueryHandler : IRequestHandler<GetVnPayByManagerIdQuery, ServiceResponse<GetVnPayByManagerIdResponse>>
+    public class GetVnPayByManagerIdQueryHandler : IRequestHandler<GetVnPayByBusinessIdQuery, ServiceResponse<GetVnPayByBusinessIdResponse>>
     {
         private readonly IVnPayRepository _vnPayRepository;
         MapperConfiguration config = new MapperConfiguration(cfg =>
@@ -23,18 +23,18 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayMa
         {
             _vnPayRepository = vnPayRepository;
         }
-        public async Task<ServiceResponse<GetVnPayByManagerIdResponse>> Handle(GetVnPayByManagerIdQuery request, CancellationToken cancellationToken)
+        public async Task<ServiceResponse<GetVnPayByBusinessIdResponse>> Handle(GetVnPayByBusinessIdQuery request, CancellationToken cancellationToken)
         {
             try
             {
                 List<Expression<Func<Domain.Entities.VnPay, object>>> includes = new List<Expression<Func<Domain.Entities.VnPay, object>>>
                 {
-                    x => x.Manager
+                    x => x.Business
                 };
-                var vnpayInfor = await _vnPayRepository.GetItemWithCondition(x => x.ManagerId.Equals(request.ManagerId), includes, true);
-                if(vnpayInfor == null)
+                var vnpayInfor = await _vnPayRepository.GetItemWithCondition(x => x.BusinessId.Equals(request.BusinessId), includes, true);
+                if (vnpayInfor == null)
                 {
-                    return new ServiceResponse<GetVnPayByManagerIdResponse>
+                    return new ServiceResponse<GetVnPayByBusinessIdResponse>
                     {
                         Message = "Không tìm thấy.",
                         StatusCode = 200,
@@ -42,8 +42,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayMa
                     };
                 };
                 var _mapper = config.CreateMapper();
-                var vnpayInforEntity = _mapper.Map<GetVnPayByManagerIdResponse>(vnpayInfor);
-                return new ServiceResponse<GetVnPayByManagerIdResponse>
+                var vnpayInforEntity = _mapper.Map<GetVnPayByBusinessIdResponse>(vnpayInfor);
+                return new ServiceResponse<GetVnPayByBusinessIdResponse>
                 {
                     Data = vnpayInforEntity,
                     Success = true,

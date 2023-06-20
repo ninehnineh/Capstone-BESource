@@ -34,7 +34,7 @@ namespace Parking.FindingSlotManagement.Infrastructure
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<ITrafficRepository, TrafficRepository>();
             services.AddScoped<IParkingRepository, ParkingRepository>();
-            services.AddScoped<IStaffParkingRepository, StaffParkingRepository>();
+            //services.AddScoped<IStaffParkingRepository, StaffParkingRepository>();
             services.AddScoped<IFloorRepository, FloorRepository>();
             services.AddScoped<IFavoriteAddressRepository, FavoriteAddressRepository>();
             services.AddScoped<IVehicleInfoRepository, VehicleInfoRepository>();
@@ -47,7 +47,7 @@ namespace Parking.FindingSlotManagement.Infrastructure
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IParkingSlotRepository, ParkingSlotRepository>();
             services.AddScoped<IBookingRepository, BookingRepository>();
-            services.AddScoped<IOTPRepository, OTPRepository>();
+            //services.AddScoped<IOTPRepository, OTPRepository>();
             services.AddScoped<IPaypalRepository, PaypalRepository>();
             services.AddScoped<IParkingSpotImageRepository, ParkingSpotImageRepository>();
             services.AddScoped<IParkingPriceRepository, ParkingPriceRepository>();
@@ -55,9 +55,9 @@ namespace Parking.FindingSlotManagement.Infrastructure
 
             FirebaseApp.Create(new AppOptions
             {
-                /*Credential = GoogleCredential
-                .FromFile(@"..\Parking.FindingSlotManagement.Infrastructure\Firebase\parkz-f1bd0-firebase-adminsdk-rjod0-8d0ba17bb5.json")*/
-                Credential = GoogleCredential.FromFile(@"C:\home\site\wwwroot\Firebase\parkz-f1bd0-firebase-adminsdk-rjod0-8d0ba17bb5.json")
+                Credential = GoogleCredential
+                .FromFile(@"..\Parking.FindingSlotManagement.Infrastructure\Firebase\parkz-f1bd0-firebase-adminsdk-rjod0-8d0ba17bb5.json")
+                //Credential = GoogleCredential.FromFile(@"C:\home\site\wwwroot\Firebase\parkz-f1bd0-firebase-adminsdk-rjod0-8d0ba17bb5.json")
             });
 
             services.AddScoped<IFireBaseMessageServices, FireBaseMessageServices>();

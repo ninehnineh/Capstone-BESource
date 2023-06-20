@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿/*using MediatR;
 using Microsoft.Extensions.Configuration;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
@@ -110,3 +110,4 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         }
     }
 }
+*/

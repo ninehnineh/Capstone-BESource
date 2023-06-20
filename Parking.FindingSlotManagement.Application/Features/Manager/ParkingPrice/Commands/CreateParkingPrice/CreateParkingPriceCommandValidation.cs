@@ -14,20 +14,23 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
         private readonly IParkingPriceRepository _parkingPriceRepository;
         private readonly IUserRepository _userRepository;
         private readonly ITrafficRepository _trafficRepository;
+        private readonly IBusinessProfileRepository _businessProfileRepository;
 
         public CreateParkingPriceCommandValidation(IParkingPriceRepository parkingPriceRepository,
-            IUserRepository userRepository, ITrafficRepository trafficRepository)
+            IUserRepository userRepository, ITrafficRepository trafficRepository,
+            IBusinessProfileRepository businessProfileRepository)
         {
             _parkingPriceRepository = parkingPriceRepository;
             _userRepository = userRepository;
             _trafficRepository = trafficRepository;
+            _businessProfileRepository = businessProfileRepository;
             RuleFor(x => x.BusinessId)
                 .NotEmpty().WithMessage("Vui lòng nhập {PropertyName}.")
                 .NotNull()
                 .GreaterThanOrEqualTo(0).WithMessage("{BusinessId} phải lớn hơn 0")
                 .MustAsync(async (id, token) =>
                 {
-                    var exist = await _userRepository.GetItemWithCondition(x => x.UserId == id);
+                    var exist = await _businessProfileRepository.GetItemWithCondition(x => x.BusinessProfileId == id);
                     return exist != null;
                 }).WithMessage("Business không tồn tại");
 
@@ -49,7 +52,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
                 {
                     var exists = await _parkingPriceRepository
                         .GetItemWithCondition(x => x.ParkingPriceName!.Equals(Command.ParkingPriceName) &&
-                                                    x.UserId == Command.BusinessId);
+                                                    x.BusinessId == Command.BusinessId);
                     return exists == null;
                 }).WithMessage("'{PropertyValue}' đã tồn tại");
             RuleFor(c => c.StartingTime)

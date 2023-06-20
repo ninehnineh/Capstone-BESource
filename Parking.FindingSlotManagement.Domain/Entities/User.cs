@@ -34,10 +34,9 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public virtual ICollection<FavoriteAddress> FavoriteAddresses { get; set; }
         public virtual ICollection<User> InverseManager { get; set; }
         public virtual ICollection<PayPal> PayPals { get; set; }
-        public virtual ICollection<StaffParking> StaffParkings { get; set; }
         public virtual ICollection<VehicleInfor> VehicleInfors { get; set; }
-        public virtual ICollection<VnPay> VnPays { get; set; }
-        public ICollection<OTP> OTPs { get; set; }
-        public ICollection<ParkingPrice> ParkingPrices { get; set; }
+        public int? ParkingId { get; set; }
+        public Parking? Parking { get; set; }
+
     }
 }

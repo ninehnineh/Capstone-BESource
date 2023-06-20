@@ -12,6 +12,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayMa
         public int VnPayId { get; set; }
         public string? TmnCode { get; set; }
         public string? HashSecret { get; set; }
-        public int? ManagerId { get; set; }
+        public int? BusinessId { get; set; }
     }
 }

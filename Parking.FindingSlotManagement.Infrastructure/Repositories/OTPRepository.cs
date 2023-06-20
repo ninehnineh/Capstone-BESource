@@ -1,21 +1,21 @@
-﻿using Parking.FindingSlotManagement.Application.Contracts.Persistence;
-using Parking.FindingSlotManagement.Domain.Entities;
-using Parking.FindingSlotManagement.Infrastructure.Persistences;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿//using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+//using Parking.FindingSlotManagement.Domain.Entities;
+//using Parking.FindingSlotManagement.Infrastructure.Persistences;
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Infrastructure.Repositories
-{
-    public class OTPRepository : GenericRepository<OTP>, IOTPRepository
-    {
-        private readonly ParkZDbContext _dbContext;
+//namespace Parking.FindingSlotManagement.Infrastructure.Repositories
+//{
+//    public class OTPRepository : GenericRepository<OTP>, IOTPRepository
+//    {
+//        private readonly ParkZDbContext _dbContext;
 
-        public OTPRepository(ParkZDbContext dbContext) : base(dbContext)
-        {
-            _dbContext = dbContext;
-        }
-    }
-}
+//        public OTPRepository(ParkZDbContext dbContext) : base(dbContext)
+//        {
+//            _dbContext = dbContext;
+//        }
+//    }
+//}

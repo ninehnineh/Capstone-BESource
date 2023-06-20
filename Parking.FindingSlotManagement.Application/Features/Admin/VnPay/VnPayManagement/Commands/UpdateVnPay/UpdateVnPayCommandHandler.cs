@@ -11,19 +11,20 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayMa
     public class UpdateVnPayCommandHandler : IRequestHandler<UpdateVnPayCommand, ServiceResponse<string>>
     {
         private readonly IVnPayRepository _vnPayRepository;
+        private readonly IBusinessProfileRepository _businessProfileRepository;
         private readonly IAccountRepository _accountRepository;
 
-        public UpdateVnPayCommandHandler(IVnPayRepository vnPayRepository, IAccountRepository accountRepository)
+        public UpdateVnPayCommandHandler(IVnPayRepository vnPayRepository, IBusinessProfileRepository businessProfileRepository)
         {
             _vnPayRepository = vnPayRepository;
-            _accountRepository = accountRepository;
+            _businessProfileRepository = businessProfileRepository;
         }
         public async Task<ServiceResponse<string>> Handle(UpdateVnPayCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 var checkExist = await _vnPayRepository.GetById(request.VnPayId);
-                if(checkExist == null)
+                if (checkExist == null)
                 {
                     return new ServiceResponse<string>
                     {
@@ -33,29 +34,29 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayMa
                         Count = 0
                     };
                 }
-                if(!string.IsNullOrEmpty(request.TmnCode))
+                if (!string.IsNullOrEmpty(request.TmnCode))
                 {
                     checkExist.TmnCode = request.TmnCode;
                 }
-                if(!string.IsNullOrEmpty(request.HashSecret))
+                if (!string.IsNullOrEmpty(request.HashSecret))
                 {
                     checkExist.HashSecret = request.HashSecret;
                 }
-                if(!string.IsNullOrEmpty(request.ManagerId.ToString()))
+                if (!string.IsNullOrEmpty(request.BusinessId.ToString()))
                 {
-                    var checkManagerExist = await _accountRepository.GetItemWithCondition(x => x.RoleId == 1 && x.IsActive == true && x.IsCensorship == true && x.UserId.Equals(request.ManagerId));
-                    if(checkManagerExist == null)
+                    
+                    var checkBusinessExist = await _businessProfileRepository.GetById(request.BusinessId);
+                    if (checkBusinessExist == null)
                     {
                         return new ServiceResponse<string>
                         {
-                            Message = "Không tìm thấy quản lý hoặc quản lý không chưa được kiểm duyệt hoặc bị banned.",
+                            Message = "Không tìm thấy tài khoản doanh nghiêp.",
                             Success = true,
                             StatusCode = 200,
-                            Count = 0
                         };
                     }
-                    var checkManagerAlreadyHasRegisterVnPay = await _vnPayRepository.GetItemWithCondition(x => x.ManagerId.Equals(checkManagerExist.UserId));
-                    if(checkManagerAlreadyHasRegisterVnPay != null)
+                    var checkBusinessAccountAlreadyRegisterVnPay = await _vnPayRepository.GetItemWithCondition(x => x.BusinessId.Equals(checkBusinessExist.BusinessProfileId));
+                    if (checkBusinessAccountAlreadyRegisterVnPay != null)
                     {
                         return new ServiceResponse<string>
                         {
@@ -65,7 +66,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayMa
                             Count = 0
                         };
                     }
-                    checkExist.ManagerId = request.ManagerId;
+                    checkExist.BusinessId = request.BusinessId;
                 }
                 await _vnPayRepository.Update(checkExist);
                 return new ServiceResponse<string>
