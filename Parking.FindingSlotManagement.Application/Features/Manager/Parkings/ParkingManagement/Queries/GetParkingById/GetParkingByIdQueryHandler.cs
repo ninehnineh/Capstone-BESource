@@ -30,6 +30,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
         {
             try
             {
+                int parkingHasPriceCount;
+                int floorCount;
                 var parkingExist = await _parkingRepository.GetById(request.ParkingId);
                 if(parkingExist == null)
                 {
@@ -53,10 +55,26 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                 var parkingEntity = _mapper.Map<ParkingEntity>(parkingExist);
 
                 var floorExist = await _floorRepository.GetAllItemWithConditionByNoInclude(x => x.ParkingId == request.ParkingId && x.IsActive == true);
-                var floorCount = floorExist.Count();
-                var parkingHasPriceExist = await _parkingHasPriceRepository.GetAllItemWithConditionByNoInclude(x => x.ParkingId == request.ParkingId);
-                var parkingHasPriceCount = parkingHasPriceExist.Count();
 
+                if (floorExist == null || floorExist.Count() == 0)
+                {
+                    floorCount = 0;
+                }
+                else
+                {
+                    floorCount = floorExist.Count();
+                }
+                var parkingHasPriceExist = await _parkingHasPriceRepository.GetAllItemWithConditionByNoInclude(x => x.ParkingId == request.ParkingId);
+                
+                if (parkingHasPriceExist == null || parkingHasPriceExist.Count() == 0)
+                {
+                    parkingHasPriceCount = 0;
+                }
+                else
+                {
+                    parkingHasPriceCount = parkingHasPriceExist.Count();
+
+                }
                 var res = new GetParkingByIdResponse
                 {
                     ParkingEntity = parkingEntity,
