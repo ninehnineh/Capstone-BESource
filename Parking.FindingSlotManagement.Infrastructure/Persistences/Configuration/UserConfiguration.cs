@@ -32,8 +32,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .IsUnicode(false);
 
             builder.Property(e => e.Gender)
-                .HasMaxLength(20)
-                .IsUnicode(false);
+                .HasMaxLength(20);
 
             builder.Property(e => e.ManagerId).HasColumnName("ManagerID");
 
