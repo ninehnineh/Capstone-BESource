@@ -75,8 +75,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Parking.Qu
                             StatusCode = 400,
                             Success = false
                         };*/
-                        itemAdd.PriceCar = 0;
-                        itemAdd.PriceMoto = 0;
+                        itemAdd.PriceCar = null;
+                        itemAdd.PriceMoto = null;
                         lstResponse.Add(itemAdd);
                         continue;
                     }
@@ -87,10 +87,12 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Parking.Qu
                         if(parkingPrice.TrafficId == 1)
                         {
                             itemAdd.PriceCar = timelineCurrent.Price;
+                            itemAdd.PriceMoto = null;
                         }
                         else if(parkingPrice.TrafficId == 2)
                         {
                             itemAdd.PriceMoto = timelineCurrent.Price;
+                            itemAdd.PriceCar = null;
                         }
                     }
                     lstResponse.Add(itemAdd);

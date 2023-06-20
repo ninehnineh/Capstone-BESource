@@ -55,51 +55,49 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
                 foreach (var item in lstDto)
                 {
                     var res = GetDistanceMethod(request.CurrentLatitude, request.CurrentLongtitude, (double)item.Latitude, (double)item.Longitude);
-                    if(res <= 5)
-                    {
-                        var parkingWithDistance = new ParkingWithDistance();
-                        var lstParkingHasPrice = await _parkingHasPriceRepository.GetAllItemWithConditionByNoInclude(x => x.ParkingId == item.ParkingId);
-                        if (lstParkingHasPrice == null)
-                        {
 
+                    var parkingWithDistance = new ParkingWithDistance();
+                    var lstParkingHasPrice = await _parkingHasPriceRepository.GetAllItemWithConditionByNoInclude(x => x.ParkingId == item.ParkingId);
+                    if (lstParkingHasPrice == null)
+                    {
+
+                        parkingWithDistance = new ParkingWithDistance
+                        {
+                            GetListParkingNearestYouQueryResponse = item,
+                            Distance = res,
+                            PriceCar = null,
+                            PriceMoto = null
+                        };
+                        lst.Add(parkingWithDistance);
+                        continue;
+                    }
+                    foreach (var item2 in lstParkingHasPrice)
+                    {
+                        var timelineCurrent = await GetTimeLine(item2);
+                        var parkingPrice = await _parkingPriceRepository.GetById(item2.ParkingPriceId);
+                        if (parkingPrice.TrafficId == 1)
+                        {
                             parkingWithDistance = new ParkingWithDistance
                             {
                                 GetListParkingNearestYouQueryResponse = item,
                                 Distance = res,
-                                PriceCar = 0,
-                                PriceMoto = 0
+                                PriceCar = timelineCurrent.Price,
+                                PriceMoto = null
                             };
-                            lst.Add(parkingWithDistance);
-                            continue;
                         }
-                        foreach (var item2 in lstParkingHasPrice)
+                        else if (parkingPrice.TrafficId == 2)
                         {
-                            var timelineCurrent = await GetTimeLine(item2);
-                            var parkingPrice = await _parkingPriceRepository.GetById(item2.ParkingPriceId);
-                            if (parkingPrice.TrafficId == 1)
+                            parkingWithDistance = new ParkingWithDistance
                             {
-                                parkingWithDistance = new ParkingWithDistance
-                                {
-                                    GetListParkingNearestYouQueryResponse = item,
-                                    Distance = res,
-                                    PriceCar = timelineCurrent.Price,
-                                    PriceMoto = 0
-                                };
-                            }
-                            else if (parkingPrice.TrafficId == 2)
-                            {
-                                parkingWithDistance = new ParkingWithDistance
-                                {
-                                    GetListParkingNearestYouQueryResponse = item,
-                                    Distance = res,
-                                    PriceCar = 0,
-                                    PriceMoto = timelineCurrent.Price
-                                };
-                            }
+                                GetListParkingNearestYouQueryResponse = item,
+                                Distance = res,
+                                PriceCar = null,
+                                PriceMoto = timelineCurrent.Price
+                            };
                         }
-                        
-                        lst.Add(parkingWithDistance);
                     }
+                        
+                    lst.Add(parkingWithDistance);
                 }
                 if (lst.Count() <= 0)
                 {
@@ -112,7 +110,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
                 }
                 return new ServiceResponse<IEnumerable<ParkingWithDistance>>
                 {
-                    Data = lst,
+                    Data = lst.OrderBy(x => x.Distance).Take(5),
                     Message = "Thành công",
                     Success = true,
                     StatusCode = 200

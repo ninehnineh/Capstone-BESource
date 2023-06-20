@@ -58,6 +58,8 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Parkin
 using Parking.FindingSlotManagement.Application.Features.Customer.Parking.Queries.GetListParkingDesByRating;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetListBookingByManagerId;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetBookingById;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Queries.GetListParkingSlotByFloorId;
+using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Queries.GetListFloorByParkingId;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -137,6 +139,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #region Floor Mapping
             CreateMap<Floor, CreateNewFloorCommand>().ReverseMap();
             CreateMap<Floor, GetListFloorResponse>().ReverseMap();
+            CreateMap<Floor, GetListFloorByParkingIdResponse>().ReverseMap();
             #endregion
 
             #region TimeLine Mapping
@@ -189,6 +192,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #region Parkingslots Mapping
             CreateMap<ParkingSlot, CreateParkingSlotsCommand>().ReverseMap();
             CreateMap<ParkingSlot, GetAvailableSlotsResponse>().ReverseMap();
+            CreateMap<ParkingSlot, GetListParkingSlotByFloorIdResponse>().ReverseMap();
             #endregion
 
             #region Timeline Mapping
@@ -216,6 +220,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.VehicleName, act => act.MapFrom(obj => obj.VehicleInfor.VehicleName))
                 .ForMember(dto => dto.Color, act => act.MapFrom(obj => obj.VehicleInfor.Color))
                 .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.VehicleInfor.Traffic.Name))
+                .ForMember(dto => dto.CustomerAvatar, act => act.MapFrom(obj => obj.User.Avatar))
                 .ReverseMap();
             #endregion
         }

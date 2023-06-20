@@ -16,6 +16,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Que
         public DateTime? CheckoutTime { get; set; }
         public string CustomerName { get; set; }
         public string CustomerPhone { get; set; }
+        public string CustomerAvatar { get; set; }
         public string? GuestName { get; set; }
         public string? GuestPhone { get; set; }
         public decimal? ActualPrice { get; set; }
