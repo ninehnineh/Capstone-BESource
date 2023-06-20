@@ -1,4 +1,4 @@
-﻿/*using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Configuration;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
@@ -20,16 +20,14 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         private readonly IParkingRepository _parkingRepository;
         private readonly IConfiguration _configuration;
         private readonly IFireBaseMessageServices _fireBaseMessageServices;
-        private readonly IStaffParkingRepository _staffParkingRepository;
         private readonly IUserRepository _userRepository;
 
-        public ChangeStatusToAlreadyPaidCommandHandler(IBookingRepository bookingRepository, IParkingRepository parkingRepository, IConfiguration configuration, IFireBaseMessageServices fireBaseMessageServices, IStaffParkingRepository staffParkingRepository, IUserRepository userRepository)
+        public ChangeStatusToAlreadyPaidCommandHandler(IBookingRepository bookingRepository, IParkingRepository parkingRepository, IConfiguration configuration, IFireBaseMessageServices fireBaseMessageServices, IUserRepository userRepository)
         {
             _bookingRepository = bookingRepository;
             _parkingRepository = parkingRepository;
             _configuration = configuration;
             _fireBaseMessageServices = fireBaseMessageServices;
-            _staffParkingRepository = staffParkingRepository;
             _userRepository = userRepository;
         }
         public async Task<ServiceResponse<string>> Handle(ChangeStatusToAlreadyPaidCommand request, CancellationToken cancellationToken)
@@ -61,7 +59,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 var titleManager = _configuration.GetSection("MessageTitle_Manager").GetSection("Payment_Success").Value;
                 var bodyManager = _configuration.GetSection("MessageBody_Manager").GetSection("Payment_Success").Value;
 
-                var includeUser = new List<Expression<Func<StaffParking, object>>>
+                /*var includeUser = new List<Expression<Func<StaffParking, object>>>
                 {
                     x => x.User!,
                 };
@@ -94,6 +92,35 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         };
                         await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
                     }
+                }*/
+                var deviceToken = "";
+                var managerAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
+                var lstStaff = managerAccount.Where(x => x.RoleId == 2);
+                var ManagerOfParking = managerAccount.FirstOrDefault(x => x.RoleId == 1);
+                if (lstStaff.Any())
+                {
+                    foreach (var item in lstStaff)
+                    {
+                        deviceToken = item.Devicetoken.ToString();
+                        var pushNotificationModel = new PushNotificationWebModel
+                        {
+                            Title = titleManager,
+                            Message = bodyManager + booking.ActualPrice,
+                            TokenWeb = deviceToken,
+                        };
+                        await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
+                    }
+                }
+                else
+                {
+                    var manager = await _userRepository.GetById(ManagerOfParking.UserId!);
+                    var pushNotificationModel = new PushNotificationWebModel
+                    {
+                        Title = titleManager,
+                        Message = bodyManager + booking.ActualPrice,
+                        TokenWeb = manager.Devicetoken,
+                    };
+                    await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
                 }
                 return new ServiceResponse<string>
                 {
@@ -110,4 +137,3 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         }
     }
 }
-*/

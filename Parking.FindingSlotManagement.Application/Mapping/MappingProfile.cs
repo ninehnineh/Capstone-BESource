@@ -62,6 +62,7 @@ using Parking.FindingSlotManagement.Application.Models.Floor;
 using Parking.FindingSlotManagement.Application.Models.User;
 using Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Queries.GetParkingSlots;
 using Parking.FindingSlotManagement.Application.Models.Traffic;
+using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetListBookingByManagerId;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -215,6 +216,13 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #region Booking Mapping
             CreateMap<Booking, BookingDto>().ReverseMap();
             CreateMap<Booking, BookingDetailsDto>().ReverseMap();
+            CreateMap<Booking, GetListBookingByManagerIdResponse>()
+                .ForMember(dto => dto.CustomerName, act => act.MapFrom(obj => obj.User.Name))
+                .ForMember(dto => dto.Phone, act => act.MapFrom(obj => obj.User.Phone))
+                .ForMember(dto => dto.Position, act => act.MapFrom(obj => obj.ParkingSlot.Name))
+                .ForMember(dto => dto.LicensePlate, act => act.MapFrom(obj => obj.VehicleInfor.LicensePlate))
+                .ForMember(dto => dto.ParkingName, act => act.MapFrom(obj => obj.ParkingSlot.Floor.Parking.Name))
+                .ReverseMap();
             #endregion
         }
     }
