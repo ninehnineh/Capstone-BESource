@@ -24,11 +24,12 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public float? Stars { get; set; }
         public float? TotalStars { get; set; }
         public int? StarsCount { get; set; }
-        public int? ManagerId { get; set; }
+        public int BusinessId { get; set; }
 
+        public BusinessProfile BusinessProfile { get; set; }
         public virtual ICollection<Floor>? Floors { get; set; }
         public virtual ICollection<ParkingHasPrice>? ParkingHasPrices { get; set; }
         public virtual ICollection<ParkingSpotImage>? ParkingSpotImages { get; set; }
-        public virtual ICollection<StaffParking>? StaffParkings { get; set; }
+        public ICollection<User> Users { get; set; }
     }
 }

@@ -20,6 +20,9 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public virtual User? User { get; set; }
 
         public ICollection<FieldWorkImg>? FieldWorkImgs { get; set; }
+        public ICollection<Parking> Parkings { get; set; }
+        public virtual ICollection<VnPay> VnPays { get; set; }
+        public ICollection<ParkingPrice> ParkingPrices { get; set; }
 
     }
 }

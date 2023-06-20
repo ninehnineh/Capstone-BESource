@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 
@@ -11,9 +12,10 @@ using Parking.FindingSlotManagement.Infrastructure.Persistences;
 namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ParkZDbContext))]
-    partial class ParkZDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230620090757_ChangeBusinessRulesUserAndParking")]
+    partial class ChangeBusinessRulesUserAndParking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -329,10 +331,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ParkingPriceId"), 1L, 1);
 
-                    b.Property<int?>("BusinessId")
-                        .HasColumnType("int")
-                        .HasColumnName("BusinessId");
-
                     b.Property<float?>("ExtraTimeStep")
                         .HasColumnType("real");
 
@@ -365,11 +363,15 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Property<int?>("TrafficId")
                         .HasColumnType("int");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("BusinessId");
+
                     b.HasKey("ParkingPriceId");
 
-                    b.HasIndex("BusinessId");
-
                     b.HasIndex("TrafficId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("ParkingPrice", (string)null);
                 });
@@ -647,7 +649,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("ParkingId")
+                    b.Property<int>("ParkingId")
                         .HasColumnType("int");
 
                     b.Property<byte[]>("PasswordHash")
@@ -844,20 +846,21 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.ParkingPrice", b =>
                 {
-                    b.HasOne("Parking.FindingSlotManagement.Domain.Entities.BusinessProfile", "BusinessProfile")
-                        .WithMany("ParkingPrices")
-                        .HasForeignKey("BusinessId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("FK__Business__ParkingPri");
-
                     b.HasOne("Parking.FindingSlotManagement.Domain.Entities.Traffic", "Traffic")
                         .WithMany("ParkingPrices")
                         .HasForeignKey("TrafficId")
                         .HasConstraintName("FK__Traffic_Parkingpri");
 
-                    b.Navigation("BusinessProfile");
+                    b.HasOne("Parking.FindingSlotManagement.Domain.Entities.User", "User")
+                        .WithMany("ParkingPrices")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK__Business__ParkingPri__sdwq23dca");
 
                     b.Navigation("Traffic");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.ParkingSlot", b =>
@@ -917,6 +920,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.HasOne("Parking.FindingSlotManagement.Domain.Entities.Parking", "Parking")
                         .WithMany("Users")
                         .HasForeignKey("ParkingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("FK__Parking__Users");
 
                     b.HasOne("Parking.FindingSlotManagement.Domain.Entities.Role", "Role")
@@ -961,8 +966,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.BusinessProfile", b =>
                 {
                     b.Navigation("FieldWorkImgs");
-
-                    b.Navigation("ParkingPrices");
 
                     b.Navigation("Parkings");
 
@@ -1020,6 +1023,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Navigation("FavoriteAddresses");
 
                     b.Navigation("InverseManager");
+
+                    b.Navigation("ParkingPrices");
 
                     b.Navigation("PayPals");
 

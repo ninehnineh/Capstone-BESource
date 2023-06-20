@@ -15,22 +15,22 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
         {
             builder.ToTable("VnPay");
 
-            builder.HasIndex(e => e.ManagerId, "IX_VnPay_ManagerID");
+            builder.HasIndex(e => e.BusinessId, "IX_VnPay_BusinessId");
 
             builder.Property(e => e.HashSecret)
                 .HasMaxLength(255)
                 .IsUnicode(false);
 
-            builder.Property(e => e.ManagerId).HasColumnName("ManagerID");
+            builder.Property(e => e.BusinessId).HasColumnName("BusinessId");
 
             builder.Property(e => e.TmnCode)
                 .HasMaxLength(20)
                 .IsUnicode(false);
 
-            builder.HasOne(d => d.Manager)
+            builder.HasOne(d => d.Business)
                 .WithMany(p => p.VnPays)
-                .HasForeignKey(d => d.ManagerId)
-                .HasConstraintName("FK__VnPay__ManagerID__2A4B4B5E");
+                .HasForeignKey(d => d.BusinessId)
+                .HasConstraintName("FK__VnPay__BusinessId__2A4B4B5E");
         }
     }
 }

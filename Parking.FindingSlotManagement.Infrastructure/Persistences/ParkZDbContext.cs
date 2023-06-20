@@ -32,12 +32,10 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences
         public DbSet<ParkingSpotImage> ParkingSpotImages { get; set; } = null!;
         public DbSet<PayPal> PayPals { get; set; } = null!;
         public DbSet<Role> Roles { get; set; } = null!;
-        public DbSet<StaffParking> StaffParkings { get; set; } = null!;
         public DbSet<Traffic> Traffics { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<VehicleInfor> VehicleInfors { get; set; } = null!;
         public DbSet<Domain.Entities.VnPay> VnPays { get; set; } = null!;
-        public DbSet<OTP> OTPs { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
