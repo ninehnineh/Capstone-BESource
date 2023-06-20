@@ -6,6 +6,7 @@ using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Comman
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CreateBooking;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.PaymentMethod;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetAvailableSlot;
+using Parking.FindingSlotManagement.Application.Features.Customer.Parking.Queries.GetBookingDetails;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.CheckIn;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
@@ -120,6 +121,26 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
                 if (res.Message == "Thành công")
                 {
                     return NoContent();
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
+        [HttpGet("getbooked-booking")]
+        public async Task<ActionResult<ServiceResponse<GetBookingDetailsResponse>>> GetBookingDetails(
+            [FromQuery] GetBookingDetailsQuery query)
+        {
+            try
+            {
+                var res = await _mediator.Send(query);
+                if (res.Message == "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
                 }
                 return StatusCode((int)res.StatusCode, res);
             }

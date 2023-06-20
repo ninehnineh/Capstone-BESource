@@ -2,16 +2,10 @@
 using Microsoft.Extensions.Configuration;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
-using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CreateBooking;
 using Parking.FindingSlotManagement.Application.Models.PushNotification;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Domain.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.CheckOut
 {
