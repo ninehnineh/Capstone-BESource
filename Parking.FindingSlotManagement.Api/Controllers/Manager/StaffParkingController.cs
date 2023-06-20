@@ -27,6 +27,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <summary>
         /// API For Manager
         /// </summary>
+        /// <remarks>
+        /// SignalR: LoadStaffParking
+        /// </remarks>
         [HttpPost(Name = "CreateNewStaffParking")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
@@ -38,6 +41,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
                 var res = await _mediator.Send(command);
                 if (res.Message == "Thành công")
                 {
+                    await _messageHub.Clients.All.SendAsync("LoadStaffParking");
                     return StatusCode((int)res.StatusCode, res);
                 }
                 return BadRequest();
@@ -57,6 +61,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <summary>
         /// API For Manager
         /// </summary>
+        /// <remarks>
+        /// SignalR: LoadStaffParking
+        /// </remarks>
         [HttpPut("{staffParkingId}", Name = "UpdateStaffParking")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -70,6 +77,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
                 {
                     return StatusCode((int)res.StatusCode, res);
                 }
+                await _messageHub.Clients.All.SendAsync("LoadStaffParking");
                 return NoContent();
             }
             catch (Exception ex)
