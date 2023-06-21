@@ -16,14 +16,14 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Cus
     {
         private readonly Mock<IVehicleInfoRepository> _vehicleInforRepositoryMock;
         private readonly Mock<ITrafficRepository> _trafficRepositoryMock;
-        private readonly VehicleInfoForGuestCommandHandler _handler;
+        private readonly VehicleInfoForGuestHandler _handler;
         private readonly VehicleInfoForGuestValidation _validator;
         public VehicleInfoForGuestCommandHandlerTests()
         {
             _vehicleInforRepositoryMock = new Mock<IVehicleInfoRepository>();
             _validator = new VehicleInfoForGuestValidation();
             _trafficRepositoryMock = new Mock<ITrafficRepository>();
-            _handler = new VehicleInfoForGuestCommandHandler(_vehicleInforRepositoryMock.Object, _trafficRepositoryMock.Object);
+            _handler = new VehicleInfoForGuestHandler(_vehicleInforRepositoryMock.Object, _trafficRepositoryMock.Object);
         }
         [Fact]
         public async Task Handle_WhenCreatedSuccessfully_ReturnsCreated()

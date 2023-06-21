@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfoForGuest.VehicleInfoForGuestManagement.Commands.CreateVehicleInfoForGuest
 {
-    public class VehicleInfoForGuestCommandHandler : IRequestHandler<VehicleInfoForGuestCommand, ServiceResponse<int>>
+    public class VehicleInfoForGuestHandler : IRequestHandler<VehicleInfoForGuestCommand, ServiceResponse<int>>
     {
         private readonly IVehicleInfoRepository _vehicleInfoRepository;
         private readonly ITrafficRepository _trafficRepository;
@@ -20,7 +20,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.VehicleInf
             cfg.AddProfile(new MappingProfile());
         });
 
-        public VehicleInfoForGuestCommandHandler(IVehicleInfoRepository vehicleInfoRepository, ITrafficRepository trafficRepository)
+        public VehicleInfoForGuestHandler(IVehicleInfoRepository vehicleInfoRepository, ITrafficRepository trafficRepository)
         {
             _vehicleInfoRepository = vehicleInfoRepository;
             _trafficRepository = trafficRepository;

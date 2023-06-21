@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Customer.VehicleInfoForGuest.VehicleInfoForGuestManagement
 {
-    public class DeleteVehicleInforForGuestCommandHandlerTests
+    public class DeleteVehicleInfoForGuestHandlerTests
     {
         private readonly Mock<IVehicleInfoRepository> _vehicleInforRepositoryMock;
-        private readonly DeleteVehicleInforForGuestCommandHandler _handler;
-        public DeleteVehicleInforForGuestCommandHandlerTests()
+        private readonly DeleteVehicleInforForGuestHandler _handler;
+        public DeleteVehicleInfoForGuestHandlerTests()
         {
             _vehicleInforRepositoryMock = new Mock<IVehicleInfoRepository>();
-            _handler = new DeleteVehicleInforForGuestCommandHandler(_vehicleInforRepositoryMock.Object);
+            _handler = new DeleteVehicleInforForGuestHandler(_vehicleInforRepositoryMock.Object);
         }
         [Fact]
         public async Task Handle_Should_DeleteVehicleInfor_When_Exist()
