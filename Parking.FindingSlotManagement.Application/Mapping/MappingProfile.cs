@@ -164,6 +164,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #region ParkingSpotImage Mapping
             CreateMap<ParkingSpotImage, CreateNewParkingSpotImageCommand>().ReverseMap();
             CreateMap<ParkingSpotImage, GetListImageByParkingIdResponse>().ReverseMap();
+            CreateMap<ParkingSpotImage, ParkingSpotImageDto>().ReverseMap();
             #endregion
 
             #region ParkingPrice Mapping

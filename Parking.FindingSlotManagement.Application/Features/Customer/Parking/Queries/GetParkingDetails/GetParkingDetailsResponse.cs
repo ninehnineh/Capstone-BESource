@@ -24,7 +24,13 @@ public class ParkingDto
     public float? TotalStars { get; set; }
     public int? StarsCount { get; set; }
     public IEnumerable<ParkingHasPriceDto?> ParkingHasPrices { get; set; }
+    public IEnumerable<ParkingSpotImageDto> ParkingSpotImages { get; set; }
+}
 
+public class ParkingSpotImageDto
+{
+    public int ParkingSpotImageId { get; set; }
+    public string? ImgPath { get; set; }
 }
 
 public class ParkingHasPriceDto
