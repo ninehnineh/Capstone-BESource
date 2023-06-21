@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commons;
 using Parking.FindingSlotManagement.Application.Models.Booking;
 using Parking.FindingSlotManagement.Application.Models.PushNotification;
 using Parking.FindingSlotManagement.Domain.Entities;
@@ -201,7 +202,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 var timeLines = await _timelineRepository
                     .GetAllItemWithCondition(x => x.ParkingPriceId == appliedParkingPriceId);
 
-                decimal totalPrice = CaculateTotalPrice(request, parkingPrice, timeLines);
+                decimal totalPrice = CaculatePriceBooking.CaculateTotalPrice(request.BookingDto.StartTime, request.BookingDto.EndTime, parkingPrice, timeLines);
 
                 entity.TotalPrice = totalPrice;
 
