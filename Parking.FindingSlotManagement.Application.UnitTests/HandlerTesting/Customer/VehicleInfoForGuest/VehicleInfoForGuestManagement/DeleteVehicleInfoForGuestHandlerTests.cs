@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Customer.VehicleInfoForGuest.VehicleInfoForGuestManagement
 {
-    public class DeleteVehicleInforForGuestCommandHandlerTests
+    public class DeleteVehicleInfoForGuestHandlerTests
     {
         private readonly Mock<IVehicleInfoRepository> _vehicleInforRepositoryMock;
         private readonly DeleteVehicleInforForGuestCommandHandler _handler;
-        public DeleteVehicleInforForGuestCommandHandlerTests()
+        public DeleteVehicleInfoForGuestHandlerTests()
         {
             _vehicleInforRepositoryMock = new Mock<IVehicleInfoRepository>();
             _handler = new DeleteVehicleInforForGuestCommandHandler(_vehicleInforRepositoryMock.Object);
