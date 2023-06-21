@@ -17,15 +17,17 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccou
     {
         private readonly IUserRepository _userRepository;
         private readonly IEmailService _emailService;
+        private readonly IParkingRepository _parkingRepository;
         MapperConfiguration _config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MappingProfile());
         });
 
-        public CreateNewAccountForKeeperCommandHandler(IUserRepository userRepository, IEmailService emailService)
+        public CreateNewAccountForKeeperCommandHandler(IUserRepository userRepository, IEmailService emailService, IParkingRepository parkingRepository)
         {
             _userRepository = userRepository;
             _emailService = emailService;
+            _parkingRepository = parkingRepository;
         }
         public async Task<ServiceResponse<int>> Handle(CreateNewAccountForKeeperCommand request, CancellationToken cancellationToken)
         {
@@ -68,6 +70,26 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccou
                         Message = "Tài khoản không phải là quản lý",
                         StatusCode = 400,
                         Success = true
+                    };
+                }
+
+                var checkParkingExist = await _parkingRepository.GetById(request.ParkingId);
+                if(checkParkingExist == null)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Không tìm thấy bãi giữ xe.",
+                        StatusCode = 200,
+                        Success = true
+                    };
+                }
+                if(checkParkingExist.IsActive == false)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Bãi đã bị ban nên không thể thêm nhân viên vào bãi.",
+                        StatusCode = 400,
+                        Success = false
                     };
                 }
 

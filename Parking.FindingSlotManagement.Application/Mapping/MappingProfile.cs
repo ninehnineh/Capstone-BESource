@@ -87,12 +87,13 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ReverseMap();
             CreateMap<User, UserEntity>().ReverseMap();
             CreateMap<User, CreateNewAccountForKeeperCommand>().ReverseMap();
-            CreateMap<User, GetListKeeperByManagerIdResponse>()
-                .ReverseMap();
             CreateMap<User, GetKeeperByIdResponse>()
                 .ForMember(dto => dto.RoleName, act => act.MapFrom(obj => obj.Role.Name))
                 .ReverseMap();
             CreateMap<User, UserBookingDto>().ReverseMap();
+            CreateMap<User, GetListKeeperByManagerIdResponse>()
+                .ForMember<string>(dto => dto.ParkingName, act => act.MapFrom<string>(obj => obj.Parking.Name))
+                .ReverseMap();
             #endregion
 
             #region Traffic Mapping
