@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfoForGuest.VehicleInfoForGuestManagement.Commands.DeleteVehicleInfoForGuest
 {
-    public class DeleteVehicleInforForGuestCommandHandler : IRequestHandler<DeleteVehicleInforForGuestCommand, ServiceResponse<string>>
+    public class DeleteVehicleInforForGuestHandler : IRequestHandler<DeleteVehicleInforForGuestCommand, ServiceResponse<string>>
     {
         private readonly IVehicleInfoRepository _vehicleInfoRepository;
 
-        public DeleteVehicleInforForGuestCommandHandler(IVehicleInfoRepository vehicleInfoRepository)
+        public DeleteVehicleInforForGuestHandler(IVehicleInfoRepository vehicleInfoRepository)
         {
             _vehicleInfoRepository = vehicleInfoRepository;
         }
