@@ -39,7 +39,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Floors.Floo
                     };
                 }
                 var lstFloor = await _floorRepository.GetAllItemWithConditionByNoInclude(x => x.ParkingId == request.ParkingId && x.IsActive == true);
-                if(lstFloor.Count() <= 0)
+                if(lstFloor == null || lstFloor.Count() <= 0)
                 {
                     return new ServiceResponse<IEnumerable<GetListFloorByParkingIdResponse>>
                     {
