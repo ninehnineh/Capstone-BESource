@@ -41,6 +41,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Parking.Qu
                 var include = new List<Expression<Func<Domain.Entities.Parking, object>>>
                 {
                     x => x.ParkingHasPrices,
+                    x => x.ParkingSpotImages,
                 };
 
                 var parking = await _parkingRepository
