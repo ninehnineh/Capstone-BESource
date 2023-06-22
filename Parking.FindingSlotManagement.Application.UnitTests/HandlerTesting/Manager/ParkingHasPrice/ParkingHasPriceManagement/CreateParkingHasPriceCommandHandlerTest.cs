@@ -271,7 +271,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             result.ShouldNotBeNull();
             result.Success.ShouldBeFalse();
             result.Data.ShouldBe(0);
-            result.Message.ShouldBe("Bãi giữ xe không hổ trợ xe hơi nên áp dụng gói không phù hợp.");
+            result.Message.ShouldBe("Bãi giữ xe chỉ hổ trợ giữ xe hơi. Áp dụng gói không phù hợp.");
             result.StatusCode.ShouldBe(400);
 
             _parkingHasPriceRepositoryMock.Verify(x => x.Insert(It.IsAny<Domain.Entities.ParkingHasPrice>()), Times.Never);
@@ -303,7 +303,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             result.ShouldNotBeNull();
             result.Success.ShouldBeFalse();
             result.Data.ShouldBe(0);
-            result.Message.ShouldBe("Bãi giữ xe không hổ trợ xe mô tô nên áp dụng gói không phù hợp.");
+            result.Message.ShouldBe("Bãi giữ xe chỉ hổ trợ giữ xe máy. Áp dụng gói không phù hợp.");
             result.StatusCode.ShouldBe(400);
 
             _parkingHasPriceRepositoryMock.Verify(x => x.Insert(It.IsAny<Domain.Entities.ParkingHasPrice>()), Times.Never);

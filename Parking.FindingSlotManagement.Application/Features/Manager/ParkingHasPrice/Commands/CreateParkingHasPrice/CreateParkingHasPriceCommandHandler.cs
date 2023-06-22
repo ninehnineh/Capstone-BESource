@@ -104,20 +104,20 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasP
                     }
                 }
                 //check traffic of the parking and the timeline has match
-                if (checkParkingExist.CarSpot == 0 && checkParkingPriceExist.TrafficId != 1)
+                if (checkParkingExist.CarSpot != 0 && checkParkingPriceExist.TrafficId != 1)
                 {
                     return new ServiceResponse<int>
                     {
-                        Message = "Bãi giữ xe không hổ trợ xe hơi nên áp dụng gói không phù hợp.",
+                        Message = "Bãi giữ xe chỉ hổ trợ giữ xe hơi. Áp dụng gói không phù hợp.",
                         Success = false,
                         StatusCode = 400
                     };
                 }
-                if (checkParkingExist.MotoSpot == 0 && checkParkingPriceExist.TrafficId != 2)
+                if (checkParkingExist.MotoSpot != 0 && checkParkingPriceExist.TrafficId != 2)
                 {
                     return new ServiceResponse<int>
                     {
-                        Message = "Bãi giữ xe không hổ trợ xe mô tô nên áp dụng gói không phù hợp.",
+                        Message = "Bãi giữ xe chỉ hổ trợ giữ xe máy. Áp dụng gói không phù hợp.",
                         Success = false,
                         StatusCode = 400
                     };
