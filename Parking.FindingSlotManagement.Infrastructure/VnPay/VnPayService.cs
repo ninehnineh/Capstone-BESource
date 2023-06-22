@@ -36,7 +36,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.VnPay
             pay.AddRequestData("vnp_IpAddr", pay.GetIpAddress(context));
             pay.AddRequestData("vnp_Locale", _configuration["Vnpay:Locale"]);
             pay.AddRequestData("vnp_OrderInfo", $"Đặt - Slot: {model.ParkingSlotName.Trim()} - Tổng tiền: {model.TotalPrice}");
-            /*pay.AddRequestData("vnp_OrderType", model.OrderType);*/
+            pay.AddRequestData("vnp_OrderType", model.OrderType);
             pay.AddRequestData("vnp_ReturnUrl", urlCallBack);
             pay.AddRequestData("vnp_TxnRef", tick);
             var paymentUrl = pay.CreateRequestUrl(_configuration["Vnpay:BaseUrl"], hashSecret);
