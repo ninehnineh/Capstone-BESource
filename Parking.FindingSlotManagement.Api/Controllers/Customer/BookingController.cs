@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Parking.FindingSlotManagement.Application;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CaculateTotalPriceAfterSelectSlot;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CancelBooking;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.ChangeStatusToAlreadyPaid;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CreateBooking;
@@ -250,6 +251,24 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
         [HttpGet("getbooked-booking")]
         public async Task<ActionResult<ServiceResponse<GetBookingDetailsResponse>>> GetBookingDetails(
             [FromQuery] GetBookingDetailsQuery query)
+        {
+            try
+            {
+                var res = await _mediator.Send(query);
+                if (res.Message == "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        [HttpGet("get-expected-price")]
+        public async Task<ActionResult<ServiceResponse<int>>> GetExpectedPrice([FromQuery] CaculateTotalPriceAfterSelectSlotCommand query)
         {
             try
             {

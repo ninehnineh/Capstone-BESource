@@ -1,4 +1,5 @@
-﻿using Parking.FindingSlotManagement.Domain.Entities;
+﻿using Parking.FindingSlotManagement.Application.Models.Traffic;
+using Parking.FindingSlotManagement.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,11 @@ public class ParkingDto
     public float? Stars { get; set; }
     public float? TotalStars { get; set; }
     public int? StarsCount { get; set; }
+    public int? MotoSpot { get; set; }
+    public int? CarSpot { get; set; }
+    public bool? IsFull { get; set; }
+    public bool? IsPrepayment { get; set; }
+    public bool? IsOvernight { get; set; }
     public IEnumerable<ParkingHasPriceDto?> ParkingHasPrices { get; set; }
     public IEnumerable<ParkingSpotImageDto> ParkingSpotImages { get; set; }
 }
@@ -43,6 +49,7 @@ public class ParkingPriceDto
     public int ParkingPriceId { get; set; }
     public string? ParkingPriceName { get; set; }
     public int? StartingTime { get; set; }
+    public virtual TrafficDto? Traffic { get; set; }
     public IEnumerable<TimeLineDto> TimeLines { get; set; }
 }
 

@@ -18,7 +18,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
         }
 
         [HttpGet("parking-slots")]
-        public async Task<ActionResult<ServiceResponse<IEnumerable<GetParkingSlotsResponse>>>> GetParkingSlots([FromQuery] GetParkingSlotsQuery query)
+        public async Task<ActionResult<ServiceResponse<IEnumerable<GetParkingSlotsResponse>>>> GetAvailableParkingSlots
+            ([FromQuery] GetParkingSlotsQuery query)
         {
             try
             {

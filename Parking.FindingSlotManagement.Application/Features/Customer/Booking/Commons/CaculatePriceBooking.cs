@@ -10,7 +10,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 {
     public class CaculatePriceBooking
     {
-        public static decimal CaculateTotalPrice(DateTime start, DateTime end, ParkingPrice parkingPrice, IEnumerable<TimeLine> timeLines)
+        public static decimal CaculateExpectedPrice(DateTime start, DateTime end, ParkingPrice parkingPrice, IEnumerable<TimeLine> timeLines)
         {
             var startTimeBooking = start.TimeOfDay.TotalHours;
             var endTimeBooking = end.TimeOfDay.TotalHours;
@@ -37,7 +37,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         endTimePackage += 24;
                     }
 
-                    if (BookingTimeInOnePackage(startTimeBooking, endTimeBooking, startTimePackage, endTimePackage))
+                    if (BookingTimeInOnePackage(startTimeBooking, endTimeBooking,
+                        startTimePackage, endTimePackage))
                     {
                         if (package.StartTime > package.EndTime)
                         {
@@ -180,7 +181,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         endTimePackage += 24;
                     }
                     // một gói, qua ngày
-                    if (BookingTimeInManyPackage(startTimeBooking, endTimeBooking, startTimePackage, endTimePackage))
+                    if (BookingTimeInManyPackage(startTimeBooking, endTimeBooking,
+                        startTimePackage, endTimePackage))
                     {
                         if (package.StartTime > package.EndTime)
                         {

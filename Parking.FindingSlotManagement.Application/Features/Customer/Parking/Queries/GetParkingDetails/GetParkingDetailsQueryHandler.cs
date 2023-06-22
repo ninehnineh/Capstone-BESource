@@ -62,6 +62,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Parking.Qu
                     x => x.Parking,
                     x => x.ParkingPrice,
                     x => x.ParkingPrice.TimeLines,
+                    x => x.ParkingPrice.Traffic,
                 };
 
                 var parkingHasPrices = _parkingHasPriceRepository
