@@ -44,6 +44,16 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.Ti
 
                 if(checkParkingPriceExist.IsWholeDay == true)
                 {
+                    var timeLineHasWholeDayExist = await _timelineRepository.GetItemWithCondition(x => x.ParkingPriceId == checkParkingPriceExist.ParkingPriceId);
+                    if(timeLineHasWholeDayExist != null)
+                    {
+                        return new ServiceResponse<int>
+                        {
+                            Message = "Bạn không thể tạo mới, do đã có timeline tồn tại rồi.",
+                            Success = false,
+                            StatusCode = 400
+                        };
+                    }
                     if (checkParkingPriceExist.IsExtrafee == false)
                     {
                         request.ExtraFee = null;

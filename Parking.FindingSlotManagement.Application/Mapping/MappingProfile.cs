@@ -66,6 +66,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetBookingById;
 using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Queries.GetListFloorByParkingId;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Queries.GetListParkingSlotByFloorId;
+using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetListParkingByParkingPriceId;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -204,6 +205,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ReverseMap();
             CreateMap<ParkingHasPrice, CreateParkingHasPriceCommand>().ReverseMap();
             CreateMap<ParkingHasPrice, ParkingHasPriceDto>()
+                .ReverseMap();
+            CreateMap<ParkingHasPrice, GetListParkingByParkingPriceIdResponse>()
+                .ForMember(dto => dto.ParkingName, act => act.MapFrom(obj => obj.Parking.Name))
                 .ReverseMap();
             #endregion
 
