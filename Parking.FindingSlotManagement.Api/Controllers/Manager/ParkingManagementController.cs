@@ -9,12 +9,14 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Parkin
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.UpdateLocationOfParking;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.UpdateParking;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetListParkingByManagerId;
+using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetListParkingByParkingPriceId;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetParkingById;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 {
+    [Authorize(Roles = "Manager")]
     [Route("api/parkings")]
     [ApiController]
     public class ParkingManagementController : ControllerBase
@@ -196,6 +198,30 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
             try
             {
                 var query = new GetParkingByIdQuery() { ParkingId = parkingId};
+                var res = await _mediator.Send(query);
+
+                return StatusCode((int)res.StatusCode, res);
+
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Manager
+        /// </summary>
+        /// 
+        [HttpGet("parking-price/{parkingPriceId}", Name = "GetParkingByParkingPriceId")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<GetListParkingByParkingPriceIdResponse>>>> GetParkingByParkingPriceId(int parkingPriceId)
+        {
+            try
+            {
+                var query = new GetListParkingByParkingPriceIdQuery() { ParkingPriceId = parkingPriceId };
                 var res = await _mediator.Send(query);
 
                 return StatusCode((int)res.StatusCode, res);
