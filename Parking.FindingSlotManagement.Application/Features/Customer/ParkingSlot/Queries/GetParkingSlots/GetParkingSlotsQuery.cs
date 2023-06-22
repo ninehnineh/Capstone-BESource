@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Queries.GetParkingSlots
 {
-    public class GetParkingSlotsQuery : IRequest<ServiceResponse<IEnumerable<GetParkingSlotsResponse>>>
+    public class GetParkingSlotsQuery : IRequest<ServiceResponse<GetParkingSlotsResponse>>
     {
         public int ParkingId { get; set; }
         //public int FloorId { get; set; }

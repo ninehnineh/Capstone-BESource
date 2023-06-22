@@ -198,9 +198,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 var timeLines = await _timelineRepository
                     .GetAllItemWithCondition(x => x.ParkingPriceId == appliedParkingPriceId);
 
-                decimal totalPrice = CaculatePriceBooking.CaculateTotalPrice(request.BookingDto.StartTime, request.BookingDto.EndTime, parkingPrice, timeLines);
+                decimal expectedPrice = CaculatePriceBooking
+                    .CaculateExpectedPrice(request.BookingDto.StartTime, request.BookingDto.EndTime,
+                    parkingPrice, timeLines);
 
-                entity.TotalPrice = totalPrice;
+                entity.TotalPrice = expectedPrice;
 
                 var listBooking = await _bookingRepository
                     .GetAllItemWithCondition(x => x.DateBook.Date <= DateTime.UtcNow.Date &&
@@ -336,8 +338,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
                     await _bookingRepository.Save();
 
-                    var titleManager = _configuration.GetSection("MessageTitle_Manager").GetSection("Success").Value;
-                    var bodyManager = _configuration.GetSection("MessageBody_Manager").GetSection("Success").Value;
+                    var titleManager = _configuration.GetSection("MessageTitle_Manager")
+                        .GetSection("Success").Value;
+                    var bodyManager = _configuration.GetSection("MessageBody_Manager")
+                        .GetSection("Success").Value;
 
                     /*var includeUser = new List<Expression<Func<StaffParking, object>>>
                     {
@@ -403,8 +407,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
                     }
 
-                    var titleCustomer = _configuration.GetSection("MessageTitle_Customer").GetSection("Success").Value;
-                    var bodyCustomer = _configuration.GetSection("MessageBody_Customer").GetSection("Success").Value;
+                    var titleCustomer = _configuration.GetSection("MessageTitle_Customer")
+                        .GetSection("Success").Value;
+                    var bodyCustomer = _configuration.GetSection("MessageBody_Customer")
+                        .GetSection("Success").Value;
 
                     var pushNotificationMobile = new PushNotificationMobileModel
                     {

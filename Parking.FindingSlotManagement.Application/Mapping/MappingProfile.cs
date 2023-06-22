@@ -214,6 +214,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<ParkingSlot, BookedParkingSlotDto>().ReverseMap();
             CreateMap<ParkingSlot, GetParkingSlotsResponse>().ReverseMap();
             CreateMap<ParkingSlot, GetListParkingSlotByFloorIdResponse>().ReverseMap();
+            CreateMap<ParkingSlot, ParkingSlotsDto>().ReverseMap();
             #endregion
 
             #region Timeline Mapping

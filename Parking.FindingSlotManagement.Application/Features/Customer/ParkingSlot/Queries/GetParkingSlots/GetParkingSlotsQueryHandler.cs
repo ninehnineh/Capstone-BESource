@@ -2,6 +2,7 @@
 using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetAvailableSlots;
+using Parking.FindingSlotManagement.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +12,15 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Queries.GetParkingSlots
 {
-    public class GetParkingSlotsQueryHandler : IRequestHandler<GetParkingSlotsQuery, ServiceResponse<IEnumerable<GetParkingSlotsResponse>>>
+    public class GetParkingSlotsQueryHandler : IRequestHandler<GetParkingSlotsQuery, ServiceResponse<GetParkingSlotsResponse>>
     {
+        private readonly int Car = 1; 
+        private readonly int MoTo = 2;
         private readonly IParkingSlotRepository _parkingSlotRepository;
         private readonly IParkingRepository _parkingRepository;
         private readonly IMapper _mapper;
         private readonly IBookingRepository _bookingRepository;
+        private readonly GetParkingSlotsResponse _getParkingSlotsResponse;
 
         public GetParkingSlotsQueryHandler(IParkingSlotRepository parkingSlotRepository,
             IParkingRepository parkingRepository,
@@ -27,8 +31,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlo
             _parkingRepository = parkingRepository;
             _mapper = mapper;
             _bookingRepository = bookingRepository;
+            _getParkingSlotsResponse = new GetParkingSlotsResponse();
         }
-        public async Task<ServiceResponse<IEnumerable<GetParkingSlotsResponse>>> Handle(GetParkingSlotsQuery request, CancellationToken cancellationToken)
+        public async Task<ServiceResponse<GetParkingSlotsResponse>> Handle(GetParkingSlotsQuery request, CancellationToken cancellationToken)
         {
             const string bookingStatusCancel = "Cancel";
             var bookedSlots = new List<int>();
@@ -74,9 +79,30 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlo
                 var filterParkingSlot = lstParkingSlot
                     .Where(item => !listParkingSlotIdExist.Contains(item.ParkingSlotId)).ToList();
 
-                var responses = _mapper.Map<IEnumerable<GetParkingSlotsResponse>>(filterParkingSlot);
+                var parking = await _parkingRepository.GetById(parkingId);
 
-                return new ServiceResponse<IEnumerable<GetParkingSlotsResponse>>
+                var totalNumberOfCarSpot = parking.CarSpot;
+                var totalNumberOfMotoSpot = parking.MotoSpot;
+
+                var availableCarSpot = filterParkingSlot.Where(x => x.TrafficId == Car).Count();
+                var availableMoToSpot = filterParkingSlot.Where(x => x.TrafficId == MoTo).Count();
+                //var responses = _mapper.Map<GetParkingSlotsResponse>(filterParkingSlot);
+                var responses = new GetParkingSlotsResponse
+                {
+                    ParkingSlots = _mapper.Map<IEnumerable<ParkingSlotsDto>>(filterParkingSlot),
+                    Car = new CarSpot
+                    {
+                        AvailableCarSlots = availableCarSpot,
+                        TotalNumberCarSlots = (int) totalNumberOfCarSpot
+                    },
+                    MoTo = new MoToSpot
+                    {
+                        AvailableMoToSlots = availableMoToSpot,
+                        TotalNumberMoToSlots = (int) totalNumberOfMotoSpot
+                    },
+                };
+
+                return new ServiceResponse<GetParkingSlotsResponse>
                 {
                     Data = responses,
                     Message = "Thành công",

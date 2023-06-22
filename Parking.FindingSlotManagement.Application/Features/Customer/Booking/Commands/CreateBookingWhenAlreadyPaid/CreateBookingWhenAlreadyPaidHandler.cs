@@ -202,7 +202,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 var timeLines = await _timelineRepository
                     .GetAllItemWithCondition(x => x.ParkingPriceId == appliedParkingPriceId);
 
-                decimal totalPrice = CaculatePriceBooking.CaculateTotalPrice(request.BookingDto.StartTime, request.BookingDto.EndTime, parkingPrice, timeLines);
+                decimal totalPrice = CaculatePriceBooking.CaculateExpectedPrice(request.BookingDto.StartTime, request.BookingDto.EndTime, parkingPrice, timeLines);
 
                 entity.TotalPrice = totalPrice;
 
