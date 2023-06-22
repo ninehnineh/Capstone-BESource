@@ -29,7 +29,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccou
             {
                 List<Expression<Func<User, object>>> includes = new List<Expression<Func<User, object>>>
                 {
-                    x => x.Role
+                    x => x.Role,
+                    x => x.Parking
                 };
                 var user = await _userRepository.GetItemWithCondition(x => x.UserId == request.UserId, includes, true);
                 if(user == null)
