@@ -17,5 +17,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccou
         public string? Gender { get; set; }
         public bool? IsActive { get; set; }
         public string RoleName { get; set; }
+        public int? ParkingId { get; set; }
+        public string? ParkingName { get; set; }
     }
 }
