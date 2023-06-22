@@ -169,8 +169,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #endregion
 
             #region ParkingPrice Mapping
-            CreateMap<ParkingPrice, CreateParkingPriceCommand>()
-                .ForMember(dest => dest.BusinessId, opt => opt.MapFrom(src => src.BusinessId))
+            CreateMap<ParkingPrice, CreateParkingPriceCommandDTO>()
                 .ReverseMap();
             CreateMap<ParkingPrice, DisableOrEnableParkingPriceCommand>().ReverseMap();
             CreateMap<ParkingPrice, GetAllParkingPriceQueryResponse>().ReverseMap();
