@@ -25,58 +25,62 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var extraFeePoint = 0;
             var isPass = false;
 
-            foreach (var package in timeLines)
+            while (hitEndPoint == false)
             {
-                var startTimePackage = package.StartTime?.TotalHours;
-                var endTimePackage = package.EndTime?.TotalHours;
-                if (startTimeDate == endTimeDate)
+                foreach (var package in timeLines)
                 {
-                    // một gói, trong ngày
+                    var startTimePackage = package.StartTime?.TotalHours;
+                    var endTimePackage = package.EndTime?.TotalHours;
+
                     if (startTimePackage > endTimePackage)
                     {
                         endTimePackage += 24;
                     }
 
-                    if (BookingTimeInOnePackage(startTimeBooking, endTimeBooking,
-                        startTimePackage, endTimePackage))
+                    if (startTimeDate == endTimeDate)
                     {
-                        if (package.StartTime > package.EndTime)
+                        // một gói, trong ngày
+
+                        if (BookingTimeInOnePackage(startTimeBooking, endTimeBooking,
+                            startTimePackage, endTimePackage))
                         {
-                            if (Math.Abs(24 - startTimeBooking) >= 24 - startTimePackage &&
-                                Math.Abs(24 - endTimeBooking) >= 24 - startTimePackage)
+                            if (package.StartTime > package.EndTime)
                             {
-                                startTimeBooking += 24;
-                                endTimeBooking += 24;
+                                if (Math.Abs(24 - startTimeBooking) >= 24 - startTimePackage &&
+                                    Math.Abs(24 - endTimeBooking) >= 24 - startTimePackage)
+                                {
+                                    startTimeBooking += 24;
+                                    endTimeBooking += 24;
+                                }
+                                package.EndTime += TimeSpan.FromHours(24);
                             }
-                            package.EndTime += TimeSpan.FromHours(24);
+
+                            var BookedTime = (decimal)(endTimeBooking - startTimeBooking);
+                            if (startingTime < BookedTime)
+                            {
+                                var ExtraFeeHours = BookedTime - startingTime;
+                                var so_step = (int)ExtraFeeHours / (int)extraTimeStep!;
+                                totalPrice = package.Price + (decimal)(so_step * package.ExtraFee) + (decimal)package.ExtraFee;
+                            }
+                            else
+                            {
+                                totalPrice = package.Price;
+                            }
+
+                            if (endTimeBooking > 24 &&
+                                startTimeBooking > 24)
+                            {
+                                endTimeBooking -= 24;
+                                startTimeBooking -= 24;
+                            }
+                            hitEndPoint = true;
+                            break;
                         }
 
-                        var BookedTime = (decimal)(endTimeBooking - startTimeBooking);
-                        if (startingTime < BookedTime)
-                        {
-                            var ExtraFeeHours = BookedTime - startingTime;
-                            var so_step = (int)ExtraFeeHours / (int)extraTimeStep!;
-                            totalPrice = package.Price + (decimal)(so_step * package.ExtraFee) + (decimal)package.ExtraFee;
-                        }
+                        // nhiều gói, trong ngày
                         else
                         {
-                            totalPrice = package.Price;
-                        }
 
-                        if (endTimeBooking > 24 &&
-                            startTimeBooking > 24)
-                        {
-                            endTimeBooking -= 24;
-                            startTimeBooking -= 24;
-                        }
-                        break;
-                    }
-
-                    // nhiều gói, trong ngày
-                    else
-                    {
-                        while (hitEndPoint == false)
-                        {
                             if (endTimePackage > 24 && startTimeBooking < 24)
                             {
                                 startTimeBooking += 24;
@@ -109,7 +113,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                                 };
                                 totalPrice += startingPrice + extraPrice;
 
-                                break;
+                                continue;
                             }
 
                             if (foundStartPoint == true)
@@ -124,7 +128,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                                 {
                                     endTimeBooking += 24;
                                 }
-                                while (extraFeePoint <= endTimeBooking)
+                                while (extraFeePoint <= endTimeBooking &&
+                                    extraFeePoint <= endTimeBooking)
                                 {
                                     priceOfTimeLineTwo = (decimal)package.ExtraFee!;
                                     totalPrice += priceOfTimeLineTwo;
@@ -137,86 +142,58 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                                     {
                                         endTimePackage += 24;
                                     }
-                                    if (extraFeePoint > endTimePackage)
-                                    {
-                                        if (extraFeePoint > 24)
-                                        {
-                                            extraFeePoint -= 24;
-                                            endTimeBooking -= 24;
-                                            package.EndTime -= TimeSpan.FromHours(24);
-                                        }
-                                        break;
-                                    }
-                                }
-                                if (extraFeePoint > endTimeBooking)
-                                {
-                                    isPass = false;
-                                    break;
-                                }
-                                else break;
-                            }
-                            if (startTimeBooking > 24)
-                            {
-                                startTimeBooking -= 24;
-                            }
 
-                            if (extraFeePoint > endTimeBooking && isPass == false)
-                            {
-                                hitEndPoint = true;
-                                break;
+                                }
+                                if (extraFeePoint <= endTimeBooking)
+                                {
+                                    continue;
+                                }
                             }
+                            hitEndPoint = true;
                             break;
                         }
                     }
-                }
 
-                if (startTimeDate < endTimeDate)
-                {
-                    if (endTimeBooking == 0)
+                    if (startTimeDate < endTimeDate)
                     {
-                        endTimeBooking += 24;
-                    }
-                    if (startTimePackage > endTimePackage)
-                    {
-                        endTimePackage += 24;
-                    }
-                    // một gói, qua ngày
-                    if (BookingTimeInManyPackage(startTimeBooking, endTimeBooking,
-                        startTimePackage, endTimePackage))
-                    {
-                        if (package.StartTime > package.EndTime)
+
+                        // một gói, qua ngày
+                        if (BookingTimeInManyPackage(startTimeBooking, endTimeBooking,
+                            startTimePackage, endTimePackage))
                         {
-                            if (startTimeBooking > endTimeBooking)
+                            if (package.StartTime > package.EndTime)
                             {
-                                endTimeBooking += 24;
+                                if (startTimeBooking > endTimeBooking)
+                                {
+                                    endTimeBooking += 24;
+                                }
+                                package.EndTime += TimeSpan.FromHours(24);
                             }
-                            package.EndTime += TimeSpan.FromHours(24);
+
+                            var BookedTime = (decimal)(endTimeBooking - startTimeBooking);
+                            if (startingTime < BookedTime)
+                            {
+                                var ExtraFeeHours = BookedTime - startingTime;
+                                var so_step = (int)ExtraFeeHours / (int)extraTimeStep!;
+                                totalPrice = package.Price + (decimal)(so_step * package.ExtraFee!) + (decimal)package.ExtraFee!;
+                            }
+                            else
+                            {
+                                totalPrice = package.Price;
+                            }
+
+                            if (endTimeBooking > 24)
+                            {
+                                endTimeBooking -= 24;
+                            }
+                            hitEndPoint = true;
+                            break;
                         }
 
-                        var BookedTime = (decimal)(endTimeBooking - startTimeBooking);
-                        if (startingTime < BookedTime)
-                        {
-                            var ExtraFeeHours = BookedTime - startingTime;
-                            var so_step = (int)ExtraFeeHours / (int)extraTimeStep!;
-                            totalPrice = package.Price + (decimal)(so_step * package.ExtraFee!) + (decimal)package.ExtraFee!;
-                        }
+                        // nhiều gói, qua ngày
                         else
                         {
-                            totalPrice = package.Price;
-                        }
 
-                        if (endTimeBooking > 24)
-                        {
-                            endTimeBooking -= 24;
-                        }
-                        break;
-                    }
-
-                    // nhiều gói, qua ngày
-                    else
-                    {
-                        while (hitEndPoint == false)
-                        {
                             if (endTimePackage < startTimePackage)
                             {
                                 package.EndTime += TimeSpan.FromHours(24);
@@ -262,7 +239,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                                 {
                                     endTimeBooking += 24;
                                 }
-                                while (extraFeePoint <= endTimeBooking)
+                                while (extraFeePoint <= endTimeBooking &&
+                                    extraFeePoint <= endTimeBooking)
                                 {
                                     totalPrice += (decimal)package.ExtraFee!;
                                     extraFeePoint += (int)extraTimeStep!;
@@ -274,28 +252,24 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                                     {
                                         endTimePackage += 24;
                                     }
-                                    if (extraFeePoint > endTimePackage)
-                                    {
-                                        if (extraFeePoint > 24)
-                                        {
-                                            extraFeePoint -= 24;
-                                            endTimeBooking -= 24;
-                                            package.EndTime -= TimeSpan.FromHours(24);
-                                        }
-                                        break;
-                                    }
                                 }
-                            }
-                            if (extraFeePoint >= endTimeBooking)
-                            {
+                                if (extraFeePoint <= endTimeBooking)
+                                {
+                                    continue;
+                                }
+                                //if (extraFeePoint >= endTimeBooking)
+                                //{
+                                //    isPass = false;
+                                //    break;
+                                //}
                                 hitEndPoint = true;
                                 break;
                             }
-                            break;
                         }
                     }
                 }
             }
+
 
             return totalPrice;
         }
