@@ -12,6 +12,7 @@ using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Comman
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.PrePaidOnline;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetAvailableSlot;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetBookingDetails;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetListBookingFollowCalendar;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.CheckIn;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
@@ -212,6 +213,24 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
 
         [HttpGet("get-available-slots")]
         public async Task<ActionResult<ServiceResponse<IEnumerable<ParkingSlot>>>> Get([FromQuery] GetAvailableSlotsQuery query)
+        {
+            try
+            {
+                var res = await _mediator.Send(query);
+                if (res.Message == "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        [HttpGet("get-available-slots-calendar")]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<GetListBookingFollowCalendarResponse>>>> GetCalendar([FromQuery] GetListBookingFollowCalendarQuery query)
         {
             try
             {

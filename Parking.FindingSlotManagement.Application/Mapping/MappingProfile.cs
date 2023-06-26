@@ -67,6 +67,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries
 using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Queries.GetListFloorByParkingId;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Queries.GetListParkingSlotByFloorId;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetListParkingByParkingPriceId;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetListBookingFollowCalendar;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -247,6 +248,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.VehicleName, act => act.MapFrom(obj => obj.VehicleInfor.VehicleName))
                 .ForMember(dto => dto.Color, act => act.MapFrom(obj => obj.VehicleInfor.Color))
                 .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.VehicleInfor.Traffic.Name))
+                .ReverseMap();
+            CreateMap<Booking, GetListBookingFollowCalendarResponse > ()
+                .ForMember(dto => dto.ParkingId, act => act.MapFrom(obj => obj.ParkingSlot.Floor.ParkingId))
                 .ReverseMap();
             #endregion
         }

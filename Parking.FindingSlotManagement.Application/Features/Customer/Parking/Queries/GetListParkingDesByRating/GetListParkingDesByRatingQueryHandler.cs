@@ -119,24 +119,32 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Parking.Qu
             var timelinelst = await _timelineRepository.GetAllItemWithCondition(x => x.ParkingPriceId == parkingHasPrice.ParkingPriceId);
             foreach (var item in timelinelst)
             {
-                if(item.StartTime > item.EndTime)
+                if (item.StartTime == null && item.EndTime == null)
                 {
-                    if(item.StartTime > a && item.EndTime >= a)
-                    {
-                        return item;
-                    }
-                    else if(item.StartTime <= a && item.EndTime < a)
-                    {
-                        return item;
-                    }
+                    return item;
                 }
                 else
                 {
-                    if(item.StartTime <= a && item.EndTime >= a)
+                    if (item.StartTime > item.EndTime)
                     {
-                        return item;
+                        if (item.StartTime > a && item.EndTime >= a)
+                        {
+                            return item;
+                        }
+                        else if (item.StartTime <= a && item.EndTime < a)
+                        {
+                            return item;
+                        }
+                    }
+                    else
+                    {
+                        if (item.StartTime <= a && item.EndTime >= a)
+                        {
+                            return item;
+                        }
                     }
                 }
+
             }
             return null;
         }
