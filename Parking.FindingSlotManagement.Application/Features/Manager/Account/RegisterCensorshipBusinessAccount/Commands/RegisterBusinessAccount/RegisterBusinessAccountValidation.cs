@@ -45,9 +45,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Account.Reg
             RuleFor(p => p.BusinessProfileEntity.BackIdentification)
                 .NotEmpty().WithMessage("Vui lòng nhập {Mặt sau của căn cước công dân}.")
                 .NotNull();
-            RuleFor(p => p.BusinessProfileEntity.BusinessLicense)
-                .NotEmpty().WithMessage("Vui lòng nhập {Giấy phép kinh doanh}.")
-                .NotNull();
         }
     }
 }
