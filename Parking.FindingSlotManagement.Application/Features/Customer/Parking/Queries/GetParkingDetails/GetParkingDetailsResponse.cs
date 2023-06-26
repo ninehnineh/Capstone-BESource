@@ -50,6 +50,7 @@ public class ParkingPriceDto
     public string? ParkingPriceName { get; set; }
     public int? StartingTime { get; set; }
     public virtual TrafficDto? Traffic { get; set; }
+    public float? ExtraTimeStep { get; set; }
     public IEnumerable<TimeLineDto> TimeLines { get; set; }
 }
 
