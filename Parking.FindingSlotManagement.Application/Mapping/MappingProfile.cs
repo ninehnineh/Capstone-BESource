@@ -118,9 +118,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
 
             #region VnPay Mapping
             CreateMap<VnPay, CreateNewVnPayCommand>().ReverseMap();
-            CreateMap<VnPay, GetVnPayByBusinessIdResponse>()
-                .ForMember(dto => dto.BusinessName, act => act.MapFrom(obj => obj.Business.Name))
-                .ReverseMap();
+            //CreateMap<VnPay, GetVnPayByBusinessIdResponse>()
+            //    .ForMember(dto => dto.BusinessName, act => act.MapFrom(obj => obj.Business.Name))
+            //    .ReverseMap();
             #endregion
 
             #region PayPal Mapping

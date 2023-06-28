@@ -42,7 +42,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
             builder.HasOne(d => d.Traffic)
                 .WithMany(p => p.ParkingSlots)
                 .HasForeignKey(d => d.TrafficId)
-                .HasConstraintName("FK__ParkingSl__Traff__534D60F1");
+                .HasConstraintName("FK__ParkingSl__Traff");
         }
     }
 }

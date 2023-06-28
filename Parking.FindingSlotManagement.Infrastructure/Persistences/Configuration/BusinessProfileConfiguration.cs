@@ -41,6 +41,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .WithOne(p => p.BusinessProfile)
                 .HasForeignKey<BusinessProfile>(d => d.UserId)
                 .HasConstraintName("fk_IsManager");
+
+            builder.HasOne(d => d.Fee)
+                .WithMany(x => x.BusinessProfiles)
+                .HasForeignKey(x => x.FeeId)
+                .HasConstraintName("FK_Fee_BusinessProfiles");
         }
     }
 }

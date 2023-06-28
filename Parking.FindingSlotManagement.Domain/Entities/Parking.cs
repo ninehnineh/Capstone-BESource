@@ -32,5 +32,6 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public virtual ICollection<ParkingHasPrice>? ParkingHasPrices { get; set; }
         public virtual ICollection<ParkingSpotImage>? ParkingSpotImages { get; set; }
         public ICollection<User> Users { get; set; }
+        public ICollection<ApproveParking> ApproveParkings { get; set; }
     }
 }

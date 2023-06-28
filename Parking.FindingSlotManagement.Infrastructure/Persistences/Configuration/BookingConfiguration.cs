@@ -40,7 +40,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
 
             builder.Property(e => e.EndTime).HasColumnType("datetime2");
 
-            builder.Property(e => e.ActualPrice).HasColumnType("money");
 
             builder.Property(e => e.QRImage).HasMaxLength(255);
 
@@ -55,16 +54,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .IsUnicode(false)
                 .IsFixedLength();
 
-            builder.Property(e => e.PaymentMethod)
-                .HasMaxLength(225)
-                .IsUnicode(false);
 
             builder.Property(e => e.Status)
                 .HasMaxLength(30);
 
-            builder.Property(e => e.TmnCodeVnPay)
-                .HasMaxLength(20)
-                .IsUnicode(false);
+
 
             builder.Property(e => e.TotalPrice).HasColumnType("money");
 
@@ -80,7 +74,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
             builder.HasOne(d => d.VehicleInfor)
                 .WithMany(p => p.Bookings)
                 .HasForeignKey(d => d.VehicleInforId)
-                .HasConstraintName("FK__Booking__Vehicle__4F7CD00D");
+                .HasConstraintName("FK__Booking__Vehicle");
 
             builder.HasOne(x => x.ParkingSlot)
                 .WithMany(p => p.Bookings)

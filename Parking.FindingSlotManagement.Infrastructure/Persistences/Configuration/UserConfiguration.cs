@@ -75,6 +75,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .WithMany(x => x.Users)
                 .HasForeignKey(x => x.ParkingId)
                 .HasConstraintName("FK__Parking__Users");
+
         }
     }
 }

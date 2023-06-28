@@ -37,7 +37,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
             builder.HasOne(x => x.Traffic)
                 .WithMany(x => x.ParkingPrices)
                 .HasForeignKey(x => x.TrafficId)
-                .HasConstraintName("FK__Traffic_Parkingpri");
+                .HasConstraintName("FK__VehicleTy_Parkingpri");
         }
     }
 }
