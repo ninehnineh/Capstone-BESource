@@ -85,11 +85,12 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             }
         }
         /// <summary>
-        /// API For Admin
+        /// API For Admin, Manager, Keeper
         /// </summary>
         /// <remarks>
         /// SignalR: LoadCensorshipManagerAccounts
         /// </remarks>
+        [Authorize(Roles = "Admin,Manager,Keeper")]
         [HttpPut("censorship/{managerId}", Name = "UpdateCensorshipManagerAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
