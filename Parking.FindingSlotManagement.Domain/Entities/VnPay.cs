@@ -11,8 +11,9 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public int VnPayId { get; set; }
         public string? TmnCode { get; set; }
         public string? HashSecret { get; set; }
-        public int? BusinessId { get; set; }
 
-        public virtual BusinessProfile? Business { get; set; }
+        public int? UserId { get; set; }
+        public User? User { get; set; }
+
     }
 }

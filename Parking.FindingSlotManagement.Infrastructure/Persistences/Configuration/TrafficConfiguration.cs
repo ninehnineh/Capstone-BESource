@@ -14,7 +14,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
     {
         public void Configure(EntityTypeBuilder<Traffic> builder)
         {
-            builder.ToTable("Traffic");
+            builder.ToTable("VehicleType");
 
             builder.Property(e => e.Name).HasMaxLength(50);
 

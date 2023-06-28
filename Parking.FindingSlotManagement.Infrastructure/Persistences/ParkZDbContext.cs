@@ -21,7 +21,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences
 
         public DbSet<Booking> Bookings { get; set; } = null!;
         public DbSet<BusinessProfile> BusinessProfiles { get; set; } = null!;
-        public DbSet<FieldWorkImg> FieldWorkImgs { get; set; } = null!;
         public DbSet<FavoriteAddress> FavoriteAddresses { get; set; } = null!;
         public DbSet<Floor> Floors { get; set; } = null!;
         public DbSet<TimeLine> TimeLines { get; set; } = null!;
@@ -35,6 +34,13 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences
         public DbSet<Traffic> Traffics { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<VehicleInfor> VehicleInfors { get; set; } = null!;
+        public DbSet<Fee> Fees { get; set; } = null!;
+        public DbSet<Bill> Bills { get; set; } = null!;
+        public DbSet<Wallet> Wallets { get; set; } = null!;
+        public DbSet<FieldWorkParkingImg> FieldWorkParkingImgs { get; set; } = null!;
+        public DbSet<BookedSlot> BookedSlots { get; set; } = null!;
+        public DbSet<BookingPayment> BookingPayments { get; set; } = null!;
+        public DbSet<ApproveParking> ApproveParkings { get; set; } = null!;
         public DbSet<Domain.Entities.VnPay> VnPays { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

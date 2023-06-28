@@ -17,6 +17,7 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public int? FloorId { get; set; }
 
         public virtual ICollection<Booking> Bookings { get; set; }
+        public virtual ICollection<BookedSlot> BookedSlots { get; set; }
         public virtual Floor? Floor { get; set; }
         public virtual Traffic? Traffic { get; set; }
     }

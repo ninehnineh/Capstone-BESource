@@ -17,13 +17,10 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public DateTime? EndTime { get; set; }
         public DateTime? CheckinTime { get; set; }
         public DateTime? CheckoutTime { get; set; }
-        public decimal? ActualPrice { get; set; }
         public string? Status { get; set; }
         public string? GuestName { get; set; }
         public string? GuestPhone { get; set; }
         public decimal? TotalPrice { get; set; }
-        public string? PaymentMethod { get; set; }
-        public string? TmnCodeVnPay { get; set; }
         public string? QRImage { get; set; }
 
         public int? UserId { get; set; }
@@ -31,5 +28,6 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public int? VehicleInforId { get; set; }
         public virtual VehicleInfor? VehicleInfor { get; set; }
         public ParkingSlot ParkingSlot { get; set; }
+        public ICollection<BookingPayment> BookingPayments { get; set; }
     }
 }
