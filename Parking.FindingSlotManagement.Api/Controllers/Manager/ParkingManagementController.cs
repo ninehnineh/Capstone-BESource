@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Parking.FindingSlotManagement.Application;
+using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.ChangeStatusFull;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.CreateNewParking;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.DisableOrEnableParking;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.UpdateLocationOfParking;
@@ -140,6 +141,45 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         {
             try
             {
+                var res = await _mediator.Send(command);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                await _messageHub.Clients.All.SendAsync("LoadParkingInAdmin");
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                IEnumerable<string> list1 = new List<string> { "Severity: Error" };
+                string message = "";
+                foreach (var item in list1)
+                {
+                    message = ex.Message.Replace(item, string.Empty);
+                }
+                var errorResponse = new ErrorResponseModel(ResponseCode.BadRequest, "Validation Error: " + message.Remove(0, 31));
+                return StatusCode((int)ResponseCode.BadRequest, errorResponse);
+            }
+        }
+        /// <summary>
+        /// API For Manager, Keeper
+        /// </summary>
+        /// <remarks>
+        /// SignalR: LoadParkingInAdmin
+        /// </remarks>
+        [Authorize(Roles = "Manager,Keeper")]
+        [HttpPut("parking/full/{parkingId}", Name = "UpdateStatusFullOfParking")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<ServiceResponse<string>>> UpdateStatusFullOfParking(int parkingId)
+        {
+            try
+            {
+                var command = new ChangeStatusFullCommand
+                {
+                    ParkingId = parkingId
+                };
                 var res = await _mediator.Send(command);
                 if (res.Message != "Thành công")
                 {
