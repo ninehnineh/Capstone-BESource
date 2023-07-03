@@ -9,12 +9,15 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuration
 {
-    public class BookedSlotConfiguration : IEntityTypeConfiguration<BookedSlot>
+    public class BookedSlotConfiguration : IEntityTypeConfiguration<TimeSlot>
     {
-        public void Configure(EntityTypeBuilder<BookedSlot> builder)
+        public void Configure(EntityTypeBuilder<TimeSlot> builder)
         {
+
+            builder.ToTable("TimeSlot");
+
             builder.HasOne(x => x.Parkingslot)
-                .WithMany(x => x.BookedSlots)
+                .WithMany(x => x.TimeSlots)
                 .HasForeignKey(x => x.ParkingSlotId)
                 .HasConstraintName("FK_Parkingslot_BookedSlots");
         }

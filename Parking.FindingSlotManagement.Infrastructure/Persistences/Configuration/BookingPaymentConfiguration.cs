@@ -9,19 +9,23 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuration
 {
-    public class BookingPaymentConfiguration : IEntityTypeConfiguration<BookingPayment>
+    public class BookingPaymentConfiguration : IEntityTypeConfiguration<Transaction>
     {
-        public void Configure(EntityTypeBuilder<BookingPayment> builder)
+        public void Configure(EntityTypeBuilder<Transaction> builder)
         {
+
+            builder.ToTable("Transaction");
+
             builder.HasOne(x => x.Wallet)
-                .WithMany(x => x.BookingPayments)
+                .WithMany(x => x.Transactions)
                 .HasForeignKey(x => x.WalletId)
                 .HasConstraintName("FK_Wallet_BookingPayments");
 
             builder.HasOne(x => x.Booking)
-                .WithMany(x => x.BookingPayments)
-                .HasPrincipalKey(x => x.BookingId)
+                .WithMany(x => x.Transactions)
+                .HasForeignKey(x => x.BookingId)
                 .HasConstraintName("FK_Booking_BookingPayments");
+
         }
     }
 }

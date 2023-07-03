@@ -13,33 +13,26 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
     {
         public void Configure(EntityTypeBuilder<Booking> builder)
         {
-            builder.HasKey(e => new { e.ParkingSlotId, e.StartTime, e.DateBook })
-                    .HasName("PK__Booking__1BDD09E6ABAB9F2E");
+            //builder.HasKey(e => new { e.ParkingSlotId, e.StartTime, e.DateBook })
+            //        .HasName("PK__Booking__1BDD09E6ABAB9F2E");
 
             builder.ToTable("Booking");
 
-            builder.HasIndex(e => e.BookingId, "AK_Booking_BookingIDsas")
-                .IsUnique();
+            //builder.HasKey(x => x.BookingId).HasName("PK_Booking");
 
             builder.HasIndex(e => e.UserId, "IX_Booking_UserID");
 
             builder.HasIndex(e => e.VehicleInforId, "IX_Booking_VehicleInforID");
 
-            builder.HasIndex(e => e.BookingId, "UQ__Booking__3214EC2628BBAE14")
-                .IsUnique();
-
-            builder.Property(e => e.ParkingSlotId).HasColumnName("ParkingSlotID");
-
             builder.Property(e => e.DateBook).HasColumnType("datetime2");
 
-            //builder.Property(e => e.StartTime).HasColumnType("datetime2");
+            builder.Property(e => e.StartTime).HasColumnType("datetime2");
 
             builder.Property(e => e.CheckinTime).HasColumnType("datetime2");
 
             builder.Property(e => e.CheckoutTime).HasColumnType("datetime2");
 
             builder.Property(e => e.EndTime).HasColumnType("datetime2");
-
 
             builder.Property(e => e.QRImage).HasMaxLength(255);
 
@@ -76,10 +69,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .HasForeignKey(d => d.VehicleInforId)
                 .HasConstraintName("FK__Booking__Vehicle");
 
-            builder.HasOne(x => x.ParkingSlot)
-                .WithMany(p => p.Bookings)
-                .HasForeignKey(x => x.ParkingSlotId)
-                .HasConstraintName("FK__Booki__ParkSlo");
         }
     }
 }
