@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿/*using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
@@ -96,3 +96,4 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Qu
         }
     }
 }
+*/

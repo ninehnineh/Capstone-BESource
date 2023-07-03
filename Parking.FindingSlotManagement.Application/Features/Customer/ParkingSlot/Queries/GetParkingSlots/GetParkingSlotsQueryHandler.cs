@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿/*using AutoMapper;
 using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetAvailableSlots;
@@ -117,3 +117,4 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlo
         }
     }
 }
+*/

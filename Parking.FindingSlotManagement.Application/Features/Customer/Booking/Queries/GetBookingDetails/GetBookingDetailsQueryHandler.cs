@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿/*using AutoMapper;
 using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Models.User;
@@ -69,3 +69,4 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Qu
         }
     }
 }
+*/
