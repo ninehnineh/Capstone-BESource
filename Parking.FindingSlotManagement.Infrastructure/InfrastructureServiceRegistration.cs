@@ -1,5 +1,6 @@
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,7 +28,6 @@ namespace Parking.FindingSlotManagement.Infrastructure
         {
             services.AddDbContext<ParkZDbContext>(opt =>
                 opt.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IBusinessManagerAuthenticationRepository, BusinessManagerAuthenticationRepository>();
@@ -52,6 +52,9 @@ namespace Parking.FindingSlotManagement.Infrastructure
             services.AddScoped<IParkingSpotImageRepository, ParkingSpotImageRepository>();
             services.AddScoped<IParkingPriceRepository, ParkingPriceRepository>();
             services.AddScoped<ITimelineRepository, TimelineRepository>();
+            services.AddScoped<ITimeSlotRepository, TimeSlotRepository>();
+            services.AddScoped<IWalletRepository, WalletRepository>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
 
             FirebaseApp.Create(new AppOptions
             {
@@ -62,7 +65,6 @@ namespace Parking.FindingSlotManagement.Infrastructure
 
             services.AddScoped<IFireBaseMessageServices, FireBaseMessageServices>();
             services.AddScoped<IVnPayService, VnPayService>();
-
             return services;
         }
     }

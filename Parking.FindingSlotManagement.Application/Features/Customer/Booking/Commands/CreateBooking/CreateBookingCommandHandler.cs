@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿/*using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -129,7 +129,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 //var vnpay = await _vnPayRepository
                 //    .GetItemWithCondition(x => x.ManagerId == managerId);
                 //entity.TmnCodeVnPay = vnpay.TmnCode;
-                /*List<Expression<Func<Domain.Entities.Booking, object>>> includes2 = new List<Expression<Func<Domain.Entities.Booking, object>>>
+                *//*List<Expression<Func<Domain.Entities.Booking, object>>> includes2 = new List<Expression<Func<Domain.Entities.Booking, object>>>
                 {
                     x => x.ParkingSlot,
                     x => x.ParkingSlot.Floor
@@ -155,7 +155,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     x => x.Floor,
                 };
                 var lstParkingSlot = await _parkingSlotRepository.GetAllItemWithCondition(x => x.FloorId == floor.FloorId && x.Floor.ParkingId == floor.ParkingId, includes3, null, true);
-                var filterParkingSlot = lstParkingSlot.Where(item => !lstParkingSlotIdExist.Contains(item.ParkingSlotId)).ToList();*/
+                var filterParkingSlot = lstParkingSlot.Where(item => !lstParkingSlotIdExist.Contains(item.ParkingSlotId)).ToList();*//*
 
                 // Set TotalPrice
 
@@ -240,7 +240,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     var titleManager = _configuration.GetSection("MessageTitle_Manager").GetSection("Success").Value;
                     var bodyManager = _configuration.GetSection("MessageBody_Manager").GetSection("Success").Value;
 
-                    /*var includeUser = new List<Expression<Func<StaffParking, object>>>
+                    *//*var includeUser = new List<Expression<Func<StaffParking, object>>>
                     {
                         x => x.User!,
                     };
@@ -273,7 +273,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                             };
                             await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
                         }
-                    }*/
+                    }*//*
                     var deviceToken = "";
                     var managerAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
                     var lstStaff = managerAccount.Where(x => x.RoleId == 2);
@@ -343,7 +343,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     var bodyManager = _configuration.GetSection("MessageBody_Manager")
                         .GetSection("Success").Value;
 
-                    /*var includeUser = new List<Expression<Func<StaffParking, object>>>
+                    *//*var includeUser = new List<Expression<Func<StaffParking, object>>>
                     {
                         x => x.User!,
                     };
@@ -376,7 +376,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                             };
                             await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
                         }
-                    }*/
+                    }*//*
                     var deviceToken = "";
                     var managerAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
                     var lstStaff = managerAccount.Where(x => x.RoleId == 2);
@@ -472,7 +472,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var ms = new MemoryStream();
             await file.CopyToAsync(ms);
             var content = new ByteArrayContent(ms.ToArray());
-            /*content.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);*/
+            *//*content.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);*//*
             var response = await _client.PostAsync("https://api.imgur.com/3/image", content);
             response.EnsureSuccessStatusCode();
             var responseContent = await response.Content.ReadAsStringAsync();
@@ -497,3 +497,4 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         }
     }
 }
+*/

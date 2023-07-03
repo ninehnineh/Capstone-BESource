@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿/*using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Domain.Enum;
 
@@ -56,3 +56,4 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         }
     }
 }
+*/
