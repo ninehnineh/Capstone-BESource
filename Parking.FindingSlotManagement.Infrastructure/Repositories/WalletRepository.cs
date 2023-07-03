@@ -100,6 +100,18 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                     checkUserExistInWallet.Balance += wallet.Balance;
                 }
                 await _dbContext.SaveChangesAsync();
+                if (status == null)
+                {
+                    var transactionEntityCommand = new CreateNewTransactionCommand
+                    {
+                        Price = wallet.Balance,
+                        WalletId = checkUserExistInWallet.WalletId,
+                        Status = Domain.Enum.TransactionStatus.Nap_tien_vao_vi_khong_thanh_cong.ToString()
+                    };
+                    var entityToAdd = _mapper.Map<Transaction>(transactionEntityCommand);
+                    await _transactionRepository.CreateNewTransactionWithDeposit(entityToAdd);
+                    return "Thành công";
+                }
                 var transactionEntityCommand3 = new CreateNewTransactionCommand
                 {
                     Price = wallet.Balance,
