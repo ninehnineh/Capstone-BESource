@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 
@@ -11,9 +12,10 @@ using Parking.FindingSlotManagement.Infrastructure.Persistences;
 namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ParkZDbContext))]
-    partial class ParkZDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230703030045_ModifyBookingFollow")]
+    partial class ModifyBookingFollow
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -89,6 +91,16 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.Booking", b =>
                 {
+                    b.Property<int>("ParkingSlotId")
+                        .HasColumnType("int")
+                        .HasColumnName("ParkingSlotID");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateBook")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("BookingId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
@@ -100,9 +112,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("CheckoutTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateBook")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("EndTime")
@@ -122,9 +131,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Status")
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
@@ -140,11 +146,18 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("VehicleInforID");
 
-                    b.HasKey("BookingId");
+                    b.HasKey("ParkingSlotId", "StartTime", "DateBook")
+                        .HasName("PK__Booking__1BDD09E6ABAB9F2E");
+
+                    b.HasIndex(new[] { "BookingId" }, "AK_Booking_BookingIDsas")
+                        .IsUnique();
 
                     b.HasIndex(new[] { "UserId" }, "IX_Booking_UserID");
 
                     b.HasIndex(new[] { "VehicleInforId" }, "IX_Booking_VehicleInforID");
+
+                    b.HasIndex(new[] { "BookingId" }, "UQ__Booking__3214EC2628BBAE14")
+                        .IsUnique();
 
                     b.ToTable("Booking", (string)null);
                 });
@@ -379,10 +392,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     b.Property<int?>("StarsCount")
                         .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
 
                     b.Property<float?>("TotalStars")
                         .HasColumnType("real");
@@ -966,6 +975,12 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.Booking", b =>
                 {
+                    b.HasOne("Parking.FindingSlotManagement.Domain.Entities.ParkingSlot", "ParkingSlot")
+                        .WithMany()
+                        .HasForeignKey("ParkingSlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Parking.FindingSlotManagement.Domain.Entities.User", "User")
                         .WithMany("Bookings")
                         .HasForeignKey("UserId")
@@ -975,6 +990,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                         .WithMany("Bookings")
                         .HasForeignKey("VehicleInforId")
                         .HasConstraintName("FK__Booking__Vehicle");
+
+                    b.Navigation("ParkingSlot");
 
                     b.Navigation("User");
 
@@ -986,6 +1003,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.HasOne("Parking.FindingSlotManagement.Domain.Entities.Booking", "Booking")
                         .WithMany("BookingDetails")
                         .HasForeignKey("BookingId")
+                        .HasPrincipalKey("BookingId")
                         .HasConstraintName("FK__Booking__BookingDetails");
 
                     b.HasOne("Parking.FindingSlotManagement.Domain.Entities.TimeSlot", "TimeSlot")
@@ -1154,6 +1172,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.HasOne("Parking.FindingSlotManagement.Domain.Entities.Booking", "Booking")
                         .WithMany("Transactions")
                         .HasForeignKey("BookingId")
+                        .HasPrincipalKey("BookingId")
                         .HasConstraintName("FK_Booking_BookingPayments");
 
                     b.HasOne("Parking.FindingSlotManagement.Domain.Entities.Wallet", "Wallet")

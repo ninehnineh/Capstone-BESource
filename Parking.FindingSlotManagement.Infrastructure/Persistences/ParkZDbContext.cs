@@ -38,10 +38,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences
         public DbSet<Bill> Bills { get; set; } = null!;
         public DbSet<Wallet> Wallets { get; set; } = null!;
         public DbSet<FieldWorkParkingImg> FieldWorkParkingImgs { get; set; } = null!;
-        public DbSet<BookedSlot> BookedSlots { get; set; } = null!;
-        public DbSet<BookingPayment> BookingPayments { get; set; } = null!;
+        public DbSet<TimeSlot> TimeSlots { get; set; } = null!;
+        public DbSet<Transaction> Transactions { get; set; } = null!;
         public DbSet<ApproveParking> ApproveParkings { get; set; } = null!;
         public DbSet<Domain.Entities.VnPay> VnPays { get; set; } = null!;
+        public DbSet<BookingDetails> BookingDetails { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

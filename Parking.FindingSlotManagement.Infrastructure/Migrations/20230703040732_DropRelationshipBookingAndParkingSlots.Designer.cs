@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 
@@ -11,9 +12,10 @@ using Parking.FindingSlotManagement.Infrastructure.Persistences;
 namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ParkZDbContext))]
-    partial class ParkZDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230703040732_DropRelationshipBookingAndParkingSlots")]
+    partial class DropRelationshipBookingAndParkingSlots
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -147,29 +149,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.HasIndex(new[] { "VehicleInforId" }, "IX_Booking_VehicleInforID");
 
                     b.ToTable("Booking", (string)null);
-                });
-
-            modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.BookingDetails", b =>
-                {
-                    b.Property<int>("BookingDetailsId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookingDetailsId"), 1L, 1);
-
-                    b.Property<int?>("BookingId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TimeSlotId")
-                        .HasColumnType("int");
-
-                    b.HasKey("BookingDetailsId");
-
-                    b.HasIndex("BookingId");
-
-                    b.HasIndex("TimeSlotId");
-
-                    b.ToTable("BookingDetails");
                 });
 
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.BusinessProfile", b =>
@@ -379,10 +358,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
 
                     b.Property<int?>("StarsCount")
                         .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
 
                     b.Property<float?>("TotalStars")
                         .HasColumnType("real");
@@ -715,38 +690,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.Transaction", b =>
-                {
-                    b.Property<int>("TransactionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TransactionId"), 1L, 1);
-
-                    b.Property<int?>("BookingId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PaymentMethod")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("WalletId")
-                        .HasColumnType("int");
-
-                    b.HasKey("TransactionId");
-
-                    b.HasIndex("BookingId");
-
-                    b.HasIndex("WalletId");
-
-                    b.ToTable("Transaction", (string)null);
-                });
-
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.User", b =>
                 {
                     b.Property<int>("UserId")
@@ -981,23 +924,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Navigation("VehicleInfor");
                 });
 
-            modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.BookingDetails", b =>
-                {
-                    b.HasOne("Parking.FindingSlotManagement.Domain.Entities.Booking", "Booking")
-                        .WithMany("BookingDetails")
-                        .HasForeignKey("BookingId")
-                        .HasConstraintName("FK__Booking__BookingDetails");
-
-                    b.HasOne("Parking.FindingSlotManagement.Domain.Entities.TimeSlot", "TimeSlot")
-                        .WithMany("BookingDetails")
-                        .HasForeignKey("TimeSlotId")
-                        .HasConstraintName("FK__TimeSlot__BookingDetails");
-
-                    b.Navigation("Booking");
-
-                    b.Navigation("TimeSlot");
-                });
-
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.BusinessProfile", b =>
                 {
                     b.HasOne("Parking.FindingSlotManagement.Domain.Entities.Fee", "Fee")
@@ -1149,23 +1075,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Navigation("Parkingslot");
                 });
 
-            modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.Transaction", b =>
-                {
-                    b.HasOne("Parking.FindingSlotManagement.Domain.Entities.Booking", "Booking")
-                        .WithMany("Transactions")
-                        .HasForeignKey("BookingId")
-                        .HasConstraintName("FK_Booking_BookingPayments");
-
-                    b.HasOne("Parking.FindingSlotManagement.Domain.Entities.Wallet", "Wallet")
-                        .WithMany("Transactions")
-                        .HasForeignKey("WalletId")
-                        .HasConstraintName("FK_Wallet_BookingPayments");
-
-                    b.Navigation("Booking");
-
-                    b.Navigation("Wallet");
-                });
-
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.User", b =>
                 {
                     b.HasOne("Parking.FindingSlotManagement.Domain.Entities.User", "Manager")
@@ -1231,13 +1140,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Navigation("FieldWorkParkingImgs");
                 });
 
-            modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.Booking", b =>
-                {
-                    b.Navigation("BookingDetails");
-
-                    b.Navigation("Transactions");
-                });
-
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.BusinessProfile", b =>
                 {
                     b.Navigation("Bills");
@@ -1287,11 +1189,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.TimeSlot", b =>
-                {
-                    b.Navigation("BookingDetails");
-                });
-
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.Traffic", b =>
                 {
                     b.Navigation("ParkingPrices");
@@ -1330,8 +1227,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
             modelBuilder.Entity("Parking.FindingSlotManagement.Domain.Entities.Wallet", b =>
                 {
                     b.Navigation("Bills");
-
-                    b.Navigation("Transactions");
                 });
 #pragma warning restore 612, 618
         }

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Domain.Entities
 {
-    public class BookingPayment
+    public class Transaction
     {
-        public int BookingPaymentId { get; set; }
+        public int TransactionId { get; set; }
         public decimal Price { get; set; }
         public string? Status { get; set; }
         public string? PaymentMethod { get; set; }

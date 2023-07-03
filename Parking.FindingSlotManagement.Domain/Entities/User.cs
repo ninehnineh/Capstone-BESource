@@ -29,6 +29,7 @@ namespace Parking.FindingSlotManagement.Domain.Entities
 
         public virtual User? Manager { get; set; }
         public virtual Role? Role { get; set; }
+        public Wallet? Wallet { get; set; }
         public virtual BusinessProfile? BusinessProfile { get; set; }
         public virtual ICollection<Booking> Bookings { get; set; }
         public virtual ICollection<FavoriteAddress> FavoriteAddresses { get; set; }
@@ -39,7 +40,6 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public Parking? Parking { get; set; }
         public virtual ICollection<VnPay> VnPays { get; set; }
         public virtual ICollection<ApproveParking> ApproveParkings { get; set; }
-        public virtual ICollection<Wallet> Wallets { get; set; }
 
     }
 }

@@ -13,10 +13,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
     {
         public void Configure(EntityTypeBuilder<Wallet> builder)
         {
-            builder.HasOne(x => x.User)
-                .WithMany(x => x.Wallets)
-                .HasForeignKey(x => x.UserId)
-                .HasConstraintName("FK_User_Wallets");
+
         }
     }
 }
