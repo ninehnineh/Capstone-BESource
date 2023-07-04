@@ -70,6 +70,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Parkin
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetListBookingFollowCalendar;
 using Parking.FindingSlotManagement.Application.Features.Common.TransactionManagement.Commands.CreateNewTransaction;
 using Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Queries.GetAvailableSlotByFloorId;
+using Parking.FindingSlotManagement.Application.Features.Customer.Account.AccountManagement.Queries.GetCustomerProfileById;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -99,6 +100,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<User, GetListKeeperByManagerIdResponse>()
                 .ForMember<string>(dto => dto.ParkingName, act => act.MapFrom<string>(obj => obj.Parking.Name))
                 .ReverseMap();
+            CreateMap<User, GetCustomerProfileByIdResponse>().ReverseMap();
             #endregion
 
             #region Traffic Mapping
