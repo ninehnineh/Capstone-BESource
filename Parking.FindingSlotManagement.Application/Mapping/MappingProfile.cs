@@ -69,6 +69,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Qu
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetListParkingByParkingPriceId;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetListBookingFollowCalendar;
 using Parking.FindingSlotManagement.Application.Features.Common.TransactionManagement.Commands.CreateNewTransaction;
+using Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Queries.GetAvailableSlotByFloorId;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -222,6 +223,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<ParkingSlot, GetParkingSlotsResponse>().ReverseMap();
             CreateMap<ParkingSlot, GetListParkingSlotByFloorIdResponse>().ReverseMap();
             CreateMap<ParkingSlot, ParkingSlotsDto>().ReverseMap();
+            CreateMap<ParkingSlot, ParkingSlotDto>().ReverseMap();
             #endregion
 
             #region Timeline Mapping

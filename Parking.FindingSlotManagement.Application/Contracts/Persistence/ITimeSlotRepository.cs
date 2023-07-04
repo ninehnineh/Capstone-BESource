@@ -9,5 +9,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
 {
     public interface ITimeSlotRepository : IGenericRepository<TimeSlot>
     {
+        Task<string> AddRangeTimeSlot(List<TimeSlot> lstTs);
     }
 }

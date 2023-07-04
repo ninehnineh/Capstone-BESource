@@ -46,7 +46,7 @@ public class CreateParkingSlotsCommandHandler : IRequestHandler<CreateParkingSlo
             await _parkingSlotRepository.Insert(a);
             DateTime startDate = DateTime.UtcNow;
             DateTime endDate = startDate.AddDays(7);
-
+            List<TimeSlot> ts = new List<TimeSlot>();
             for (DateTime date = startDate; date < endDate; date = date.AddDays(1))
             {
                 for (int i = 0; i < 24; i++)
@@ -59,13 +59,25 @@ public class CreateParkingSlotsCommandHandler : IRequestHandler<CreateParkingSlo
                         StartTime = startTime,
                         EndTime = endTime,
                         CreatedDate = date.Date,
-                        Status = "Chua_dat",
+                        Status = "Free",
                         ParkingSlotId = a.ParkingSlotId
                     };
-                    await _timeSlotRepository.Insert(entityTimeSlot);
+                    ts.Add(entityTimeSlot);
                 }
             }
+            var res = await _timeSlotRepository.AddRangeTimeSlot(ts);
+            if(!res.Equals("Thành công"))
+            {
+                return new ServiceResponse<int>
+                {
+                    Message = "Quá trình thêm mới xảy ra lỗi!!!",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
             RecurringJob.AddOrUpdate<IServiceManagement>(x => x.DeleteTimeSlotIn1Week(), Cron.Weekly);
+            RecurringJob.AddOrUpdate<IServiceManagement>(x => x.AddTimeSlotInFuture((int)request.FloorId), Cron.Weekly);
+
             return new ServiceResponse<int>
             {
                 Data = a.ParkingSlotId,

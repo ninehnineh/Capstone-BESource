@@ -12,5 +12,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Infrastructure
         void DeleteTimeSlotIn1Week();
         void GenerateMerchandise();
         void SyncData();
+        void AddTimeSlotInFuture(int floorId);
     }
 }
