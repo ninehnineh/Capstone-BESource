@@ -59,7 +59,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                 var _mapper = config.CreateMapper();
                 var parkingEntity = _mapper.Map<Domain.Entities.Parking>(request);
                 parkingEntity.BusinessId = checkBusinessExist.BusinessProfileId;
-                parkingEntity.IsActive = true;
+                parkingEntity.IsActive = false;
                 parkingEntity.IsFull = false;
                 await _parkingRepository.Insert(parkingEntity);
                 parkingEntity.Code = "BX" + parkingEntity.ParkingId;
