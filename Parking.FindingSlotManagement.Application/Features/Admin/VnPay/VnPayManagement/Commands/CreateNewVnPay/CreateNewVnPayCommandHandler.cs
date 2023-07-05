@@ -53,6 +53,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayMa
                 }
                 var _mapper = config.CreateMapper();
                 var vnPayEntity = _mapper.Map<Domain.Entities.VnPay>(request);
+                vnPayEntity.UserId = checkManagerExist.UserId;
                 await _vnPayRepository.Insert(vnPayEntity);
                 return new ServiceResponse<int>
                 {
