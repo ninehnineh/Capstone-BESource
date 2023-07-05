@@ -54,12 +54,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlo
                 HashSet<int> listParkingSlotIdExist = new();
                 foreach (var item in currentLstBookedSlot)
                 {
-                    /*var bookedStartTime = item.StartTime.Hour;
-                    var bookedEndTime = item.EndTime.Hour;
-                    if (request.StartTimeBooking < item.EndTime && request.EndTimeBooking > item.StartTime)
-                    {
-                        listParkingSlotIdExist.Add((int)item.ParkingSlotId);
-                    }*/
                     if (!listParkingSlotIdExist.Contains((int)item.ParkingSlotId))
                     {
                         listParkingSlotIdExist.Add((int)item.ParkingSlotId);

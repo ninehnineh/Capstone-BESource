@@ -71,6 +71,7 @@ using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Querie
 using Parking.FindingSlotManagement.Application.Features.Common.TransactionManagement.Commands.CreateNewTransaction;
 using Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Queries.GetAvailableSlotByFloorId;
 using Parking.FindingSlotManagement.Application.Features.Customer.Account.AccountManagement.Queries.GetCustomerProfileById;
+using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetAllParkingRequest;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -149,6 +150,10 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ReverseMap();
             CreateMap<Domain.Entities.Parking, ParkingDto>()
                 .ForMember(des => des.ParkingHasPrices, src => src.MapFrom(obj => obj.ParkingHasPrices))
+                .ReverseMap();
+            CreateMap<Domain.Entities.Parking, GetAllParkingRequestResponse>()
+                .ForMember(dto => dto.BusinessProfileName, act => act.MapFrom(obj => obj.BusinessProfile.Name))
+                .ForMember(dto => dto.ApproveParkingStatus, act => act.MapFrom(obj => obj.ApproveParkings.FirstOrDefault().Status))
                 .ReverseMap();
             #endregion
 
