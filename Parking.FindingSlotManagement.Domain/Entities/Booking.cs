@@ -21,6 +21,8 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public string? GuestPhone { get; set; }
         public decimal? TotalPrice { get; set; }
         public string? QRImage { get; set; }
+        public decimal UnPaidMoney { get; set; }
+
 
         public int? UserId { get; set; }
         public virtual User? User { get; set; }

@@ -24,7 +24,6 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public float? Stars { get; set; }
         public float? TotalStars { get; set; }
         public int? StarsCount { get; set; }
-        public string? Status { get; set; }
         public int BusinessId { get; set; }
 
         public BusinessProfile BusinessProfile { get; set; }

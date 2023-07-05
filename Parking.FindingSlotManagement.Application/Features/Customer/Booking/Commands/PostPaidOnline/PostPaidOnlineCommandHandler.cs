@@ -57,7 +57,7 @@
 //                    };
 //                }
 //                var manager = await _userRepository.GetItemWithCondition(x => x.ParkingId == parking.ParkingId && x.RoleId == 1);
-//                if(manager == null)
+//                if (manager == null)
 //                {
 //                    return new ServiceResponse<string>
 //                    {

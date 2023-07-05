@@ -1,4 +1,4 @@
-﻿/*using AutoMapper;
+using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +8,9 @@ using MongoDB.Driver;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commons;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetBookingDetails;
 using Parking.FindingSlotManagement.Application.Models.Booking;
+using Parking.FindingSlotManagement.Application.Models.BookingDetails;
 using Parking.FindingSlotManagement.Application.Models.PushNotification;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Domain.Enum;
@@ -17,12 +19,17 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq.Expressions;
 using System.Net.Http.Headers;
+using System.Net.WebSockets;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CreateBooking
 {
     public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand, ServiceResponse<string>>
     {
         const int CUSTOMER = 3;
+        const string BOOKED = "Booked";
+        const string UNPAID = "Unpaid";
+        const string PAID = "Paid";
         const int OTO = 1;
         const int MOTO = 2;
         private readonly IBookingRepository _bookingRepository;
@@ -40,6 +47,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         private readonly IConfiguration _configuration;
         private readonly IFireBaseMessageServices _fireBaseMessageServices;
         private readonly IVehicleInfoRepository _vehicleInfoRepository;
+        private readonly IBookingDetailsRepository _bookingDetailsRepository;
+        private readonly ITimeSlotRepository _timeSlotRepository;
+        private readonly ITransactionRepository _transactionRepository;
         private readonly HttpClient _client;
 
         public CreateBookingCommandHandler(IBookingRepository bookingRepository,
@@ -56,7 +66,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             IParkingPriceRepository parkingPriceRepository,
             IConfiguration configuration,
             IFireBaseMessageServices fireBaseMessageServices,
-            IVehicleInfoRepository vehicleInfoRepository)
+            IVehicleInfoRepository vehicleInfoRepository,
+            IBookingDetailsRepository bookingDetailsRepository,
+            ITimeSlotRepository timeSlotRepository, 
+            ITransactionRepository transactionRepository)
         {
             _bookingRepository = bookingRepository;
             _parkingSlotRepository = parkingSlotRepository;
@@ -73,16 +86,24 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             _configuration = configuration;
             _fireBaseMessageServices = fireBaseMessageServices;
             _vehicleInfoRepository = vehicleInfoRepository;
+            _bookingDetailsRepository = bookingDetailsRepository;
+            _timeSlotRepository = timeSlotRepository;
+            _transactionRepository = transactionRepository;
             _client = new HttpClient();
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Client-ID", "886d0b92410e625");
         }
 
         public async Task<ServiceResponse<string>> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
         {
+            var startTimeBooking = request.BookingDto.StartTime;
+            var endTimeBooking = request.BookingDto.EndTime;
+            var parkingSlotId = request.BookingDto.ParkingSlotId;
+            var paymentMethod = request.BookingDto.PaymentMethod;
             try
             {
                 var parkingSlot = await _parkingSlotRepository
-                    .GetById(request.BookingDto.ParkingSlotId);
+                    .GetById(parkingSlotId);
+
                 if (parkingSlot == null)
                 {
                     return new ServiceResponse<string>
@@ -104,10 +125,16 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         StatusCode = 200
                     };
                 }
+
+                List<Expression<Func<User, object>>> includesWallet = new()
+                {
+                    x => x.Wallet,
+                };
+
                 var user = await _userRepository
                     .GetItemWithCondition(x => x.UserId == request.BookingDto.UserId &&
                                             x.IsActive == true &&
-                                            x.RoleId == CUSTOMER);
+                                            x.RoleId == CUSTOMER, includesWallet);
                 if (user == null)
                 {
                     return new ServiceResponse<string>
@@ -120,44 +147,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
                 var entity = _mapper.Map<Domain.Entities.Booking>(request.BookingDto);
                 entity.Status = BookingStatus.Initial.ToString();
-                // get and set TMNCodeVnPay
                 var floor = await _floorRepository.GetById(parkingSlot.FloorId!);
                 var parkingId = floor.ParkingId;
 
                 var parking = await _parkingRepository.GetById(parkingId!);
-
-                //var vnpay = await _vnPayRepository
-                //    .GetItemWithCondition(x => x.ManagerId == managerId);
-                //entity.TmnCodeVnPay = vnpay.TmnCode;
-                *//*List<Expression<Func<Domain.Entities.Booking, object>>> includes2 = new List<Expression<Func<Domain.Entities.Booking, object>>>
-                {
-                    x => x.ParkingSlot,
-                    x => x.ParkingSlot.Floor
-                };
-                var lstBooking = await _bookingRepository.GetAllItemWithCondition(x => x.ParkingSlotId == request.BookingDto.ParkingSlotId && x.ParkingSlot.FloorId == floor.FloorId && x.ParkingSlot.Floor.ParkingId == floor.ParkingId && x.DateBook.Date == DateTime.UtcNow.Date && x.Status != BookingStatus.Cancel.ToString(), includes2, null, true);
-                List<int> lstParkingSlotIdExist = new();
-                if(lstBooking.Count() > 0)
-                {
-                    foreach (var item in lstBooking)
-                    {
-                        if(request.BookingDto.StartTime < item.EndTime && request.BookingDto.EndTime > item.StartTime)
-                        {
-                            if(lstParkingSlotIdExist.Where(x => x.Equals(item.ParkingSlotId)).Count() <= 0)
-                            {
-                                lstParkingSlotIdExist.Add(item.ParkingSlotId);
-                            }
-                            
-                        }
-                    }
-                }
-                List<Expression<Func<Domain.Entities.ParkingSlot, object>>> includes3 = new List<Expression<Func<Domain.Entities.ParkingSlot, object>>>
-                {
-                    x => x.Floor,
-                };
-                var lstParkingSlot = await _parkingSlotRepository.GetAllItemWithCondition(x => x.FloorId == floor.FloorId && x.Floor.ParkingId == floor.ParkingId, includes3, null, true);
-                var filterParkingSlot = lstParkingSlot.Where(item => !lstParkingSlotIdExist.Contains(item.ParkingSlotId)).ToList();*//*
-
-                // Set TotalPrice
 
                 var trafficid = vehicleInfor.TrafficId;
 
@@ -203,237 +196,92 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     parkingPrice, timeLines);
 
                 entity.TotalPrice = expectedPrice;
+                entity.DateBook = DateTime.UtcNow.AddHours(7);
 
-                var listBooking = await _bookingRepository
-                    .GetAllItemWithCondition(x => x.DateBook.Date <= DateTime.UtcNow.Date &&
-                    x.ParkingSlotId == request.BookingDto.ParkingSlotId);
+                await _bookingRepository.Insert(entity);
 
-                DateTime Gioloinhat = new();
+                var linkQRImage = await UploadQRImagess(entity.BookingId);
+                var currentBooking = await _bookingRepository
+                    .GetItemWithCondition(x => x.BookingId == entity.BookingId, null!, false);
+                currentBooking.QRImage = linkQRImage;
 
-                if (listBooking.Count() > 0)
+                await _bookingRepository.Save();
+
+                var timeSlotsBooking = await _timeSlotRepository
+                    .GetAllTimeSlotsBooking(startTimeBooking, endTimeBooking, parkingSlotId);
+
+                var bookingDetails = new List<BookingDetails>();
+
+                foreach (var timeSlot in timeSlotsBooking)
                 {
-                    foreach (var item in listBooking)
-                    {
-                        if (Gioloinhat < item.EndTime)
-                        {
-                            Gioloinhat = item.EndTime.Value;
-                        }
-                    }
+                    bookingDetails.Add(new BookingDetails{ BookingId = entity.BookingId, TimeSlotId = timeSlot.TimeSlotId });
+                    //timeSlot.Status = TimeSlotStatus.Booked.ToString();
                 }
 
-                if (parkingSlot.IsAvailable == true)
+                //await _timeSlotRepository.Save();
+                await _bookingDetailsRepository.AddRange(bookingDetails);
+                var transaction = new Transaction
                 {
-                    parkingSlot.IsAvailable = false;
-                    await _parkingSlotRepository.Save();
-                    entity.DateBook = DateTime.UtcNow.AddHours(7);
+                    Price = expectedPrice,
+                    Status = UNPAID,
+                    PaymentMethod = paymentMethod,
+                    WalletId = user.Wallet.WalletId,
+                    BookingId = entity.BookingId
+                };
 
-                    await _bookingRepository.Insert(entity);
+                await _transactionRepository.Insert(transaction);
 
-                    var linkQRImage = await UploadQRImagess(entity.BookingId);
-                    var currentBooking = await _bookingRepository
-                        .GetItemWithCondition(x => x.BookingId == entity.BookingId, null!, false);
+                var titleManager = _configuration.GetSection("MessageTitle_Manager").GetSection("Success").Value;
+                var bodyManager = _configuration.GetSection("MessageBody_Manager").GetSection("Success").Value;
 
-                    currentBooking.QRImage = linkQRImage;
+                var deviceToken = "";
+                var managerAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
+                var lstStaff = managerAccount.Where(x => x.RoleId == 2);
+                var ManagerOfParking = managerAccount.FirstOrDefault(x => x.RoleId == 1);
 
-                    await _bookingRepository.Save();
-
-                    var titleManager = _configuration.GetSection("MessageTitle_Manager").GetSection("Success").Value;
-                    var bodyManager = _configuration.GetSection("MessageBody_Manager").GetSection("Success").Value;
-
-                    *//*var includeUser = new List<Expression<Func<StaffParking, object>>>
-                    {
-                        x => x.User!,
-                    };
-
-                    var deviceToken = "";
-                    var staffParking = await _staffParkingRepository
-                        .GetAllItemWithCondition(x => x.ParkingId == parkingId, includeUser);
-
-                    if (!staffParking.Any())
-                    {
-                        var manager = await _userRepository.GetById(managerId!);
-                        var pushNotificationModel = new PushNotificationWebModel
-                        {
-                            Title = titleManager,
-                            Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                            TokenWeb = manager.Devicetoken,
-                        };
-                        await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
-                    }
-                    else
-                    {
-                        foreach (var item in staffParking)
-                        {
-                            deviceToken = item.User.Devicetoken!.ToString();
-                            var pushNotificationModel = new PushNotificationWebModel
-                            {
-                                Title = titleManager,
-                                Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                                TokenWeb = deviceToken,
-                            };
-                            await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
-                        }
-                    }*//*
-                    var deviceToken = "";
-                    var managerAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
-                    var lstStaff = managerAccount.Where(x => x.RoleId == 2);
-                    var ManagerOfParking = managerAccount.FirstOrDefault(x => x.RoleId == 1);
-                    if (lstStaff.Any())
-                    {
-                        foreach (var item in lstStaff)
-                        {
-                            deviceToken = item.Devicetoken.ToString();
-                            var pushNotificationModel = new PushNotificationWebModel
-                            {
-                                Title = titleManager,
-                                Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                                TokenWeb = deviceToken,
-                            };
-                            await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
-                        }
-                    }
-                    else
-                    {
-                        var manager = await _userRepository.GetById(ManagerOfParking.UserId!);
-                        var pushNotificationModel = new PushNotificationWebModel
-                        {
-                            Title = titleManager,
-                            Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                            TokenWeb = manager.Devicetoken,
-                        };
-                        await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
-                    }
-
-                    var titleCustomer = _configuration.GetSection("MessageTitle_Customer").GetSection("Success").Value;
-                    var bodyCustomer = _configuration.GetSection("MessageBody_Customer").GetSection("Success").Value;
-
-                    var pushNotificationMobile = new PushNotificationMobileModel
-                    {
-                        Title = titleCustomer,
-                        Message = bodyCustomer + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                        TokenMobile = request.DeviceToKenMobile,
-                    };
-
-                    await _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
-
-                    return new ServiceResponse<string>
-                    {
-                        Data = entity.BookingId.ToString(),
-                        StatusCode = 201,
-                        Success = true,
-                    };
-                }
-                else if (parkingSlot.IsAvailable == false && request.BookingDto.StartTime >= Gioloinhat)
+                if (lstStaff.Any())
                 {
-
-                    entity.DateBook = DateTime.UtcNow.AddHours(7);
-
-                    await _bookingRepository.Insert(entity);
-
-                    var linkQRImage = await UploadQRImagess(entity.BookingId);
-                    var currentBooking = await _bookingRepository
-                        .GetItemWithCondition(x => x.BookingId == entity.BookingId, null!, false);
-
-                    currentBooking.QRImage = linkQRImage;
-
-                    await _bookingRepository.Save();
-
-                    var titleManager = _configuration.GetSection("MessageTitle_Manager")
-                        .GetSection("Success").Value;
-                    var bodyManager = _configuration.GetSection("MessageBody_Manager")
-                        .GetSection("Success").Value;
-
-                    *//*var includeUser = new List<Expression<Func<StaffParking, object>>>
+                    foreach (var item in lstStaff)
                     {
-                        x => x.User!,
-                    };
-
-                    var deviceToken = "";
-                    var staffParking = await _staffParkingRepository
-                        .GetAllItemWithCondition(x => x.ParkingId == parkingId, includeUser);
-
-                    if (!staffParking.Any())
-                    {
-                        var manager = await _userRepository.GetById(managerId!);
+                        deviceToken = item.Devicetoken.ToString();
                         var pushNotificationModel = new PushNotificationWebModel
                         {
                             Title = titleManager,
                             Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                            TokenWeb = manager.Devicetoken,
+                            TokenWeb = deviceToken,
                         };
                         await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
                     }
-                    else
-                    {
-                        foreach (var item in staffParking)
-                        {
-                            deviceToken = item.User.Devicetoken!.ToString();
-                            var pushNotificationModel = new PushNotificationWebModel
-                            {
-                                Title = titleManager,
-                                Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                                TokenWeb = deviceToken,
-                            };
-                            await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
-                        }
-                    }*//*
-                    var deviceToken = "";
-                    var managerAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
-                    var lstStaff = managerAccount.Where(x => x.RoleId == 2);
-                    var ManagerOfParking = managerAccount.FirstOrDefault(x => x.RoleId == 1);
-                    if (lstStaff.Any())
-                    {
-                        foreach (var item in lstStaff)
-                        {
-                            deviceToken = item.Devicetoken.ToString();
-                            var pushNotificationModel = new PushNotificationWebModel
-                            {
-                                Title = titleManager,
-                                Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                                TokenWeb = deviceToken,
-                            };
-                            await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
-                        }
-                    }
-                    else
-                    {
-                        var manager = await _userRepository.GetById(ManagerOfParking.UserId!);
-                        var pushNotificationModel = new PushNotificationWebModel
-                        {
-                            Title = titleManager,
-                            Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                            TokenWeb = manager.Devicetoken,
-                        };
-                        await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
-                    }
-
-                    var titleCustomer = _configuration.GetSection("MessageTitle_Customer")
-                        .GetSection("Success").Value;
-                    var bodyCustomer = _configuration.GetSection("MessageBody_Customer")
-                        .GetSection("Success").Value;
-
-                    var pushNotificationMobile = new PushNotificationMobileModel
-                    {
-                        Title = titleCustomer,
-                        Message = bodyCustomer + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                        TokenMobile = request.DeviceToKenMobile,
-                    };
-
-                    await _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
-
-                    return new ServiceResponse<string>
-                    {
-                        Data = entity.BookingId.ToString(),
-                        StatusCode = 201,
-                        Success = true,
-                    };
                 }
+                else
+                {
+                    var manager = await _userRepository.GetById(ManagerOfParking.UserId!);
+                    var pushNotificationModel = new PushNotificationWebModel
+                    {
+                        Title = titleManager,
+                        Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                        TokenWeb = manager.Devicetoken,
+                    };
+                    await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
+                }
+
+                var titleCustomer = _configuration.GetSection("MessageTitle_Customer").GetSection("Success").Value;
+                var bodyCustomer = _configuration.GetSection("MessageBody_Customer").GetSection("Success").Value;
+
+                var pushNotificationMobile = new PushNotificationMobileModel
+                {
+                    Title = titleCustomer,
+                    Message = bodyCustomer + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                    TokenMobile = request.DeviceToKenMobile,
+                };
+
+                await _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
 
                 return new ServiceResponse<string>
                 {
-                    Message = "Chỗ đỗ xe đã được người khác đặt, vui lòng chọn chỗ mới",
-                    Success = false,
-                    StatusCode = 400
+                    Data = entity.BookingId.ToString(),
+                    StatusCode = 201,
+                    Success = true,
                 };
             }
             catch (DbUpdateException ex)
@@ -454,7 +302,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             }
         }
 
-        
 
         private async Task<string> UploadQRImagess(int bookingId)
         {
@@ -472,7 +319,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var ms = new MemoryStream();
             await file.CopyToAsync(ms);
             var content = new ByteArrayContent(ms.ToArray());
-            *//*content.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);*//*
+            /*content.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);*/
             var response = await _client.PostAsync("https://api.imgur.com/3/image", content);
             response.EnsureSuccessStatusCode();
             var responseContent = await response.Content.ReadAsStringAsync();
@@ -497,4 +344,3 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         }
     }
 }
-*/

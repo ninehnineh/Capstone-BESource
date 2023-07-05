@@ -10,7 +10,9 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
 {
     public interface IBookingRepository : IGenericRepository<Booking>
     {
-        Task<Booking> GetBooking(BookingDTO bookingDTO);
         Task<Booking> GetBooking(int bookingId);
+        Task<Booking> GetBookingIncludeTransaction(int bookingId);
+        Task<Booking> GetBookingIncludeUser(int bookingId);
+        Task<Booking> GetBookingIncludeParkingSlot (int bookingId);
     }
 }

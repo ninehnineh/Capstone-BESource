@@ -22,7 +22,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .IsFixedLength();
 
             builder.Property(e => e.Description).HasMaxLength(255);
-            builder.Property(e => e.Status).HasMaxLength(20);
 
             builder.Property(e => e.Latitude).HasColumnType("decimal(10, 6)");
 
