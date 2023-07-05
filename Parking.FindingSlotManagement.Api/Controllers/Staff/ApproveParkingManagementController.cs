@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Parking.FindingSlotManagement.Application;
-using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Commands.CreateNewApproveParking;
+using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Commands.UpdateApproveParking;
 using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Staff
@@ -20,11 +20,11 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Staff
         /// <summary>
         /// API For Staff
         /// </summary>
-        [HttpPost("parking", Name = "CreateNewApproveParking")]
+        [HttpPut("parking", Name = "UpdateApproveParking")]
         [Produces("application/json")]
-        [ProducesResponseType((int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<ServiceResponse<int>>> CreateNewApproveParking([FromBody] CreateNewApproveParkingCommand command)
+        public async Task<ActionResult<ServiceResponse<int>>> CreateNewApproveParking([FromBody] UpdateApproveParkingCommand command)
         {
             try
             {
