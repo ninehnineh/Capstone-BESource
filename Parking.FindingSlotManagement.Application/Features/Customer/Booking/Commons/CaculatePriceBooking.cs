@@ -128,7 +128,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                                 {
                                     endTimeBooking += 24;
                                 }
-                                while (extraFeePoint <= endTimeBooking &&
+                                while (extraFeePoint <= endTimePackage &&
                                     extraFeePoint <= endTimeBooking)
                                 {
                                     priceOfTimeLineTwo = (decimal)package.ExtraFee!;
@@ -148,9 +148,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                                 {
                                     continue;
                                 }
+                                hitEndPoint = true;
+                                break;
                             }
-                            hitEndPoint = true;
-                            break;
+
                         }
                     }
 

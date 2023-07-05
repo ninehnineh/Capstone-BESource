@@ -1,4 +1,4 @@
-using Parking.FindingSlotManagement.Domain.Entities;
+﻿using Parking.FindingSlotManagement.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
 {
-    public interface ITransactionRepository : IGenericRepository<Transaction>
+    public interface IBookingDetailsRepository : IGenericRepository<BookingDetails>
     {
-        Task<int> CreateNewTransactionWithDeposit(Transaction transaction);
+        Task AddRange(List<BookingDetails> bookingDetails);
     }
 }
