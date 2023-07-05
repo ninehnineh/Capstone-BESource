@@ -22,18 +22,24 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public bool? IsCensorship { get; set; }
         public int? ManagerId { get; set; }
         public int? RoleId { get; set; }
+        public string? IdCardNo { get; set; }
+        public DateTime? IdCardDate { get; set; }
+        public string? IdCardIssuedBy { get; set; }
+        public string? Address { get; set; }
 
         public virtual User? Manager { get; set; }
         public virtual Role? Role { get; set; }
+        public Wallet? Wallet { get; set; }
         public virtual BusinessProfile? BusinessProfile { get; set; }
         public virtual ICollection<Booking> Bookings { get; set; }
         public virtual ICollection<FavoriteAddress> FavoriteAddresses { get; set; }
         public virtual ICollection<User> InverseManager { get; set; }
         public virtual ICollection<PayPal> PayPals { get; set; }
-        public virtual ICollection<StaffParking> StaffParkings { get; set; }
         public virtual ICollection<VehicleInfor> VehicleInfors { get; set; }
+        public int? ParkingId { get; set; }
+        public Parking? Parking { get; set; }
         public virtual ICollection<VnPay> VnPays { get; set; }
-        public ICollection<OTP> OTPs { get; set; }
-        public ICollection<ParkingPrice> ParkingPrices { get; set; }
+        public virtual ICollection<ApproveParking> ApproveParkings { get; set; }
+
     }
 }

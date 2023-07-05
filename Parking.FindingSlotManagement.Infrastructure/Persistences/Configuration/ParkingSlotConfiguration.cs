@@ -13,15 +13,10 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
     {
         public void Configure(EntityTypeBuilder<ParkingSlot> builder)
         {
-            builder.HasIndex(e => e.BookingId, "IX_ParkingSlots_BookingID");
 
             builder.HasIndex(e => e.FloorId, "IX_ParkingSlots_FloorID");
 
-            builder.HasIndex(e => e.ParkingId, "IX_ParkingSlots_ParkingID");
-
             builder.HasIndex(e => e.TrafficId, "IX_ParkingSlots_TrafficID");
-
-            builder.Property(e => e.BookingId).HasColumnName("BookingID");
 
             builder.Property(e => e.FloorId).HasColumnName("FloorID");
 
@@ -30,30 +25,24 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .IsUnicode(false)
                 .IsFixedLength();
 
-            builder.Property(e => e.ParkingId).HasColumnName("ParkingID");
-
             builder.Property(e => e.TrafficId).HasColumnName("TrafficID");
 
-            builder.HasOne(d => d.Booking)
-                .WithMany(p => p.ParkingSlots)
-                .HasPrincipalKey(p => p.BookingId)
-                .HasForeignKey(d => d.BookingId)
-                .HasConstraintName("FK__ParkingSl__Booki__5629CD9C");
+            //builder.HasOne(d => d.Booking)
+            //    .WithMany(p => p.ParkingSlots)
+            //    .HasPrincipalKey(p => p.BookingId)
+            //    .HasForeignKey(d => d.BookingId)
+            //    .HasConstraintName("FK__ParkingSl__Booki__5629CD9C");
 
             builder.HasOne(d => d.Floor)
                 .WithMany(p => p.ParkingSlots)
                 .HasForeignKey(d => d.FloorId)
                 .HasConstraintName("FK__ParkingSl__Floor__5441852A");
 
-            builder.HasOne(d => d.Parking)
-                .WithMany(p => p.ParkingSlots)
-                .HasForeignKey(d => d.ParkingId)
-                .HasConstraintName("FK__ParkingSl__Parki__5535A963");
 
             builder.HasOne(d => d.Traffic)
                 .WithMany(p => p.ParkingSlots)
                 .HasForeignKey(d => d.TrafficId)
-                .HasConstraintName("FK__ParkingSl__Traff__534D60F1");
+                .HasConstraintName("FK__ParkingSl__Traff");
         }
     }
 }

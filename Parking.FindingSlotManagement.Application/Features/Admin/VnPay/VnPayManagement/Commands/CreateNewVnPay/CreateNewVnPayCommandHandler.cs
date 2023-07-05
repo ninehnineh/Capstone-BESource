@@ -14,21 +14,33 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayMa
     {
         private readonly IVnPayRepository _vnPayRepository;
         private readonly IAccountRepository _accountRepository;
+        private readonly IBusinessProfileRepository _businessProfileRepository;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MappingProfile());
         });
 
-        public CreateNewVnPayCommandHandler(IVnPayRepository vnPayRepository, IAccountRepository accountRepository)
+        public CreateNewVnPayCommandHandler(IVnPayRepository vnPayRepository, IAccountRepository accountRepository, IBusinessProfileRepository businessProfileRepository)
         {
             _vnPayRepository = vnPayRepository;
             _accountRepository = accountRepository;
+            _businessProfileRepository = businessProfileRepository;
         }
         public async Task<ServiceResponse<int>> Handle(CreateNewVnPayCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                var checkManagerExist = await _accountRepository.GetItemWithCondition(x => x.RoleId == 1 && x.IsActive == true && x.IsCensorship == true && x.UserId.Equals(request.ManagerId));
+                var checkBusinessExist = await _businessProfileRepository.GetById(request.BusinessId);
+                if(checkBusinessExist == null)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Không tìm thấy tài khoản doanh nghiệp.",
+                        Success = true,
+                        StatusCode = 200
+                    };
+                }
+                var checkManagerExist = await _accountRepository.GetItemWithCondition(x => x.RoleId == 1 && x.IsActive == true && x.IsCensorship == true && x.UserId.Equals(checkBusinessExist.UserId));
                 if (checkManagerExist == null)
                 {
                     return new ServiceResponse<int>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Org.BouncyCastle.Math.EC.Rfc7748;
 using Parking.FindingSlotManagement.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -17,29 +18,20 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
 
             builder.Property(e => e.Description).HasMaxLength(255);
 
-            builder.Property(e => e.EndTime).HasColumnType("datetime");
+            builder.Property(e => e.EndTime).HasColumnType("time");
 
             builder.Property(e => e.ExtraFee).HasColumnType("money");
 
             builder.Property(e => e.Name).HasMaxLength(50);
 
-            builder.Property(e => e.PenaltyPrice).HasColumnType("money");
-
             builder.Property(e => e.Price).HasColumnType("money");
 
-            builder.Property(e => e.StartTime).HasColumnType("datetime");
-
-            builder.Property(e => e.StartingTime).HasColumnType("datetime");
+            builder.Property(e => e.StartTime).HasColumnType("time");
 
             builder.HasOne(d => d.ParkingPrice)
                 .WithMany(p => p.TimeLines)
                 .HasForeignKey(d => d.ParkingPriceId)
                 .HasConstraintName("FK_Timeline_ParkingPrice");
-
-            builder.HasOne(d => d.Traffic)
-                .WithMany(p => p.TimeLines)
-                .HasForeignKey(d => d.TrafficId)
-                .HasConstraintName("FK_Timeline_Traffic");
         }
     }
 }

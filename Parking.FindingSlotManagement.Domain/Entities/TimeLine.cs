@@ -11,21 +11,13 @@ namespace Parking.FindingSlotManagement.Domain.Entities
     {
         public int TimeLineId { get; set; }
         public string? Name { get; set; }
-        public decimal? Price { get; set; }
+        public decimal Price { get; set; }
         public string? Description { get; set; }
         public bool? IsActive { get; set; }
-        public DateTime? StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
-        public DateTime? StartingTime { get; set; }
-        public bool? IsExtrafee { get; set; }
+        public TimeSpan? StartTime { get; set; }
+        public TimeSpan? EndTime { get; set; }
         public decimal? ExtraFee { get; set; }
-        public float? ExtraTimeStep { get; set; }
-        public bool? HasPenaltyPrice { get; set; }
-        public decimal? PenaltyPrice { get; set; }
-        public float? PenaltyPriceStepTime { get; set; }
 
-        public int? TrafficId { get; set; }
-        public virtual Traffic? Traffic { get; set; }
         public int? ParkingPriceId { get; set; }
         public ParkingPrice? ParkingPrice { get; set; }
 

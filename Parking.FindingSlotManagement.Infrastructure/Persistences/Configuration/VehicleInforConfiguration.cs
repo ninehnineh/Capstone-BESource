@@ -13,7 +13,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
     {
         public void Configure(EntityTypeBuilder<VehicleInfor> builder)
         {
-            builder.ToTable("VehicleInfor");
+            builder.ToTable("Vehicle");
 
             builder.HasIndex(e => e.TrafficId, "IX_VehicleInfor_TrafficID");
 
@@ -32,7 +32,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
             builder.HasOne(d => d.Traffic)
                 .WithMany(p => p.VehicleInfors)
                 .HasForeignKey(d => d.TrafficId)
-                .HasConstraintName("FK__VehicleIn__Traff__4BAC3F29");
+                .HasConstraintName("FK__VehicleIn__Traff");
 
             builder.HasOne(d => d.User)
                 .WithMany(p => p.VehicleInfors)

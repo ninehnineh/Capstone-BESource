@@ -19,15 +19,25 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
             builder.Property(e => e.ParkingPriceName)
                 .HasMaxLength(250);
 
-            builder.Property(x => x.UserId)
+            builder.Property(x => x.BusinessId)
                     .HasColumnName("BusinessId");
 
+            builder.Property(e => e.PenaltyPrice).HasColumnType("money");
 
-            builder.HasOne(x => x.User)
+            builder.Property(e => e.StartingTime).HasColumnName("StartingTime")
+                .HasColumnType("int");
+
+
+            builder.HasOne(x => x.BusinessProfile)
                     .WithMany(x => x.ParkingPrices)
-                    .HasForeignKey(x => x.UserId)
+                    .HasForeignKey(x => x.BusinessId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK__Business__ParkingPri__sdwq23dca");
+                    .HasConstraintName("FK__Business__ParkingPri");
+
+            builder.HasOne(x => x.Traffic)
+                .WithMany(x => x.ParkingPrices)
+                .HasForeignKey(x => x.TrafficId)
+                .HasConstraintName("FK__VehicleTy_Parkingpri");
         }
     }
 }

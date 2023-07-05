@@ -32,8 +32,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .IsUnicode(false);
 
             builder.Property(e => e.Gender)
-                .HasMaxLength(20)
-                .IsUnicode(false);
+                .HasMaxLength(20);
 
             builder.Property(e => e.ManagerId).HasColumnName("ManagerID");
 
@@ -48,6 +47,18 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .IsUnicode(false)
                 .IsFixedLength();
 
+            builder.Property(e => e.IdCardNo)
+                .HasMaxLength(20);
+
+            builder.Property(e => e.IdCardDate)
+                .HasColumnType("date");
+
+            builder.Property(e => e.IdCardIssuedBy)
+                .HasMaxLength(255);
+
+            builder.Property(e => e.Address)
+                .HasMaxLength(255);
+
             builder.Property(e => e.RoleId).HasColumnName("RoleID");
 
             builder.HasOne(d => d.Manager)
@@ -59,6 +70,12 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)
                 .HasConstraintName("FK__Users__RoleID__276EDEB3");
+
+            builder.HasOne(x => x.Parking)
+                .WithMany(x => x.Users)
+                .HasForeignKey(x => x.ParkingId)
+                .HasConstraintName("FK__Parking__Users");
+
         }
     }
 }

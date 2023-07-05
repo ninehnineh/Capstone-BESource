@@ -58,34 +58,34 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories.Authenticati
         private ServiceResponse<AuthResponse> GenerateTokenForAdminNotManagedByPersistences(
             ServiceResponse<AuthResponse> response, string adminEmail)
         {
-            var claims = new[]
+            var claims = new List<Claim>
             {
-                    new Claim(JwtRegisteredClaimNames.Sub, adminEmail),
-                    new Claim("Email", adminEmail),
-                    new Claim("Role", "Admin")
+                new Claim(ClaimTypes.Name, adminEmail),
+                new Claim(ClaimTypes.Role, "Admin"),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
-            var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
 
-            var jwtSecurityTokenForAdmin = new JwtSecurityToken(
-                issuer: _jwtSettings.Issuer,
-                audience: _jwtSettings.Audience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes),
-                signingCredentials: signingCredentials);
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 
-            var identity = new ClaimsIdentity(claims, "custom");
-            var principal = new ClaimsPrincipal(identity);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = System.DateTime.Now.AddDays(1),
+                SigningCredentials = creds
+            };
 
-            _httpContextAccessor.HttpContext!.User = principal;
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
 
+            var accessToken = tokenHandler.WriteToken(token);
             response.Success = true;
             response.Message = "Successfully";
             response.StatusCode = 200;
             response.Data = new AuthResponse
             {
-                Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityTokenForAdmin),
+                Token = accessToken,
             };
             return response;
         }

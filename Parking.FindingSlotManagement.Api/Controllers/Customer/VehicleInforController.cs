@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -13,6 +14,7 @@ using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Customer
 {
+    [Authorize(Roles = "Customer")]
     [Route("api/vehicle-infor")]
     [ApiController]
     public class VehicleInforController : ControllerBase
@@ -93,7 +95,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
                 var errorResponse = new ErrorResponseModel(ResponseCode.BadRequest, "Validation Error: " + message.Remove(0, 31));
                 return StatusCode((int)ResponseCode.BadRequest, errorResponse);
             }
-        }/// <summary>
+        }
+        /// <summary>
          /// API For Customer
          /// </summary>
          /// <remarks>

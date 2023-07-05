@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿/*using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +10,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
     public class UpdateParkingPriceCommand : IRequest<ServiceResponse<string>>
     {
         public int ParkingPriceId { get; set; }
-
         public string? ParkingPriceName { get; set; }
-
-        public int BusinessId { get; set; }
-
+        public int? BusinessId { get; set; }
+        public int? TrafficId { get; set; }
 
     }
 }
+*/

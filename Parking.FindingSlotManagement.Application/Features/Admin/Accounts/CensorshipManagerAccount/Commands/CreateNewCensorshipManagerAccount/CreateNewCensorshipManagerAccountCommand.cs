@@ -18,5 +18,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Cens
         public bool IsActive { get; set; } = true;
         public bool IsCensorship { get; set; } = true;
         public int? RoleId { get; set; } = 1;
+        public int? ParkingId { get; set; }
     }
 }

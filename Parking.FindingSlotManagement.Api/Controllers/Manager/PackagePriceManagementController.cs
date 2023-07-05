@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿/*using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -147,3 +147,4 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         }
     }
 }
+*/

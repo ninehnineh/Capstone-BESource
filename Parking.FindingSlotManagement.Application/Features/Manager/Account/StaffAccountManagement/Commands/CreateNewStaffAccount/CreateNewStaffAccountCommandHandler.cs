@@ -48,7 +48,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Account.Sta
                     out byte[] passwordSalt);
                 accEntity.PasswordHash = passwordHash;
                 accEntity.PasswordSalt = passwordSalt;
-                accEntity.RoleId = 2;
+                accEntity.RoleId = 4;
                 accEntity.IsActive = true;
                 accEntity.IsCensorship = true;
                 await _accountRepository.Insert(accEntity);

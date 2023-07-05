@@ -22,14 +22,20 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .IsFixedLength();
 
             builder.Property(e => e.Description).HasMaxLength(255);
+            builder.Property(e => e.Status).HasMaxLength(20);
 
             builder.Property(e => e.Latitude).HasColumnType("decimal(10, 6)");
 
             builder.Property(e => e.Longitude).HasColumnType("decimal(10, 6)");
 
-            builder.Property(e => e.ManagerId).HasColumnName("ManagerID");
+            builder.Property(e => e.BusinessId).HasColumnName("BusinessId");
 
             builder.Property(e => e.Name).HasMaxLength(50);
+
+            builder.HasOne(x => x.BusinessProfile)
+                .WithMany(x => x.Parkings)
+                .HasForeignKey(x => x.BusinessId)
+                .HasConstraintName("FK__BusiessPro__Parking");
         }
     }
 }

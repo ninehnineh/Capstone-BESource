@@ -17,6 +17,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                     .IsUnique()
                     .HasFilter("([UserID] IS NOT NULL)");
 
+            builder.ToTable("Business");
+
             builder.Property(e => e.Address).HasMaxLength(255);
 
             builder.Property(e => e.BackIdentification)
@@ -39,6 +41,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
                 .WithOne(p => p.BusinessProfile)
                 .HasForeignKey<BusinessProfile>(d => d.UserId)
                 .HasConstraintName("fk_IsManager");
+
+            builder.HasOne(d => d.Fee)
+                .WithMany(x => x.BusinessProfiles)
+                .HasForeignKey(x => x.FeeId)
+                .HasConstraintName("FK_Fee_BusinessProfiles");
         }
     }
 }

@@ -25,8 +25,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             var slotNameExist = await _dbContext.ParkingSlots
                 .AnyAsync(x =>
                     x.Name!.Trim().Equals(parkingSlotDTO.Name) &&
-                    x.FloorId == parkingSlotDTO.FloorId && 
-                    x.ParkingId == parkingSlotDTO.ParkingId
+                    x.FloorId == parkingSlotDTO.FloorId
                 );
 
             return slotNameExist;

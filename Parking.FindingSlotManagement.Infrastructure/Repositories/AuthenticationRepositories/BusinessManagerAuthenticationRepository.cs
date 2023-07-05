@@ -146,9 +146,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories.Authenticati
                 return response;
             }
 
-            TokenManage token = new TokenManage(_jwtSettings);
+            TokenManage token = new TokenManage(_jwtSettings, _configuration);
 
-            if (manager.IsActive == true && manager.IsCensorship == true && manager.Role!.Name!.Equals("Manager"))
+            if (manager.IsActive == true && manager.IsCensorship == true && manager.Role!.Name!.Equals("Manager") || manager.IsActive == true && manager.IsCensorship == true && manager.Role!.Name!.Equals("Keeper"))
             {
                 response.Success = true;
                 response.Message = $"Chào mừng {manager.Name}";

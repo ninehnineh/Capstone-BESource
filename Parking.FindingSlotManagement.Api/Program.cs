@@ -1,16 +1,20 @@
+using Hangfire;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Behaviours;
+using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Models;
 using Parking.FindingSlotManagement.Infrastructure;
+using Parking.FindingSlotManagement.Infrastructure.HangFire;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
+using Parking.FindingSlotManagement.Infrastructure.Repositories;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.Security.Claims;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,71 +25,59 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddHangfire(hangfire =>
+{
+    hangfire.SetDataCompatibilityLevel(CompatibilityLevel.Version_170);
+    hangfire.UseSimpleAssemblyNameTypeSerializer();
+    hangfire.UseRecommendedSerializerSettings();
+    hangfire.UseColouredConsoleLogProvider();
+    hangfire.UseSqlServerStorage(
+                 builder.Configuration.GetConnectionString("DefaultConnection"));
+
+});
+builder.Services.AddHangfireServer();
+builder.Services.AddTransient<IServiceManagement, ServiceManagement>();
+//For Register MiddleWare
+builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, AuthorizationMiddlewareHandlerService>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            System.Text.Encoding.ASCII.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                    };
+                });
+
+//for appear summary
 builder.Services.AddSwaggerGen(c =>
 {
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n
-                Enter 'Bearer' [space] and then your token in the text input below.
-                \r\n\r\nExample: 'Bearer 12345avcdef'",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
-        {
-            {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    },
-                    Scheme = "oauth2",
-                    Name = "Bearer",
-                    In = ParameterLocation.Header,
-                },
-                new List<string>()
-            }
-        });
+    c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        Description = "Standard Authorization header using the Bearer schame. Example: \"bearer {token}\"",
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
     c.OperationFilter<SecurityRequirementsOperationFilter>();
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath);
 });
 
-builder.Services.AddAuthentication(op =>
-{
-    op.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    op.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(o =>
-{
-    o.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero,
-        ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-        ValidAudience = builder.Configuration["JwtSettings:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]))
-    };
-});
-
 builder.Services.AddAuthorization(op =>
 {
     op.AddPolicy("RequireAdminRole", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
 });
-//For Register MiddleWare
-builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, AuthorizationMiddlewareHandlerService>();
+
 
 builder.Services.AddLogging(config =>
 {
@@ -93,6 +85,20 @@ builder.Services.AddLogging(config =>
     config.AddConsole();
     //etc
 });
+/*builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});*/
+
+
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
@@ -103,10 +109,6 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
-
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSignalR();
 builder.Services.AddSwaggerGen();
 
@@ -127,7 +129,7 @@ app.UseSwaggerUI(c =>
 
 app.UseHttpsRedirection();
 
-app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+app.UseCors();
 app.UseRouting();
 
 app.UseMiddleware<LogMiddleware>();
@@ -142,5 +144,6 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
     endpoints.MapHub<MessageHub>("/parkz");
 });
-
+app.UseHangfireDashboard();
+app.MapHangfireDashboard();
 app.Run();

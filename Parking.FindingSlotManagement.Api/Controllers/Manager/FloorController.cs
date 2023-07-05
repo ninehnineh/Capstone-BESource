@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -7,11 +8,13 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorMan
 using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Commands.DisableOrEnableFloor;
 using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Commands.UpdateFloor;
 using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Queries.GetListFloor;
+using Parking.FindingSlotManagement.Application.Features.Manager.Floors.FloorManagement.Queries.GetListFloorByParkingId;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 {
+    [Authorize(Roles = "Manager")]
     [Route("api/floors")]
     [ApiController]
     public class FloorController : ControllerBase
@@ -39,6 +42,30 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
                 {
                     PageNo = pageNo,
                     PageSize = pageSize
+                };
+                var res = await _mediator.Send(query);
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Manager
+        /// </summary>
+        [HttpGet("parking/{parkingId}", Name = "GetListFloorByParkingId")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<GetListFloorByParkingIdResponse>>>> GetListFloorByParkingId(int parkingId)
+        {
+            try
+            {
+                var query = new GetListFloorByParkingIdQuery()
+                {
+                    ParkingId = parkingId
                 };
                 var res = await _mediator.Send(query);
                 return StatusCode((int)res.StatusCode, res);

@@ -9,5 +9,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
 {
     public interface IAccountRepository : IGenericRepository<User>
     {
+        Task<bool> Exists(string phoneNumber);
     }
 }

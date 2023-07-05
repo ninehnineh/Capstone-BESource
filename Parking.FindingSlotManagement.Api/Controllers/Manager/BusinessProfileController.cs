@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -12,6 +13,7 @@ using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 {
+    [Authorize(Roles = "Manager")]
     [Route("api/business-profile")]
     [ApiController]
     public class BusinessProfileController : ControllerBase
