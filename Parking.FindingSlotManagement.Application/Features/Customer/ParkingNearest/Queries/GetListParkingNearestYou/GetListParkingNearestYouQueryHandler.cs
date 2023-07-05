@@ -43,6 +43,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
         {
             try
             {
+                if(string.IsNullOrEmpty(request.CurrentLatitude.ToString()) || string.IsNullOrEmpty(request.CurrentLongtitude.ToString()) || request.CurrentLatitude == 0 || request.CurrentLongtitude == 0)
+                {
+                    return new ServiceResponse<IEnumerable<ParkingWithDistance>>
+                    {
+                        Message = "Dữ liệu không hợp lệ.",
+                        Success = false,
+                        StatusCode = 400
+                    };
+                }
                 var includes = new List<Expression<Func<Domain.Entities.Parking, object>>>
                 {
                     x => x.ParkingHasPrices,
@@ -162,24 +171,32 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
             var timelinelst = await _timelineRepository.GetAllItemWithCondition(x => x.ParkingPriceId == parkingHasPrice.ParkingPriceId);
             foreach (var item in timelinelst)
             {
-                if (item.StartTime > item.EndTime)
+                if(item.StartTime == null && item.EndTime == null)
                 {
-                    if (item.StartTime > a && item.EndTime >= a)
-                    {
-                        return item;
-                    }
-                    else if (item.StartTime <= a && item.EndTime < a)
-                    {
-                        return item;
-                    }
+                    return item;
                 }
                 else
                 {
-                    if (item.StartTime <= a && item.EndTime >= a)
+                    if (item.StartTime > item.EndTime)
                     {
-                        return item;
+                        if (item.StartTime > a && item.EndTime >= a)
+                        {
+                            return item;
+                        }
+                        else if (item.StartTime <= a && item.EndTime < a)
+                        {
+                            return item;
+                        }
+                    }
+                    else
+                    {
+                        if (item.StartTime <= a && item.EndTime >= a)
+                        {
+                            return item;
+                        }
                     }
                 }
+                
             }
             return null;
         }

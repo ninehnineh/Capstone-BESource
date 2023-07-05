@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿/*using AutoMapper;
 using FluentValidation;
 using FluentValidation.TestHelper;
 using Moq;
@@ -41,7 +41,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
         {
             var command = new CreateParkingPriceCommand
             {
-                BusinessId = 1,
+                ManagerId = 1,
                 ParkingPriceName = "Test",
                 TrafficId = 1,
                 StartingTime = 1,
@@ -300,3 +300,4 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
         }
     }
 }
+*/

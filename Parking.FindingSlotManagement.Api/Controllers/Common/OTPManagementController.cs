@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Features.Common.OTPManagement.Commands.GenerateOTP;
+using Parking.FindingSlotManagement.Application.Features.Common.OTPManagement.Commands.SendMailWithOTP;
 using Parking.FindingSlotManagement.Application.Features.Common.OTPManagement.Commands.VerifyOTP;
 using System.Net;
 
@@ -18,11 +19,11 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Common
         {
             _mediator = mediator;
         }
-        [HttpPost(Name = "GenerateOTP")]
+        [HttpPost("send-email-otp", Name = "SendEmailOTP")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<ServiceResponse<string>>> GenerateOTP([FromBody] GenerateOTPCommand command)
+        public async Task<ActionResult<ServiceResponse<string>>> SendEmailOTP([FromBody] SendMailWithOTPCommands command)
         {
             try
             {
@@ -45,7 +46,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Common
                 return StatusCode((int)ResponseCode.BadRequest, errorResponse);
             }
         }
-        [HttpPost("verify", Name = "VerifyOTP")]
+        /*[HttpPost("verify", Name = "VerifyOTP")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -71,6 +72,6 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Common
                 var errorResponse = new ErrorResponseModel(ResponseCode.BadRequest, "Validation Error: " + message.Remove(0, 31));
                 return StatusCode((int)ResponseCode.BadRequest, errorResponse);
             }
-        }
+        }*/
     }
 }

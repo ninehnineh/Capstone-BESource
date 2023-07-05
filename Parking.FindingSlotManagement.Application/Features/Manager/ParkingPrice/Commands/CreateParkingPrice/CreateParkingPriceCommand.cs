@@ -10,7 +10,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
     public class CreateParkingPriceCommand : IRequest<ServiceResponse<int>>
     {
         public string? ParkingPriceName { get; set; }
-        public int BusinessId { get; set; }
+        public int ManagerId { get; set; }
         public int? TrafficId { get; set; }
         public bool IsWholeDay { get; set; } = false; 
         public int? StartingTime { get; set; }

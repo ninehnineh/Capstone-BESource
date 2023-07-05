@@ -1,13 +1,13 @@
-﻿//using AutoMapper;
-//using MediatR;
-//using Parking.FindingSlotManagement.Application.Contracts.Persistence;
-//using Parking.FindingSlotManagement.Application.Mapping;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Linq.Expressions;
-//using System.Text;
-//using System.Threading.Tasks;
+/*using AutoMapper;
+using MediatR;
+using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Mapping;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
+using System.Threading.Tasks;
 
 //namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetBookingById
 //{
@@ -58,8 +58,10 @@
 //            catch (Exception ex)
 //            {
 
-//                throw new Exception(ex.Message);
-//            }
-//        }
-//    }
-//}
+                throw new Exception(ex.Message);
+            }
+        }
+    }
+}
+*/
+

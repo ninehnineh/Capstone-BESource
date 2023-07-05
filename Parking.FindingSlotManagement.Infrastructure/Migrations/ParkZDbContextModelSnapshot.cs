@@ -380,6 +380,10 @@ namespace Parking.FindingSlotManagement.Infrastructure.Migrations
                     b.Property<int?>("StarsCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("Status")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<float?>("TotalStars")
                         .HasColumnType("real");
 

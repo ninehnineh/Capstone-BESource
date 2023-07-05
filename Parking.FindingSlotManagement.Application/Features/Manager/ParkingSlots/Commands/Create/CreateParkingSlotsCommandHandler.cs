@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Hangfire;
 using MediatR;
+using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Domain.Entities;
 
@@ -9,11 +11,13 @@ public class CreateParkingSlotsCommandHandler : IRequestHandler<CreateParkingSlo
 {
     private readonly IMapper _mapper;
     private readonly IParkingSlotRepository _parkingSlotRepository;
+    private readonly ITimeSlotRepository _timeSlotRepository;
 
-    public CreateParkingSlotsCommandHandler(IMapper mapper, IParkingSlotRepository parkingSlotRepository)
+    public CreateParkingSlotsCommandHandler(IMapper mapper, IParkingSlotRepository parkingSlotRepository, ITimeSlotRepository timeSlotRepository)
     {
         _mapper = mapper;
         _parkingSlotRepository = parkingSlotRepository;
+        _timeSlotRepository = timeSlotRepository;
     }
 
     public async Task<ServiceResponse<int>> Handle(CreateParkingSlotsCommand request, CancellationToken cancellationToken)
@@ -40,6 +44,40 @@ public class CreateParkingSlotsCommandHandler : IRequestHandler<CreateParkingSlo
 
             var a = _mapper.Map<ParkingSlot>(request);
             await _parkingSlotRepository.Insert(a);
+            DateTime startDate = DateTime.UtcNow;
+            DateTime endDate = startDate.AddDays(7);
+            List<TimeSlot> ts = new List<TimeSlot>();
+            for (DateTime date = startDate; date < endDate; date = date.AddDays(1))
+            {
+                for (int i = 0; i < 24; i++)
+                {
+                    DateTime startTime = date.Date + TimeSpan.FromHours(i);
+                    DateTime endTime = date.Date + TimeSpan.FromHours(i + 1);
+
+                    var entityTimeSlot = new TimeSlot
+                    {
+                        StartTime = startTime,
+                        EndTime = endTime,
+                        CreatedDate = date.Date,
+                        Status = "Free",
+                        ParkingSlotId = a.ParkingSlotId
+                    };
+                    ts.Add(entityTimeSlot);
+                }
+            }
+            var res = await _timeSlotRepository.AddRangeTimeSlot(ts);
+            if(!res.Equals("Thành công"))
+            {
+                return new ServiceResponse<int>
+                {
+                    Message = "Quá trình thêm mới xảy ra lỗi!!!",
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+            RecurringJob.AddOrUpdate<IServiceManagement>(x => x.DeleteTimeSlotIn1Week(), Cron.Weekly);
+            RecurringJob.AddOrUpdate<IServiceManagement>(x => x.AddTimeSlotInFuture((int)request.FloorId), Cron.Weekly);
+
             return new ServiceResponse<int>
             {
                 Data = a.ParkingSlotId,

@@ -1,13 +1,13 @@
-﻿//using AutoMapper;
-//using MediatR;
-//using Parking.FindingSlotManagement.Application.Contracts.Persistence;
-//using Parking.FindingSlotManagement.Application.Models.User;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Linq.Expressions;
-//using System.Text;
-//using System.Threading.Tasks;
+/*using AutoMapper;
+using MediatR;
+using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Models.User;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
+using System.Threading.Tasks;
 
 //namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetBookingDetails
 //{
@@ -54,18 +54,19 @@
 //                    ParkingSlot = _mapper.Map<BookedParkingSlotDto>(booking.ParkingSlot)
 //                };
 
-//                return new ServiceResponse<GetBookingDetailsResponse>
-//                {
-//                    Data = response,
-//                    Message = "Thành công",
-//                    StatusCode = 200,
-//                    Success = true,
-//                };
-//            }
-//            catch (Exception ex)
-//            {
-//                throw new Exception(ex.Message);
-//            }
-//        }
-//    }
-//}
+                return new ServiceResponse<GetBookingDetailsResponse>
+                {
+                    Data = response,
+                    Message = "Thành công",
+                    StatusCode = 200,
+                    Success = true,
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+    }
+}
+*/

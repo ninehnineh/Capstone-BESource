@@ -1,14 +1,14 @@
-﻿//using AutoMapper;
-//using MediatR;
-//using Parking.FindingSlotManagement.Application.Contracts.Persistence;
-//using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetAvailableSlots;
-//using Parking.FindingSlotManagement.Domain.Entities;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Linq.Expressions;
-//using System.Text;
-//using System.Threading.Tasks;
+/*using AutoMapper;
+using MediatR;
+using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetAvailableSlots;
+using Parking.FindingSlotManagement.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
+using System.Threading.Tasks;
 
 //namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Queries.GetParkingSlots
 //{
@@ -102,18 +102,20 @@
 //                    },
 //                };
 
-//                return new ServiceResponse<GetParkingSlotsResponse>
-//                {
-//                    Data = responses,
-//                    Message = "Thành công",
-//                    StatusCode = 200,
-//                    Success = true
-//                };
-//            }
-//            catch (Exception ex)
-//            {
-//                throw new Exception(ex.Message);
-//            }
-//        }
-//    }
-//}
+                return new ServiceResponse<GetParkingSlotsResponse>
+                {
+                    Data = responses,
+                    Message = "Thành công",
+                    StatusCode = 200,
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+    }
+}
+*/
+

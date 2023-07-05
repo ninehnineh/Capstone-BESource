@@ -17,7 +17,7 @@ using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Admin
 {
-    [Authorize(Roles = "Admin")]
+    
     [Route("api/managers")]
     [ApiController]
     public class ManagerManagementController : ControllerBase
@@ -32,7 +32,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         }
         /// <summary>
         /// API For Admin
-        /// </summary>
+        /// </summary> 
+        [Authorize(Roles = "Admin")]
         [HttpGet("censorship", Name = "GetCensorshipManagerAccountList")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -61,6 +62,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <remarks>
         /// SignalR: LoadCensorshipManagerAccounts
         /// </remarks>
+        [Authorize(Roles = "Admin")]
         [HttpDelete("censorship/{managerId}", Name = "DisableOrEnableCensorshipManagerAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -85,11 +87,12 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             }
         }
         /// <summary>
-        /// API For Admin
+        /// API For Admin, Manager, Keeper
         /// </summary>
         /// <remarks>
         /// SignalR: LoadCensorshipManagerAccounts
         /// </remarks>
+        [Authorize(Roles = "Admin,Manager,Keeper")]
         [HttpPut("censorship/{managerId}", Name = "UpdateCensorshipManagerAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -125,7 +128,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <remarks>
         /// SignalR: LoadCensorshipManagerAccounts
         /// </remarks>
-        /// 
+        [Authorize(Roles = "Admin")]
         [HttpPost("register/censorship", Name = "CreateNewCensorshipManagerAccountList")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
@@ -157,6 +160,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
+        [Authorize(Roles = "Admin")]
         [HttpGet("request/register-censorship", Name = "GetRequestRegisterCensorshipManagerAccountList")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -185,6 +189,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <remarks>
         /// SignalR: LoadRequestRegisterCensorshipManagerAccounts
         /// </remarks>
+        [Authorize(Roles = "Admin")]
         [HttpPut("request/register-censorship/accept/{userId}", Name = "AcceptRequestRegisterAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -217,6 +222,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <remarks>
         /// SignalR: LoadRequestRegisterCensorshipManagerAccounts
         /// </remarks>
+        [Authorize(Roles = "Admin")]
         [HttpPut("request/register-censorship/decline/{userId}", Name = "DeclineRequestRegisterAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -246,6 +252,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
+        [Authorize(Roles = "Admin")]
         [HttpGet("non-censorship", Name = "GetNonCensorshipManagerAccountList")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]

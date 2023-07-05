@@ -24,7 +24,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
             _userRepository = userRepository;
             _trafficRepository = trafficRepository;
             _businessProfileRepository = businessProfileRepository;
-            RuleFor(x => x.BusinessId)
+            /*RuleFor(x => x.BusinessId)
                 .NotEmpty().WithMessage("Vui lòng nhập {PropertyName}.")
                 .NotNull()
                 .GreaterThanOrEqualTo(0).WithMessage("{BusinessId} phải lớn hơn 0")
@@ -32,7 +32,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
                 {
                     var exist = await _businessProfileRepository.GetItemWithCondition(x => x.BusinessProfileId == id);
                     return exist != null;
-                }).WithMessage("Business không tồn tại");
+                }).WithMessage("Business không tồn tại");*/
 
             RuleFor(x => x.TrafficId)
                 .NotEmpty().WithMessage("Vui lòng nhập {PropertyName}.")
@@ -47,14 +47,14 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingPric
             RuleFor(p => p.ParkingPriceName)
                 .NotEmpty().WithMessage("Vui lòng nhập {PropertyName}.")
                 .NotNull()
-                .MaximumLength(250).WithMessage("{PropertyName} không được nhập quá 250 kí tự")
-                .MustAsync(async (Command, context, token) =>
+                .MaximumLength(250).WithMessage("{PropertyName} không được nhập quá 250 kí tự");
+                /*.MustAsync(async (Command, context, token) =>
                 {
                     var exists = await _parkingPriceRepository
                         .GetItemWithCondition(x => x.ParkingPriceName!.Equals(Command.ParkingPriceName) &&
                                                     x.BusinessId == Command.BusinessId);
                     return exists == null;
-                }).WithMessage("'{PropertyValue}' đã tồn tại");
+                }).WithMessage("'{PropertyValue}' đã tồn tại");*/
             RuleFor(c => c.StartingTime)
                 .NotEmpty().WithMessage("Vui lòng nhập {Số tiếng khởi điểm}.")
                 .NotNull()

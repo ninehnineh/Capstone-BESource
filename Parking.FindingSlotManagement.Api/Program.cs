@@ -1,12 +1,17 @@
+using Hangfire;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Behaviours;
+using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Models;
 using Parking.FindingSlotManagement.Infrastructure;
+using Parking.FindingSlotManagement.Infrastructure.HangFire;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
+using Parking.FindingSlotManagement.Infrastructure.Repositories;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.Security.Claims;
@@ -20,6 +25,18 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddHangfire(hangfire =>
+{
+    hangfire.SetDataCompatibilityLevel(CompatibilityLevel.Version_170);
+    hangfire.UseSimpleAssemblyNameTypeSerializer();
+    hangfire.UseRecommendedSerializerSettings();
+    hangfire.UseColouredConsoleLogProvider();
+    hangfire.UseSqlServerStorage(
+                 builder.Configuration.GetConnectionString("DefaultConnection"));
+
+});
+builder.Services.AddHangfireServer();
+builder.Services.AddTransient<IServiceManagement, ServiceManagement>();
 //For Register MiddleWare
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, AuthorizationMiddlewareHandlerService>();
 builder.Services.AddHttpContextAccessor();
@@ -127,5 +144,6 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
     endpoints.MapHub<MessageHub>("/parkz");
 });
-
+app.UseHangfireDashboard();
+app.MapHangfireDashboard();
 app.Run();
