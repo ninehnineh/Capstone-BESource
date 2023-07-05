@@ -1,0 +1,154 @@
+﻿using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Parking.FindingSlotManagement.Application;
+using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Commands.AcceptParkingRequest;
+using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Commands.DeclineParkingRequest;
+using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetAllParkingRequest;
+using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetFieldInforByParkingId;
+using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetParkingInformationTab;
+using System.Net;
+
+namespace Parking.FindingSlotManagement.Api.Controllers.Admin
+{
+    [Route("api/approve-parkings")]
+    [ApiController]
+    public class ApproveParkingController : ControllerBase
+    {
+        private readonly IMediator _mediator;
+
+        public ApproveParkingController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
+        [HttpGet("field-information/{parkingId}", Name = "GetFieldInforByParkingId")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<GetFieldInforByParkingIdResponse>>> GetFieldInforByParkingId (int parkingId)
+        {
+            try
+            {
+                var query = new GetFieldInforByParkingIdQuery()
+                {
+                   ParkingId = parkingId
+                };
+                var res = await _mediator.Send(query);
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
+        [HttpGet("request", Name = "GetAllParkingRequest")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<GetAllParkingRequestResponse>>> GetAllParkingRequest([FromQuery]int PageNo, [FromQuery]int PageSize)
+        {
+            try
+            {
+                var query = new GetAllParkingRequestQuery()
+                {
+                    PageNo = PageNo,
+                    PageSize = PageSize
+                };
+                var res = await _mediator.Send(query);
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
+        [HttpGet("parking-information-tab/{parkingId}", Name = "GetParkingInformationTab")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<GetParkingInformationTabResponse>>> GetParkingInformationTab(int parkingId)
+        {
+            try
+            {
+                var query = new GetParkingInformationTabQuery()
+                {
+                    ParkingId = parkingId
+                };
+                var res = await _mediator.Send(query);
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
+        [HttpPut("request/accept/{parkingId}", Name = "AcceptParkingRequest")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<ServiceResponse<string>>> AcceptParkingRequest(int parkingId)
+        {
+            try
+            {
+                var command = new AcceptParkingRequestCommand()
+                {
+                    ParkingId = parkingId
+                };
+                var res = await _mediator.Send(command);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
+        [HttpPut("request/decline/{parkingId}", Name = "DeclineParkingRequest")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<ServiceResponse<string>>> DeclineParkingRequest(int parkingId)
+        {
+            try
+            {
+                var command = new DeclineParkingRequestCommand()
+                {
+                    ParkingId = parkingId
+                };
+                var res = await _mediator.Send(command);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+    }
+}
