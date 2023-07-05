@@ -1,4 +1,6 @@
-﻿using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Models.TimeSlot;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using System;
@@ -17,6 +19,25 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
         {
             _dbContext = dbContext;
         }
+
+
+        public async Task<List<TimeSlot>> GetAllTimeSlotsBooking(DateTime startTimeBooking,
+            DateTime endTimeBooking, int parkingSlotId)
+        {
+            try
+            {
+                var bookingTimeSlots = await _dbContext.TimeSlots
+                    .Where(x => x.ParkingSlotId == parkingSlotId &&
+                        x.StartTime >= startTimeBooking && x.EndTime <= endTimeBooking)
+                    .ToListAsync();
+                
+                return bookingTimeSlots;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+      }
 
         public async Task<string> AddRangeTimeSlot(List<TimeSlot> lstTs)
         {

@@ -21,22 +21,51 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<Booking> GetBooking(BookingDTO bookingDTO)
-        {
-            var booking = await _dbContext.Bookings.FindAsync(
-                bookingDTO.StartTime,
-                bookingDTO.DateBook,
-                bookingDTO.ParkingSlotId
-            );
-            if (booking == null) { return null; }
-            return booking;
-        }
 
         public async Task<Booking> GetBooking(int bookingId)
         {
             var booking = await _dbContext.Bookings
+                .Include(x => x.BookingDetails)!
+                .ThenInclude(x => x.TimeSlot)
                 .FirstOrDefaultAsync(x => x.BookingId == bookingId);
-            if (booking == null) { return null; }
+            
+            if (booking == null) { return null!; }
+
+            return booking;
+        }
+
+        public async Task<Booking> GetBookingIncludeParkingSlot(int bookingId)
+        {
+            var booking = await _dbContext.Bookings
+                .Include(x => x.User)
+                .Include(x => x.BookingDetails)!
+                .ThenInclude(x => x.TimeSlot)
+                .ThenInclude(x => x.Parkingslot)
+                .FirstOrDefaultAsync(x => x.BookingId == bookingId);
+            
+            if (booking == null) { return null!; }
+
+            return booking;
+        }
+        public async Task<Booking> GetBookingIncludeUser(int bookingId)
+        {
+            var booking = await _dbContext.Bookings
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.BookingId == bookingId);
+            
+            if (booking == null) { return null!; }
+
+            return booking;
+        }
+
+        public async Task<Booking> GetBookingIncludeTransaction(int bookingId)
+        {
+            var booking = await _dbContext.Bookings
+                .Include(x => x.Transactions)
+                .FirstOrDefaultAsync(x => x.BookingId == bookingId);
+            
+            if (booking == null) { return null!; }
+
             return booking;
         }
     }
