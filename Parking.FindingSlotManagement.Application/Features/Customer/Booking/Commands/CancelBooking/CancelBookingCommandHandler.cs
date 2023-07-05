@@ -20,10 +20,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             try
             {
                 var booking = await _bookingRepository
-                    .GetItemWithCondition(x => x.BookingId == request.BookingId, null, false);
+                    .GetBookingIncludeParkingSlot(request.BookingId);
 
                 var parkingSlot = await _parkingSlotRepository
-                    .GetItemWithCondition(x => x.ParkingSlotId == booking.ParkingSlotId, null, false);
+                    .GetItemWithCondition(x => x.ParkingSlotId == booking.BookingDetails.First().TimeSlot.Parkingslot.ParkingSlotId, null, false);
 
                 if (booking.Status == BookingStatus.Initial.ToString())
                 {
