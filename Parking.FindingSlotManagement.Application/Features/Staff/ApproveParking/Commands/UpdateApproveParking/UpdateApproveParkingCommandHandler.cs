@@ -7,26 +7,45 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Commands.CreateNewApproveParking
+namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Commands.UpdateApproveParking
 {
-    public class CreateNewApproveParkingCommandHandler : IRequestHandler<CreateNewApproveParkingCommand, ServiceResponse<int>>
+    public class UpdateApproveParkingCommandHandler : IRequestHandler<UpdateApproveParkingCommand, ServiceResponse<int>>
     {
         private readonly IFieldWorkParkingImgRepository _fieldWorkParkingImgRepository;
         private readonly IApproveParkingRepository _approveParkingRepository;
         private readonly IParkingRepository _parkingRepository;
         private readonly IUserRepository _userRepository;
 
-        public CreateNewApproveParkingCommandHandler(IFieldWorkParkingImgRepository fieldWorkParkingImgRepository, IApproveParkingRepository approveParkingRepository, IParkingRepository parkingRepository, IUserRepository userRepository)
+        public UpdateApproveParkingCommandHandler(IFieldWorkParkingImgRepository fieldWorkParkingImgRepository, IApproveParkingRepository approveParkingRepository, IParkingRepository parkingRepository, IUserRepository userRepository)
         {
             _fieldWorkParkingImgRepository = fieldWorkParkingImgRepository;
             _approveParkingRepository = approveParkingRepository;
             _parkingRepository = parkingRepository;
             _userRepository = userRepository;
         }
-        public async Task<ServiceResponse<int>> Handle(CreateNewApproveParkingCommand request, CancellationToken cancellationToken)
+        public async Task<ServiceResponse<int>> Handle(UpdateApproveParkingCommand request, CancellationToken cancellationToken)
         {
             try
             {
+                var approveParking = await _approveParkingRepository.GetItemWithCondition(x => x.ParkingId == request.ParkingId, null, false);
+                if (approveParking == null)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Không tìm thấy yêu cầu xác thực của bãi.",
+                        Success = true,
+                        StatusCode = 200
+                    };
+                }
+                if (!approveParking.Status.Equals(Domain.Enum.ApproveParkingStatus.Chờ_duyệt.ToString()))
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Bãi đã được xử lý duyệt/từ chối, không thể thực hiện thao tác.",
+                        StatusCode = 400,
+                        Success = false
+                    };
+                }
                 var staffExist = await _userRepository.GetById(request.StaffId);
                 if(staffExist == null)
                 {
@@ -46,41 +65,16 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
                         Success = false
                     };
                 }
-                var parkingExist = await _parkingRepository.GetById(request.ParkingId);
-                if(parkingExist == null)
-                {
-                    return new ServiceResponse<int>
-                    {
-                        Message = "Không tìm thấy bãi giữ xe.",
-                        Success = true,
-                        StatusCode = 200
-                    };
-                }
-                if(parkingExist.IsActive == true)
-                {
-                    return new ServiceResponse<int>
-                    {
-                        Message = "Bãi đã được duyệt.",
-                        StatusCode = 400,
-                        Success = false
-                    };
-                }
-                var ap = new Domain.Entities.ApproveParking
-                {
-                    StaffId = request.StaffId,
-                    ParkingId = request.ParkingId,
-                    CreatedDate = DateTime.UtcNow.AddHours(7),
-                    Note = request.Note,
-                    Status = Domain.Enum.ApproveParkingStatus.Chờ_duyệt.ToString()
-                };
-                await _approveParkingRepository.Insert(ap);
+                approveParking.StaffId = request.StaffId;
+                approveParking.Note = request.Note;
+                await _approveParkingRepository.Update(approveParking);
                 List<FieldWorkParkingImg> lstFWPI = new();
                 foreach (var item in request.Images)
                 {
                     FieldWorkParkingImg fwpi = new FieldWorkParkingImg
                     {
                         Url = item,
-                        ApproveParkingId = ap.ApproveParkingId
+                        ApproveParkingId = approveParking.ApproveParkingId
                     };
                     lstFWPI.Add(fwpi);
                 }
@@ -89,8 +83,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
                 {
                     Message = "Thành công",
                     Success = true,
-                    StatusCode = 201,
-                    Data = ap.ApproveParkingId
+                    StatusCode = 204
                 };
             }
             catch (Exception ex)
