@@ -72,6 +72,7 @@ using Parking.FindingSlotManagement.Application.Features.Common.TransactionManag
 using Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Queries.GetAvailableSlotByFloorId;
 using Parking.FindingSlotManagement.Application.Features.Customer.Account.AccountManagement.Queries.GetCustomerProfileById;
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetAllParkingRequest;
+using Parking.FindingSlotManagement.Application.Features.Customer.ParkingNearest.Queries.GetListParkingNearestWithDistance;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -141,6 +142,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #region Parking Mapping
             CreateMap<Domain.Entities.Parking, CreateNewParkingCommand>().ReverseMap();
             CreateMap<Domain.Entities.Parking, GetListParkingNearestYouQueryResponse>()
+                .ForMember(dto => dto.Avatar, act => act.MapFrom(obj => obj.ParkingSpotImages.FirstOrDefault().ImgPath))
+                .ReverseMap();
+            CreateMap<Domain.Entities.Parking, GetListParkingNearestWithDistanceResponse>()
                 .ForMember(dto => dto.Avatar, act => act.MapFrom(obj => obj.ParkingSpotImages.FirstOrDefault().ImgPath))
                 .ReverseMap();
             CreateMap<Domain.Entities.Parking, GetListParkingByManagerIdResponse>().ReverseMap();
