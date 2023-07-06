@@ -39,7 +39,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                         {
                             StartTime = startTime,
                             EndTime = endTime,
-                            CreatedDate = date.Date,
+                            CreatedDate = DateTime.UtcNow.Date,
                             Status = "Free",
                             ParkingSlotId = a.ParkingSlotId
                         };

@@ -58,7 +58,7 @@ public class CreateParkingSlotsCommandHandler : IRequestHandler<CreateParkingSlo
                     {
                         StartTime = startTime,
                         EndTime = endTime,
-                        CreatedDate = date.Date,
+                        CreatedDate = DateTime.UtcNow.Date,
                         Status = "Free",
                         ParkingSlotId = a.ParkingSlotId
                     };
