@@ -73,6 +73,9 @@ using Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Qu
 using Parking.FindingSlotManagement.Application.Features.Customer.Account.AccountManagement.Queries.GetCustomerProfileById;
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetAllParkingRequest;
 using Parking.FindingSlotManagement.Application.Features.Customer.ParkingNearest.Queries.GetListParkingNearestWithDistance;
+using Parking.FindingSlotManagement.Application.Features.Admin.Fee.Commands.CreateNewFee;
+using Parking.FindingSlotManagement.Application.Features.Admin.Fee.Queries.GetListFee;
+using Parking.FindingSlotManagement.Application.Features.Admin.Fee.Queries.GetFeeById;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -272,6 +275,12 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #endregion
             #region Transaction Mapping
             CreateMap<Transaction, CreateNewTransactionCommand>().ReverseMap();
+            #endregion
+
+            #region Fee Mapping
+            CreateMap<Fee, CreateNewFeeCommand>().ReverseMap();
+            CreateMap<Fee, GetListFeeResponse>().ReverseMap();
+            CreateMap<Fee, GetFeeByIdResponse>().ReverseMap();
             #endregion
         }
     }
