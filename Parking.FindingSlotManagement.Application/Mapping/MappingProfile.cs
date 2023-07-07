@@ -251,18 +251,18 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<Booking, GetListBookingByManagerIdResponse>()
                 .ForMember(dto => dto.CustomerName, act => act.MapFrom(obj => obj.User.Name))
                 .ForMember(dto => dto.Phone, act => act.MapFrom(obj => obj.User.Phone))
-/*                .ForMember(dto => dto.Position, act => act.MapFrom(obj => obj.ParkingSlot.Name))*/
+                .ForMember(dto => dto.Position, act => act.MapFrom(obj => obj.BookingDetails.First().TimeSlot.Parkingslot.Name))
                 .ForMember(dto => dto.LicensePlate, act => act.MapFrom(obj => obj.VehicleInfor.LicensePlate))
-/*                .ForMember(dto => dto.ParkingName, act => act.MapFrom(obj => obj.ParkingSlot.Floor.Parking.Name))*/
+                .ForMember(dto => dto.ParkingName, act => act.MapFrom(obj => obj.BookingDetails.First().TimeSlot.Parkingslot.Floor.Parking.Name))
                 .ReverseMap();
             CreateMap<Booking, GetBookingByIdResponse>()
                 .ForMember(dto => dto.CustomerName, act => act.MapFrom(obj => obj.User.Name))
                 .ForMember(dto => dto.CustomerPhone, act => act.MapFrom(obj => obj.User.Phone))
                 .ForMember(dto => dto.CustomerAvatar, act => act.MapFrom(obj => obj.User.Avatar))
-/*                .ForMember(dto => dto.ParkingSlotName, act => act.MapFrom(obj => obj.ParkingSlot.Name))
-                .ForMember(dto => dto.FloorName, act => act.MapFrom(obj => obj.ParkingSlot.Floor.FloorName))
-                .ForMember(dto => dto.ParkingId, act => act.MapFrom(obj => obj.ParkingSlot.Floor.Parking.ParkingId))
-                .ForMember(dto => dto.ParkingName, act => act.MapFrom(obj => obj.ParkingSlot.Floor.Parking.Name))*/
+                .ForMember(dto => dto.ParkingSlotName, act => act.MapFrom(obj => obj.BookingDetails.First().TimeSlot.Parkingslot.Name))
+                .ForMember(dto => dto.FloorName, act => act.MapFrom(obj => obj.BookingDetails.First().TimeSlot.Parkingslot.Floor.FloorName))
+                .ForMember(dto => dto.ParkingId, act => act.MapFrom(obj => obj.BookingDetails.First().TimeSlot.Parkingslot.Floor.Parking.ParkingId))
+                .ForMember(dto => dto.ParkingName, act => act.MapFrom(obj => obj.BookingDetails.First().TimeSlot.Parkingslot.Floor.Parking.Name))
 
                 .ForMember(dto => dto.LicensePlate, act => act.MapFrom(obj => obj.VehicleInfor.LicensePlate))
                 .ForMember(dto => dto.VehicleName, act => act.MapFrom(obj => obj.VehicleInfor.VehicleName))
@@ -270,7 +270,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.VehicleInfor.Traffic.Name))
                 .ReverseMap();
             CreateMap<Booking, GetListBookingFollowCalendarResponse > ()
-/*                .ForMember(dto => dto.ParkingId, act => act.MapFrom(obj => obj.ParkingSlot.Floor.ParkingId))*/
+                .ForMember(dto => dto.ParkingId, act => act.MapFrom(obj => obj.BookingDetails.First().TimeSlot.Parkingslot.Floor.ParkingId))
                 .ReverseMap();
             #endregion
             #region Transaction Mapping

@@ -30,11 +30,11 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <summary>
         /// API For Manager
         /// </summary>
-        [HttpGet(Name = "GetListBookingByManagerId")]
+        [HttpGet("request/{managerId}", Name = "GetListBookingByManagerId")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ServiceResponse<IEnumerable<GetListBookingByManagerIdResponse>>>> GetListBookingByManagerId([FromQuery] int pageNo, [FromQuery] int pageSize, [FromQuery]int managerId)
+        public async Task<ActionResult<ServiceResponse<IEnumerable<GetListBookingByManagerIdResponse>>>> GetListBookingByManagerId([FromQuery] int pageNo, [FromQuery] int pageSize, int managerId)
         {
             try
             {
