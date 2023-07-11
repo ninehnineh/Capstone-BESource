@@ -1,4 +1,4 @@
-﻿/*using MediatR;
+﻿using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Domain.Enum;
 
@@ -29,8 +29,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 {
                     booking.Status = BookingStatus.Cancel.ToString();
                     await _bookingRepository.Save();
-                    parkingSlot.IsAvailable = true;
-                    await _parkingSlotRepository.Save();
 
                     return new ServiceResponse<string>
                     {
@@ -56,4 +54,3 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         }
     }
 }
-*/
