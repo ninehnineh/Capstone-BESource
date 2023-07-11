@@ -13,5 +13,7 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Infrastructure
         void GenerateMerchandise();
         void SyncData();
         void AddTimeSlotInFuture(int floorId);
+        void AutoCancelBookingWhenOverAllowTimeBooking(int bookingId);
+        void AutoCancelBookingWhenOutOfEndTimeBooking(int bookingId);
     }
 }

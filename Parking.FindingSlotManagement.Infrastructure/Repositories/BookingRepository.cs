@@ -38,10 +38,12 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
         public async Task<Booking> GetBookingIncludeParkingSlot(int bookingId)
         {
             var booking = await _dbContext.Bookings
+                .Include(x => x.Transactions)
                 .Include(x => x.User)
+                    .ThenInclude(x => x.Wallet)
                 .Include(x => x.BookingDetails)!
-                .ThenInclude(x => x.TimeSlot)
-                .ThenInclude(x => x.Parkingslot)
+                    .ThenInclude(x => x.TimeSlot)
+                        .ThenInclude(x => x.Parkingslot)
                 .FirstOrDefaultAsync(x => x.BookingId == bookingId);
             
             if (booking == null) { return null!; }
@@ -70,6 +72,33 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             return booking;
         }
 
+        public async Task<Booking> GetBookingIncludeTimeSlot(int bookingId)
+        {
+            var booking = await _dbContext.Bookings
+                .Include(x => x.BookingDetails)!
+                .ThenInclude(x => x.TimeSlot)
+                .FirstOrDefaultAsync(x => x.BookingId == bookingId);
+            
+            if (booking == null) { return null!; }
+
+            return booking;
+        }
+
+        public async Task<Booking> GetBookingInclude(int bookingId)
+        {
+            var booking = await _dbContext.Bookings
+                .Include(x => x.Transactions)
+                .Include(x => x.VehicleInfor)
+                .Include(x => x.BookingDetails)!
+                    .ThenInclude(x => x.TimeSlot)
+                    .ThenInclude(x => x.Parkingslot)
+                    .ThenInclude(x => x.Floor)
+                .FirstOrDefaultAsync(x => x.BookingId == bookingId);
+            
+            if (booking == null) { return null!; }
+
+            return booking;
+        }
         public async Task<IEnumerable<Booking>> GetListBookingByManagerIdMethod(int businessId, int pageNo, int pageSize)
         {
             try

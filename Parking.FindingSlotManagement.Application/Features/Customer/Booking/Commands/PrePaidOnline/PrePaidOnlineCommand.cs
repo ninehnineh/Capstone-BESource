@@ -10,9 +10,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 {
     public class PrePaidOnlineCommand : IRequest<ServiceResponse<string>>
     {
-        public string ParkingSlotName { get; set; }
+        public int UserId { get; set; }
         public decimal TotalPrice { get; set; }
         public int ParkingId { get; set; }
-        public HttpContext? context { get; set; }
     }
 }

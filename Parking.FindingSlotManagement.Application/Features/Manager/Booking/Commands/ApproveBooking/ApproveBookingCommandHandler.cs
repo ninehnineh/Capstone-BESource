@@ -1,10 +1,13 @@
-﻿/*using MediatR;
+﻿using Hangfire;
+using MediatR;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Models.PushNotification;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Domain.Enum;
+using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,27 +23,32 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
         private readonly IConfiguration _configuration;
         private readonly IFireBaseMessageServices _fireBaseMessageServices;
         private readonly ITimeSlotRepository _timeSlotRepository;
+        private readonly ILogger<ApproveBookingCommandHandler> _logger;
+        private readonly TimeZoneInfo _timeZoneInfo;
 
         public ApproveBookingCommandHandler(IBookingRepository bookingRepository,
             IConfiguration configuration,
             IFireBaseMessageServices fireBaseMessageServices, 
-            ITimeSlotRepository timeSlotRepository)
+            ITimeSlotRepository timeSlotRepository,
+            ILogger<ApproveBookingCommandHandler> logger)
         {
             _bookingRepository = bookingRepository;
             _configuration = configuration;
             _fireBaseMessageServices = fireBaseMessageServices;
             _timeSlotRepository = timeSlotRepository;
+            _logger = logger;
+            _timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"); ;
         }
 
         public async Task<ServiceResponse<string>> Handle(ApproveBookingCommand request, CancellationToken cancellationToken)
         {
             var bookingId = request.BookingId;
-
+            var business_Representatives = request.BusinessId;
             try
             {
 
                 var booking = await _bookingRepository
-                    .GetBooking(bookingId);
+                    .GetBookingIncludeTransaction(bookingId);
 
                 if (booking == null)
                 {
@@ -52,29 +60,28 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                     };
                 }
 
-                var bookingSlot = booking.BookingDetails.First().TimeSlot.ParkingSlotId;
-                var startTimeOfFirstElement = booking.BookingDetails.First().TimeSlot.StartTime;
-                var endTimeOfLastElement = booking.BookingDetails.Last().TimeSlot.EndTime;
-
-                var timeSlotsExist = await _timeSlotRepository
-                    .GetAllItemWithCondition(x => x.ParkingSlotId == bookingSlot &&
-                        x.StartTime >= startTimeOfFirstElement &&
-                        x.EndTime <= endTimeOfLastElement &&
-                        x.Status.Equals(TimeSlotStatus.Free.ToString()), null, null, false);
-
-                if (!timeSlotsExist.Any())
-                {
-                    return new ServiceResponse<string>
-                    {
-                        Message = "Chỗ đặt hiện tại đang bận, vui lòng chuyển chỗ",
-                    };
-                }
-
                 booking.Status = BookingStatus.Success.ToString();
                 await _bookingRepository.Save();
 
-                timeSlotsExist.ToList().ForEach(x => x.Status = TimeSlotStatus.Booked.ToString());
-                await _timeSlotRepository.Save();
+
+                var isPostPaid = booking.Transactions.First().Status.Equals(BookingPaymentStatus.Chua_thanh_toan.ToString()) &&
+                                    booking.Transactions.First().PaymentMethod.Equals(PaymentMethod.tra_sau.ToString());
+
+                var isPrePaid = booking.Transactions.First().Status.Equals(BookingPaymentStatus.Da_thanh_toan.ToString()) &&
+                                    booking.Transactions.First().PaymentMethod.Equals(PaymentMethod.thanh_toan_online.ToString());
+
+                if (isPostPaid)
+                {
+                    var timeToCancel = booking.StartTime.AddHours(1);
+                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(bookingId), timeToCancel);
+                }
+                else if (isPrePaid)
+                {
+                    var timeToCancel = booking.EndTime.Value;
+                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOutOfEndTimeBooking(bookingId), timeToCancel);
+                }
+
+
 
                 var titleCustomer = _configuration.GetSection("MessageTitle_Customer")
                     .GetSection("Accept").Value;
@@ -106,4 +113,3 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
         }
     }
 }
-*/

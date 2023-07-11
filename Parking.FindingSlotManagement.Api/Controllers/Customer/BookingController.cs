@@ -181,7 +181,6 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
         {
             try
             {
-                command.context = HttpContext;
                 var res = await _mediator.Send(command);
                 if (res.Message == "Thành công")
                 {
