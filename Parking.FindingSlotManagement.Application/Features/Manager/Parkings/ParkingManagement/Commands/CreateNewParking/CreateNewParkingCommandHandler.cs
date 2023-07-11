@@ -15,6 +15,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
         private readonly IParkingRepository _parkingRepository;
         private readonly IBusinessProfileRepository _businessProfileRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IApproveParkingRepository _approveParkingRepository;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MappingProfile());
@@ -22,11 +23,13 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
 
         public CreateNewParkingCommandHandler(IParkingRepository parkingRepository,
             IBusinessProfileRepository businessProfileRepository,
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            IApproveParkingRepository approveParkingRepository)
         {
             _parkingRepository = parkingRepository;
             _businessProfileRepository = businessProfileRepository;
             _userRepository = userRepository;
+            _approveParkingRepository = approveParkingRepository;
         }
         public async Task<ServiceResponse<int>> Handle(CreateNewParkingCommand request, CancellationToken cancellationToken)
         {
@@ -63,12 +66,19 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                 parkingEntity.IsFull = false;
                 await _parkingRepository.Insert(parkingEntity);
                 parkingEntity.Code = "BX" + parkingEntity.ParkingId;
-                parkingEntity.Stars = 0;
+                parkingEntity.Stars = (float)0.0;
                 await _parkingRepository.Save();
                 var managerExist = await _userRepository.GetById(checkBusinessExist.UserId);
                 managerExist.ParkingId = parkingEntity.ParkingId;
 
                 await _userRepository.Save();
+                var ap = new Domain.Entities.ApproveParking
+                {
+                    ParkingId = parkingEntity.ParkingId,
+                    CreatedDate = DateTime.UtcNow.AddHours(7),
+                    Status = Domain.Enum.ApproveParkingStatus.Chờ_duyệt.ToString()
+                };
+                await _approveParkingRepository.Insert(ap);
                 return new ServiceResponse<int>
                 {
                     Data = parkingEntity.ParkingId,

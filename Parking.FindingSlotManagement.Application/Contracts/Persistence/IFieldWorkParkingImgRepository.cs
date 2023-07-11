@@ -1,0 +1,14 @@
+﻿using Parking.FindingSlotManagement.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
+{
+    public interface IFieldWorkParkingImgRepository : IGenericRepository<FieldWorkParkingImg>
+    {
+        Task AddRangeFieldWorkParkingImg(List<FieldWorkParkingImg> fwpi);
+    }
+}

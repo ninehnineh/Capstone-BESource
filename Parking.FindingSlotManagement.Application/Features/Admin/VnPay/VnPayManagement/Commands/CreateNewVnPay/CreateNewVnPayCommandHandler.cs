@@ -30,25 +30,14 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayMa
         {
             try
             {
-                var checkBusinessExist = await _businessProfileRepository.GetById(request.BusinessId);
-                if(checkBusinessExist == null)
+                var accountExist = await _accountRepository.GetById(request.UserId);
+                if(accountExist == null)
                 {
                     return new ServiceResponse<int>
                     {
-                        Message = "Không tìm thấy tài khoản doanh nghiệp.",
+                        Message = "Không tìm thấy tài khoản.",
                         Success = true,
                         StatusCode = 200
-                    };
-                }
-                var checkManagerExist = await _accountRepository.GetItemWithCondition(x => x.RoleId == 1 && x.IsActive == true && x.IsCensorship == true && x.UserId.Equals(checkBusinessExist.UserId));
-                if (checkManagerExist == null)
-                {
-                    return new ServiceResponse<int>
-                    {
-                        Message = "Không tìm thấy quản lý hoặc quản lý không chưa được kiểm duyệt hoặc bị banned.",
-                        Success = true,
-                        StatusCode = 200,
-                        Count = 0
                     };
                 }
                 var _mapper = config.CreateMapper();

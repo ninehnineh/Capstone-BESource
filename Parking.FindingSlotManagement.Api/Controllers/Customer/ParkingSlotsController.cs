@@ -18,7 +18,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
             _mediator = mediator;
         }
 
-        [HttpGet("parking-slots")]
+        /*[HttpGet("parking-slots")]
         public async Task<ActionResult<ServiceResponse<IEnumerable<GetParkingSlotsResponse>>>> GetAvailableParkingSlots
             ([FromQuery] GetParkingSlotsQuery query)
         {
@@ -35,7 +35,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
             {
                 throw new Exception(ex.Message);
             }
-        }
+        }*/
         [HttpGet("floors/floorId/parking-slots")]
         public async Task<ActionResult<ServiceResponse<IEnumerable<GetAvailableSlotByFloorIdResponse>>>> GetAvailableParkingSlots
             ([FromQuery] GetAvailableSlotByFloorIdQuery query)

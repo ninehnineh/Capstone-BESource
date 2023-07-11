@@ -1,4 +1,4 @@
-﻿/*using AutoMapper;
+﻿using AutoMapper;
 using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Mapping;
@@ -28,13 +28,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Qu
             {
                 var startDate = request.Start.Date;
                 var endDate = request.End.Date;
-                List<Expression<Func<Domain.Entities.Booking, object>>> includes = new List<Expression<Func<Domain.Entities.Booking, object>>>
-                {
-                    x => x.ParkingSlot,
-                    x => x.ParkingSlot.Floor
-                };
-                var lst = await _bookingRepository.GetAllItemWithCondition(x => x.DateBook.Date >= startDate && x.DateBook.Date <= endDate, includes, null, true);
-                if(!lst.Any())
+                var lst = await _bookingRepository.GetListBookingFollowCalendarMethod(startDate, endDate);
+                if (!lst.Any())
                 {
                     return new ServiceResponse<IEnumerable<GetListBookingFollowCalendarResponse>>
                     {
@@ -62,4 +57,3 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Qu
         }
     }
 }
-*/

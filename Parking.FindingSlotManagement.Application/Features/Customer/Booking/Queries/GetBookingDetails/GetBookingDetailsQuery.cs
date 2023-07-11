@@ -9,7 +9,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Qu
 {
     public class GetBookingDetailsQuery : IRequest<ServiceResponse<GetBookingDetailsResponse>>
     {
-        public int Bookingid { get; set; }
-
+        public int BookingId { get; set; }
     }
 }
