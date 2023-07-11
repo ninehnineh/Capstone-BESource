@@ -14,6 +14,8 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         Task<Booking> GetBookingIncludeTransaction(int bookingId);
         Task<Booking> GetBookingIncludeUser(int bookingId);
         Task<Booking> GetBookingIncludeParkingSlot (int bookingId);
+        Task<Booking> GetBookingIncludeTimeSlot(int bookingId);
+        Task<Booking> GetBookingInclude(int bookingId);
         Task<IEnumerable<Booking>> GetListBookingByManagerIdMethod(int businessId, int pageNo, int pageSize);
         Task<IEnumerable<Booking>> GetListBookingFollowCalendarMethod(DateTime start, DateTime end);
         Task<Booking> GetListBookingByBookingIdMethod(int bookingId);

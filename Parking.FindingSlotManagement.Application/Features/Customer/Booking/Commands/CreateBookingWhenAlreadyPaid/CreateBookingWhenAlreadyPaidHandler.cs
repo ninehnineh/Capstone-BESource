@@ -27,6 +27,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
     public class CreateBookingWhenAlreadyPaidHandler : IRequestHandler<CreateBookingWhenAlreadyPaidCommand, ServiceResponse<int>>
     {
         const int CUSTOMER = 3;
+        const int MANAGER = 1;
         const int OTO = 1;
         const int MOTO = 2;
         private readonly IBookingRepository _bookingRepository;
@@ -44,6 +45,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         private readonly IConfiguration _configuration;
         private readonly IFireBaseMessageServices _fireBaseMessageServices;
         private readonly IVehicleInfoRepository _vehicleInfoRepository;
+        private readonly ITimeSlotRepository _timeSlotRepository;
+        private readonly IBookingDetailsRepository _bookingDetailsRepository;
+        private readonly ITransactionRepository _transactionRepository;
+        private readonly IWalletRepository _walletRepository;
         private readonly HttpClient _client;
 
         public CreateBookingWhenAlreadyPaidHandler(IBookingRepository bookingRepository,
@@ -60,7 +65,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             IParkingPriceRepository parkingPriceRepository,
             IConfiguration configuration,
             IFireBaseMessageServices fireBaseMessageServices,
-            IVehicleInfoRepository vehicleInfoRepository)
+            IVehicleInfoRepository vehicleInfoRepository,
+            ITimeSlotRepository timeSlotRepository,
+            IBookingDetailsRepository bookingDetailsRepository,
+            ITransactionRepository transactionRepository,
+            IWalletRepository walletRepository)
         {
             _bookingRepository = bookingRepository;
             _parkingSlotRepository = parkingSlotRepository;
@@ -77,15 +86,47 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             _configuration = configuration;
             _fireBaseMessageServices = fireBaseMessageServices;
             _vehicleInfoRepository = vehicleInfoRepository;
+            _timeSlotRepository = timeSlotRepository;
+            _bookingDetailsRepository = bookingDetailsRepository;
+            _transactionRepository = transactionRepository;
+            _walletRepository = walletRepository;
             _client = new HttpClient();
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Client-ID", "886d0b92410e625");
         }
         public async Task<ServiceResponse<int>> Handle(CreateBookingWhenAlreadyPaidCommand request, CancellationToken cancellationToken)
         {
+
+            var startTimeBooking = request.BookingDto.StartTime;
+            var endTimeBooking = request.BookingDto.EndTime;
+            var parkingSlotId = request.BookingDto.ParkingSlotId;
+            var paymentMethod = request.BookingDto.PaymentMethod;
             try
             {
+
+                var includes = new List<Expression<Func<Domain.Entities.TimeSlot, object>>>
+                {
+                   x => x.Parkingslot,
+                   x => x.Parkingslot.Floor
+                };
+                var currentLstBookedSlot = await _timeSlotRepository
+                    .GetAllItemWithCondition(x => x.ParkingSlotId == request.BookingDto.ParkingSlotId &&
+                                                  x.StartTime >= startTimeBooking &&
+                                                  x.EndTime <= endTimeBooking &&
+                                                  x.Status == "Booked", includes);
+
+                if (currentLstBookedSlot.Any())
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Chỗ đặt đã được đặt, vui lòng chọn chỗ khác.",
+                        StatusCode = 400,
+                        Success = true,
+                    };
+                }
+
                 var parkingSlot = await _parkingSlotRepository
-                    .GetById(request.BookingDto.ParkingSlotId);
+                    .GetById(parkingSlotId);
+
                 if (parkingSlot == null)
                 {
                     return new ServiceResponse<int>
@@ -95,6 +136,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         StatusCode = 200
                     };
                 }
+
                 var vehicleInfor = await _vehicleInfoRepository
                     .GetById(request.BookingDto.VehicleInforId);
 
@@ -107,10 +149,17 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         StatusCode = 200
                     };
                 }
+
+                List<Expression<Func<User, object>>> includesWallet = new()
+                {
+                    x => x.Wallet,
+                };
+
                 var user = await _userRepository
                     .GetItemWithCondition(x => x.UserId == request.BookingDto.UserId &&
                                             x.IsActive == true &&
-                                            x.RoleId == CUSTOMER);
+                                            x.RoleId == CUSTOMER, includesWallet, false);
+
                 if (user == null)
                 {
                     return new ServiceResponse<int>
@@ -122,47 +171,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 }
 
                 var entity = _mapper.Map<Domain.Entities.Booking>(request.BookingDto);
-                entity.Status = BookingStatus.Payment_Successed.ToString();
-                entity.Transactions.First().PaymentMethod = Domain.Enum.PaymentMethod.thanh_toan_online.ToString();
-                // get and set TMNCodeVnPay
+                entity.Status = BookingStatus.Initial.ToString();
                 var floor = await _floorRepository.GetById(parkingSlot.FloorId!);
                 var parkingId = floor.ParkingId;
-
                 var parking = await _parkingRepository.GetById(parkingId!);
-
-                //var vnpay = await _vnPayRepository
-                //    .GetItemWithCondition(x => x.ManagerId == managerId);
-                //entity.TmnCodeVnPay = vnpay.TmnCode;
-                /*List<Expression<Func<Domain.Entities.Booking, object>>> includes2 = new List<Expression<Func<Domain.Entities.Booking, object>>>
-                {
-                    x => x.ParkingSlot,
-                    x => x.ParkingSlot.Floor
-                };
-                var lstBooking = await _bookingRepository.GetAllItemWithCondition(x => x.ParkingSlotId == request.BookingDto.ParkingSlotId && x.ParkingSlot.FloorId == floor.FloorId && x.ParkingSlot.Floor.ParkingId == floor.ParkingId && x.DateBook.Date == DateTime.UtcNow.Date && x.Status != BookingStatus.Cancel.ToString(), includes2, null, true);
-                List<int> lstParkingSlotIdExist = new();
-                if(lstBooking.Count() > 0)
-                {
-                    foreach (var item in lstBooking)
-                    {
-                        if(request.BookingDto.StartTime < item.EndTime && request.BookingDto.EndTime > item.StartTime)
-                        {
-                            if(lstParkingSlotIdExist.Where(x => x.Equals(item.ParkingSlotId)).Count() <= 0)
-                            {
-                                lstParkingSlotIdExist.Add(item.ParkingSlotId);
-                            }
-                            
-                        }
-                    }
-                }
-                List<Expression<Func<Domain.Entities.ParkingSlot, object>>> includes3 = new List<Expression<Func<Domain.Entities.ParkingSlot, object>>>
-                {
-                    x => x.Floor,
-                };
-                var lstParkingSlot = await _parkingSlotRepository.GetAllItemWithCondition(x => x.FloorId == floor.FloorId && x.Floor.ParkingId == floor.ParkingId, includes3, null, true);
-                var filterParkingSlot = lstParkingSlot.Where(item => !lstParkingSlotIdExist.Contains(item.ParkingSlotId)).ToList();*/
-
-                // Set TotalPrice
-
                 var trafficid = vehicleInfor.TrafficId;
 
                 if (parking.CarSpot <= 0 && trafficid == OTO)
@@ -184,186 +196,56 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     };
                 }
 
-                List<Expression<Func<ParkingHasPrice, object>>> includes = new List<Expression<Func<ParkingHasPrice, object>>>
+                decimal expectedPrice = await CaculateExpectedPrice(request, parkingId, trafficid);
+
+                if (user.Wallet.Balance < expectedPrice)
                 {
-                    x => x.ParkingPrice!,
-                    x => x.ParkingPrice!.Traffic!
-                };
-
-                var parkingHasPrice = await _parkingHasPriceRepository
-                        .GetAllItemWithCondition(x => x.ParkingId == parkingId, includes);
-
-                var appliedParkingPriceId = parkingHasPrice
-                    .Where(x => x.ParkingPrice!.Traffic!.TrafficId == trafficid)
-                    .FirstOrDefault()!.ParkingPriceId;
-
-                var parkingPrice = await _parkingPriceRepository.GetById(appliedParkingPriceId);
-
-                var timeLines = await _timelineRepository
-                    .GetAllItemWithCondition(x => x.ParkingPriceId == appliedParkingPriceId);
-
-                decimal totalPrice = CaculatePriceBooking.CaculateExpectedPrice(request.BookingDto.StartTime, request.BookingDto.EndTime, parkingPrice, timeLines);
-
-                entity.TotalPrice = totalPrice;
-
-                var listBooking = await _bookingRepository
-                    .GetAllItemWithCondition(x => x.DateBook.Date <= DateTime.UtcNow.Date &&
-                    x.BookingDetails.First().TimeSlot.Parkingslot.ParkingSlotId == request.BookingDto.ParkingSlotId);
-
-                DateTime Gioloinhat = new();
-
-                if (listBooking.Count() > 0)
-                {
-                    foreach (var item in listBooking)
-                    {
-                        if (Gioloinhat < item.EndTime)
-                        {
-                            Gioloinhat = item.EndTime.Value;
-                        }
-                    }
-                }
-
-                if (parkingSlot.IsAvailable == true)
-                {
-                    parkingSlot.IsAvailable = false;
-                    await _parkingSlotRepository.Save();
-                    entity.DateBook = DateTime.UtcNow.AddHours(7);
-
-                    await _bookingRepository.Insert(entity);
-
-                    var linkQRImage = await UploadQRImagess(entity.BookingId);
-                    var currentBooking = await _bookingRepository
-                        .GetItemWithCondition(x => x.BookingId == entity.BookingId, null!, false);
-
-                    currentBooking.QRImage = linkQRImage;
-
-                    await _bookingRepository.Save();
-
-                    var titleManager = _configuration.GetSection("MessageTitle_Manager").GetSection("Success").Value;
-                    var bodyManager = _configuration.GetSection("MessageBody_Manager").GetSection("Success").Value;
-
-                    var deviceToken = "";
-                    var managerAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
-                    var lstStaff = managerAccount.Where(x => x.RoleId == 2);
-                    var ManagerOfParking = managerAccount.FirstOrDefault(x => x.RoleId == 1);
-                    if (lstStaff.Any())
-                    {
-                        foreach (var item in lstStaff)
-                        {
-                            deviceToken = item.Devicetoken.ToString();
-                            var pushNotificationModel = new PushNotificationWebModel
-                            {
-                                Title = titleManager,
-                                Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                                TokenWeb = deviceToken,
-                            };
-                            await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
-                        }
-                    }
-                    else
-                    {
-                        var manager = await _userRepository.GetById(ManagerOfParking.UserId!);
-                        var pushNotificationModel = new PushNotificationWebModel
-                        {
-                            Title = titleManager,
-                            Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                            TokenWeb = manager.Devicetoken,
-                        };
-                        await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
-                    }
-
-                    var titleCustomer = _configuration.GetSection("MessageTitle_Customer").GetSection("Success").Value;
-                    var bodyCustomer = _configuration.GetSection("MessageBody_Customer").GetSection("Success").Value;
-
-                    var pushNotificationMobile = new PushNotificationMobileModel
-                    {
-                        Title = titleCustomer,
-                        Message = bodyCustomer + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                        TokenMobile = request.DeviceToKenMobile,
-                    };
-
-                    await _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
-
                     return new ServiceResponse<int>
                     {
-                        Data = entity.BookingId,
-                        StatusCode = 201,
-                        Success = true,
+                        Message = "Số dư ví không đủ, vui lòng nạp thêm hoặc chọn phương thức thanh toán khác.",
                     };
                 }
-                else if (parkingSlot.IsAvailable == false && request.BookingDto.StartTime >= Gioloinhat)
+                else
                 {
+                    var managerWallet = await _userRepository
+                        .GetItemWithCondition(x => x.ParkingId == parkingId && x.RoleId == MANAGER, includesWallet, false);
 
-                    entity.DateBook = DateTime.UtcNow.AddHours(7);
-
-                    await _bookingRepository.Insert(entity);
-
-                    var linkQRImage = await UploadQRImagess(entity.BookingId);
-                    var currentBooking = await _bookingRepository
-                        .GetItemWithCondition(x => x.BookingId == entity.BookingId, null!, false);
-
-                    currentBooking.QRImage = linkQRImage;
-
-                    await _bookingRepository.Save();
-
-                    var titleManager = _configuration.GetSection("MessageTitle_Manager").GetSection("Success").Value;
-                    var bodyManager = _configuration.GetSection("MessageBody_Manager").GetSection("Success").Value;
-
-                    var deviceToken = "";
-                    var managerAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
-                    var lstStaff = managerAccount.Where(x => x.RoleId == 2);
-                    var ManagerOfParking = managerAccount.FirstOrDefault(x => x.RoleId == 1);
-                    if (lstStaff.Any())
-                    {
-                        foreach (var item in lstStaff)
-                        {
-                            deviceToken = item.Devicetoken.ToString();
-                            var pushNotificationModel = new PushNotificationWebModel
-                            {
-                                Title = titleManager,
-                                Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                                TokenWeb = deviceToken,
-                            };
-                            await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
-                        }
-                    }
-                    else
-                    {
-                        var manager = await _userRepository.GetById(ManagerOfParking.UserId!);
-                        var pushNotificationModel = new PushNotificationWebModel
-                        {
-                            Title = titleManager,
-                            Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                            TokenWeb = manager.Devicetoken,
-                        };
-                        await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
-                    }
-
-                    var titleCustomer = _configuration.GetSection("MessageTitle_Customer").GetSection("Success").Value;
-                    var bodyCustomer = _configuration.GetSection("MessageBody_Customer").GetSection("Success").Value;
-
-                    var pushNotificationMobile = new PushNotificationMobileModel
-                    {
-                        Title = titleCustomer,
-                        Message = bodyCustomer + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                        TokenMobile = request.DeviceToKenMobile,
-                    };
-
-                    await _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
-
-                    return new ServiceResponse<int>
-                    {
-                        Data = entity.BookingId,
-                        StatusCode = 201,
-                        Success = true,
-                    };
+                    managerWallet.Wallet!.Balance += expectedPrice;
+                    user.Wallet.Balance -= expectedPrice;
+                    await _walletRepository.Save();
                 }
+
+                entity.TotalPrice = expectedPrice;
+                entity.DateBook = DateTime.Now;
+                await _bookingRepository.Insert(entity);
+
+                var linkQRImage = await UploadQRImagess(entity.BookingId);
+                var currentBooking = await _bookingRepository
+                    .GetItemWithCondition(x => x.BookingId == entity.BookingId, null!, false);
+                currentBooking.QRImage = linkQRImage;
+                await _bookingRepository.Save();
+
+                var timeSlotsBooking = await _timeSlotRepository
+                    .GetAllTimeSlotsBooking(startTimeBooking, endTimeBooking, parkingSlotId);
+                var bookingDetails = new List<BookingDetails>();
+                foreach (var timeSlot in timeSlotsBooking)
+                {
+                    bookingDetails.Add(new BookingDetails { BookingId = entity.BookingId, TimeSlotId = timeSlot.TimeSlotId });
+                    timeSlot.Status = TimeSlotStatus.Booked.ToString();
+                }
+
+                await _timeSlotRepository.Save();
+                await _bookingDetailsRepository.AddRange(bookingDetails);
+
+                await CreateNewTransaction(paymentMethod, user, entity, expectedPrice);
+                await PushNotiToManager(parkingSlot, floor, parking);
+                await PushNoTiToCustomer(request, parkingSlot, floor);
 
                 return new ServiceResponse<int>
                 {
-                    Message = "Chỗ đỗ xe đã được người khác đặt, vui lòng chọn chỗ mới",
-                    Success = false,
-                    StatusCode = 400
+                    Data = entity.BookingId,
+                    StatusCode = 201,
+                    Success = true,
                 };
             }
             catch (DbUpdateException ex)
@@ -383,318 +265,92 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 }
             }
         }
-        private static decimal CaculateTotalPrice(CreateBookingWhenAlreadyPaidCommand request, ParkingPrice parkingPrice, IEnumerable<TimeLine> timeLines)
+
+        private async Task CreateNewTransaction(string? paymentMethod, User user, Domain.Entities.Booking entity, decimal expectedPrice)
         {
-            var startTimeBooking = request.BookingDto.StartTime.TimeOfDay.TotalHours;
-            var endTimeBooking = request.BookingDto.EndTime.TimeOfDay.TotalHours;
-            var startTimeDate = request.BookingDto.StartTime.Date;
-            var endTimeDate = request.BookingDto.EndTime.Date;
-            var startingTime = parkingPrice.StartingTime;
-            var extraTimeStep = parkingPrice.ExtraTimeStep;
-            bool foundStartPoint = false;
-            var hitEndPoint = false;
-            var totalPrice = 0M;
-            var startingPoint = 0;
-            var extraFeePoint = 0;
-            var isPass = false;
-
-            foreach (var package in timeLines)
+            var transaction = new Transaction
             {
-                var startTimePackage = package.StartTime?.TotalHours;
-                var endTimePackage = package.EndTime?.TotalHours;
-                if (startTimeDate == endTimeDate)
-                {
-                    // một gói, trong ngày
-                    if (startTimePackage > endTimePackage)
-                    {
-                        endTimePackage += 24;
-                    }
-                    //if (startTimeBooking < startTimePackage)
-                    //{
-                    //    startTimeBooking += 24;
-                    //    endTimeBooking += 24;
-                    //}
-                    if (startTimeBooking >= startTimePackage &&
-                        startTimeBooking <= endTimePackage &&
-                        endTimeBooking > startTimeBooking &&
-                        endTimeBooking >= startTimePackage &&
-                        endTimeBooking <= endTimePackage ||
-                        (startTimeBooking + 24) >= startTimePackage &&
-                        (startTimeBooking + 24) <= endTimePackage &&
-                        (endTimeBooking + 24) > (startTimeBooking + 24) &&
-                        (endTimeBooking + 24) >= startTimePackage &&
-                        (endTimeBooking + 24) <= endTimePackage)
-                    {
-                        if (package.StartTime > package.EndTime)
-                        {
-                            if (Math.Abs(24 - startTimeBooking) >= 24 - startTimePackage &&
-                                Math.Abs(24 - endTimeBooking) >= 24 - startTimePackage)
-                            {
-                                startTimeBooking += 24;
-                                endTimeBooking += 24;
-                            }
-                            package.EndTime += TimeSpan.FromHours(24);
-                        }
-
-                        if (startTimeBooking >= startTimePackage &&
-                            startTimeBooking <= endTimePackage &&
-                            endTimeBooking >= startTimePackage &&
-                            endTimeBooking <= endTimePackage)
-                        {
-                            var so_tieng_book = (decimal)(endTimeBooking - startTimeBooking);
-                            if (startingTime < so_tieng_book)
-                            {
-                                var so_tieng_tinh_ExtraFee = so_tieng_book - startingTime;
-                                var so_step = (int)so_tieng_tinh_ExtraFee / (int)extraTimeStep!;
-                                totalPrice = package.Price + (decimal)(so_step * package.ExtraFee) + (decimal)package.ExtraFee;
-                            }
-                            else
-                            {
-                                totalPrice = package.Price;
-                            }
-                        }
-
-                        if (endTimeBooking > 24 &&
-                            startTimeBooking > 24)
-                        {
-                            endTimeBooking -= 24;
-                            startTimeBooking -= 24;
-                        }
-                        break;
-                    }
-
-                    // nhiều gói, trong ngày
-                    else
-                    {
-                        while (hitEndPoint == false)
-                        {
-                            if (endTimePackage > 24 && startTimeBooking < 24)
-                            {
-                                startTimeBooking += 24;
-                            }
-                            if (startTimeBooking >= startTimePackage &&
-                                startTimeBooking < endTimePackage &&
-                                foundStartPoint == false)
-                            {
-                                foundStartPoint = true;
-                                var step = 0;
-                                var startingPrice = 0M;
-
-                                startingPrice =
-                                    (double)(startTimeBooking + startingTime)! == endTimePackage
-                                    ? package.Price
-                                    : package.Price + (decimal)package.ExtraFee!;
-
-                                var extraPrice = 0M;
-                                startingPoint = (int)(startTimeBooking + startingTime)!;
-                                if (startingPoint == endTimePackage)
-                                {
-                                    isPass = true;
-                                }
-                                extraFeePoint = (int)(startingPoint + extraTimeStep)!;
-                                while (extraFeePoint <= endTimePackage)
-                                {
-                                    step++;
-                                    extraFeePoint = (int)(extraFeePoint + extraTimeStep)!;
-                                    extraPrice = step * (decimal)package.ExtraFee!;
-                                };
-                                totalPrice += startingPrice + extraPrice;
-
-                                break;
-                            }
-
-                            if (foundStartPoint == true)
-                            {
-                                var priceOfTimeLineTwo = 0M;
-                                if (startingPoint == startTimePackage ||
-                                    startingPoint == startTimePackage + 24)
-                                {
-                                    totalPrice += (decimal)package.ExtraFee!;
-                                }
-                                if (extraFeePoint > 24 && endTimeBooking < 24)
-                                {
-                                    endTimeBooking += 24;
-                                }
-                                while (extraFeePoint <= endTimeBooking)
-                                {
-                                    priceOfTimeLineTwo = (decimal)package.ExtraFee!;
-                                    totalPrice += priceOfTimeLineTwo;
-                                    extraFeePoint += (int)extraTimeStep!;
-                                    if (endTimePackage < startTimePackage)
-                                    {
-                                        endTimePackage += 24;
-                                    }
-                                    if (extraFeePoint > 24 && endTimePackage < 24)
-                                    {
-                                        endTimePackage += 24;
-                                    }
-                                    if (extraFeePoint > endTimePackage)
-                                    {
-                                        if (extraFeePoint > 24)
-                                        {
-                                            extraFeePoint -= 24;
-                                            endTimeBooking -= 24;
-                                            package.EndTime -= TimeSpan.FromHours(24);
-                                        }
-                                        break;
-                                    }
-                                }
-                                if (extraFeePoint > endTimeBooking)
-                                {
-                                    isPass = false;
-                                    break;
-                                }
-                                else break;
-                            }
-                            if (startTimeBooking > 24)
-                            {
-                                startTimeBooking -= 24;
-                            }
-
-                            if (extraFeePoint > endTimeBooking && isPass == false)
-                            {
-                                hitEndPoint = true;
-                                break;
-                            }
-                            break;
-                        }
-                    }
-                }
-
-                if (startTimeDate < endTimeDate)
-                {
-                    if (endTimeBooking == 0)
-                    {
-                        endTimeBooking += 24;
-                    }
-                    if (startTimePackage > endTimePackage)
-                    {
-                        endTimePackage += 24;
-                    }
-                    // một gói, qua ngày
-                    if (startTimeBooking >= startTimePackage &&
-                        startTimeBooking < endTimePackage &&
-                        endTimeBooking > startTimeBooking &&
-                        endTimeBooking >= startTimePackage &&
-                        endTimeBooking <= endTimePackage)
-                    {
-                        if (package.StartTime > package.EndTime)
-                        {
-                            if (startTimeBooking > endTimeBooking)
-                            {
-                                endTimeBooking += 24;
-                            }
-                            package.EndTime += TimeSpan.FromHours(24);
-                        }
-
-                        if (startTimeBooking >= startTimePackage &&
-                            startTimeBooking < endTimePackage &&
-                            endTimeBooking >= startTimePackage &&
-                            endTimeBooking <= endTimePackage)
-                        {
-                            var so_tieng_book = (decimal)(endTimeBooking - startTimeBooking);
-                            if (startingTime < so_tieng_book)
-                            {
-                                var so_tieng_tinh_ExtraFee = so_tieng_book - startingTime;
-                                var so_step = (int)so_tieng_tinh_ExtraFee / (int)extraTimeStep!;
-                                totalPrice = package.Price + (decimal)(so_step * package.ExtraFee!) + (decimal)package.ExtraFee!;
-                            }
-                            else
-                            {
-                                totalPrice = package.Price;
-                            }
-                        }
-
-                        if (endTimeBooking > 24)
-                        {
-                            endTimeBooking -= 24;
-                        }
-                        break;
-                    }
-
-                    // nhiều gói, qua ngày
-                    else
-                    {
-                        while (hitEndPoint == false)
-                        {
-                            if (endTimePackage < startTimePackage)
-                            {
-                                package.EndTime += TimeSpan.FromHours(24);
-                            }
-
-                            if (startTimeBooking >= startTimePackage &&
-                                startTimeBooking < endTimePackage &&
-                                foundStartPoint == false)
-                            {
-                                foundStartPoint = true;
-                                var step = 0;
-                                var startingPrice = 0M;
-
-                                startingPrice =
-                                    (double)(startTimeBooking + startingTime)! == endTimePackage
-                                    ? package.Price
-                                    : package.Price + (decimal)package.ExtraFee!;
-
-                                var extraPrice = 0M;
-                                var bookedTime = (int)(endTimePackage - startTimeBooking);
-                                startingPoint = (int)(startTimeBooking + startingTime!);
-
-                                extraFeePoint = (int)(startingPoint + extraTimeStep)!;
-                                while (extraFeePoint <= endTimePackage)
-                                {
-                                    step++;
-                                    extraFeePoint = (int)(extraFeePoint + extraTimeStep)!;
-                                    extraPrice = step * (decimal)package.ExtraFee!;
-                                };
-                                totalPrice = startingPrice + extraPrice;
-
-                                break;
-                            }
-
-                            if (foundStartPoint)
-                            {
-                                if (startingPoint == startTimePackage)
-                                {
-                                    totalPrice += (decimal)package.ExtraFee!;
-                                }
-                                while (extraFeePoint <= endTimeBooking)
-                                {
-                                    totalPrice += (decimal)package.ExtraFee!;
-                                    extraFeePoint += (int)extraTimeStep!;
-                                    if (endTimePackage < startTimePackage)
-                                    {
-                                        endTimePackage += 24;
-                                    }
-                                    if (extraFeePoint > 24 && endTimePackage < 24)
-                                    {
-                                        endTimePackage += 24;
-                                    }
-                                    if (extraFeePoint > endTimePackage)
-                                    {
-                                        if (extraFeePoint > 24)
-                                        {
-                                            extraFeePoint -= 24;
-                                            endTimeBooking -= 24;
-                                            package.EndTime -= TimeSpan.FromHours(24);
-                                        }
-                                        break;
-                                    }
-                                }
-                            }
-                            if (extraFeePoint >= endTimeBooking)
-                            {
-                                hitEndPoint = true;
-                                break;
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-
-            return totalPrice;
+                Price = expectedPrice,
+                Status = BookingPaymentStatus.Da_thanh_toan.ToString(),
+                PaymentMethod = paymentMethod,
+                WalletId = user.Wallet.WalletId,
+                BookingId = entity.BookingId
+            };
+            await _transactionRepository.Insert(transaction);
         }
 
+        private async Task PushNoTiToCustomer(CreateBookingWhenAlreadyPaidCommand request, Domain.Entities.ParkingSlot parkingSlot, Floor floor)
+        {
+            var titleCustomer = _configuration.GetSection("MessageTitle_Customer").GetSection("Success").Value;
+            var bodyCustomer = _configuration.GetSection("MessageBody_Customer").GetSection("Success").Value;
+
+            var pushNotificationMobile = new PushNotificationMobileModel
+            {
+                Title = titleCustomer,
+                Message = bodyCustomer + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                TokenMobile = request.DeviceToKenMobile,
+            };
+
+            await _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
+        }
+
+        private async Task PushNotiToManager(Domain.Entities.ParkingSlot parkingSlot, Floor floor, Domain.Entities.Parking parking)
+        {
+            var titleManager = _configuration.GetSection("MessageTitle_Manager").GetSection("Success").Value;
+            var bodyManager = _configuration.GetSection("MessageBody_Manager").GetSection("Success").Value;
+
+            var deviceToken = "";
+            var managerAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
+            var lstStaff = managerAccount.Where(x => x.RoleId == 2);
+            var ManagerOfParking = managerAccount.FirstOrDefault(x => x.RoleId == 1);
+
+            if (lstStaff.Any())
+            {
+                foreach (var item in lstStaff)
+                {
+                    deviceToken = item.Devicetoken.ToString();
+                    var pushNotificationModel = new PushNotificationWebModel
+                    {
+                        Title = titleManager,
+                        Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                        TokenWeb = deviceToken,
+                    };
+                    await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
+                }
+            }
+            else
+            {
+                var manager = await _userRepository.GetById(ManagerOfParking.UserId!);
+                var pushNotificationModel = new PushNotificationWebModel
+                {
+                    Title = titleManager,
+                    Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                    TokenWeb = manager.Devicetoken,
+                };
+                await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
+            }
+        }
+
+        private async Task<decimal> CaculateExpectedPrice(CreateBookingWhenAlreadyPaidCommand request, int? parkingId, int? trafficid)
+        {
+            List<Expression<Func<ParkingHasPrice, object>>> includess = new List<Expression<Func<ParkingHasPrice, object>>>
+                {
+                    x => x.ParkingPrice!,
+                    x => x.ParkingPrice!.Traffic!
+                };
+            var parkingHasPrice = await _parkingHasPriceRepository
+                    .GetAllItemWithCondition(x => x.ParkingId == parkingId, includess);
+            var appliedParkingPriceId = parkingHasPrice
+                .Where(x => x.ParkingPrice!.Traffic!.TrafficId == trafficid)
+                .FirstOrDefault()!.ParkingPriceId;
+            var parkingPrice = await _parkingPriceRepository.GetById(appliedParkingPriceId);
+            var timeLines = await _timelineRepository
+                .GetAllItemWithCondition(x => x.ParkingPriceId == appliedParkingPriceId);
+            decimal expectedPrice = CaculatePriceBooking
+                .CaculateExpectedPrice(request.BookingDto.StartTime, request.BookingDto.EndTime,
+                parkingPrice, timeLines);
+            return expectedPrice;
+        }
 
         private async Task<string> UploadQRImagess(int bookingId)
         {

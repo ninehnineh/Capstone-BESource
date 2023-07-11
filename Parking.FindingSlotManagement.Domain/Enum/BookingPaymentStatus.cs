@@ -9,6 +9,7 @@ namespace Parking.FindingSlotManagement.Domain.Enum
     public enum BookingPaymentStatus
     {
         Da_thanh_toan,
-        Chua_thanh_toan
+        Chua_thanh_toan,
+        Huy
     }
 }

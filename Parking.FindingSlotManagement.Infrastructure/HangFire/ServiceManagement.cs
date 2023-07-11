@@ -1,10 +1,18 @@
 ﻿using Hangfire;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Org.BouncyCastle.Ocsp;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
+using Parking.FindingSlotManagement.Application.Models.PushNotification;
 using Parking.FindingSlotManagement.Domain.Entities;
+using Parking.FindingSlotManagement.Domain.Enum;
+using Parking.FindingSlotManagement.Infrastructure.Firebase.PushService;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,10 +21,16 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
     public class ServiceManagement : IServiceManagement
     {
         private readonly ParkZDbContext _context;
+        private readonly ILogger<ServiceManagement> _logger;
+        private readonly IFireBaseMessageServices _fireBaseMessageServices;
 
-        public ServiceManagement(ParkZDbContext context)
+        public ServiceManagement(ParkZDbContext context,
+            ILogger<ServiceManagement> logger,
+            IFireBaseMessageServices fireBaseMessageServices)
         {
             _context = context;
+            _logger = logger;
+            _fireBaseMessageServices = fireBaseMessageServices;
         }
 
         public void AddTimeSlotInFuture(int floorId)
@@ -24,7 +38,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             var lstParkingSlot = _context.ParkingSlots.Where(x => x.FloorId == floorId).ToList();
             DateTime startDate = DateTime.UtcNow;
             DateTime endDate = startDate.AddDays(7);
-            
+
             foreach (var a in lstParkingSlot)
             {
                 List<TimeSlot> ts = new List<TimeSlot>();
@@ -53,6 +67,119 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             RecurringJob.AddOrUpdate<IServiceManagement>(x => x.DeleteTimeSlotIn1Week(), Cron.Weekly);
             RecurringJob.AddOrUpdate<IServiceManagement>(x => x.AddTimeSlotInFuture((int)floorId), Cron.Weekly);
 
+        }
+
+        public void AutoCancelBookingWhenOverAllowTimeBooking(int bookingId)
+        {
+            var lateHoursAllowed = 1;
+
+            try
+            {
+                var bookedBooking = _context.Bookings
+                    .Include(x => x.BookingDetails)!
+                        .ThenInclude(x => x.TimeSlot)
+                    .Include(x => x.Transactions)
+                    .FirstOrDefault(x => x.BookingId == bookingId);
+
+                var guestArrived = bookedBooking.CheckinTime.HasValue;
+                var hitAllowedDelayTime = DateTime.Now >= bookedBooking.StartTime.AddHours(lateHoursAllowed);
+
+                if (!guestArrived && hitAllowedDelayTime)
+                {
+                    bookedBooking.Status = BookingStatus.Cancel.ToString();
+                    bookedBooking.Transactions.First().Status = BookingPaymentStatus.Huy.ToString();
+                    bookedBooking.Transactions.First().Description = "Trễ quá giờ cho phép";
+
+                    foreach (var bookingDetail in bookedBooking.BookingDetails)
+                    {
+                        _logger.LogInformation($"Count: {bookedBooking.BookingDetails.Count}");
+                        bookingDetail.TimeSlot.Status = TimeSlotStatus.Free.ToString();
+                    }
+
+                    // bắn message, đơn của mày đã bị hủy + lý do
+
+                    PushNotiToCustomerWhenOverLateAllowedTime(lateHoursAllowed, bookedBooking);
+
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    Console.WriteLine($"Exception");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        private void PushNotiToCustomerWhenOverLateAllowedTime(int lateHoursAllowed, Booking? bookedBooking)
+        {
+            var titleCustomer = "Trạng thái đơn đặt";
+            var bodyCustomer = $"Đơn của bạn đã bị hủy vì đã quá giờ trễ cho phép ({lateHoursAllowed})";
+
+            var pushNotificationMobile = new PushNotificationMobileModel
+            {
+                Title = titleCustomer,
+                Message = bodyCustomer,
+                TokenMobile = bookedBooking.User.Devicetoken,
+            };
+
+            _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
+        }
+
+        public void AutoCancelBookingWhenOutOfEndTimeBooking(int bookingId, int business_Representatives)
+        {
+            try
+            {
+                var bookedBooking = _context.Bookings
+                        .Include(x => x.User)
+                        .Include(x => x.BookingDetails)!.ThenInclude(x => x.TimeSlot)
+                        .Include(x => x.Transactions)!.ThenInclude(x => x.Wallet)
+                        .FirstOrDefault(x => x.BookingId == bookingId);
+
+                var guestArrived = bookedBooking.CheckinTime.HasValue;
+                var isOutOfEndTimeBooking = bookedBooking.EndTime <= DateTime.Now;
+
+                if (!guestArrived && isOutOfEndTimeBooking)
+                {
+                    bookedBooking.Status = BookingStatus.Cancel.ToString();
+                    bookedBooking.Transactions.First().Status = BookingPaymentStatus.Huy.ToString();
+                    bookedBooking.Transactions.First().Description = "Khách không đến";
+
+                    foreach (var bookingDetail in bookedBooking.BookingDetails)
+                    {
+                        _logger.LogInformation($"Count: {bookedBooking.BookingDetails.Count}");
+                        bookingDetail.TimeSlot.Status = TimeSlotStatus.Free.ToString();
+                    }
+                    // bắn message, đơn của mày đã bị hủy + lý do
+                    PushNotiToCustomerWhenCustomerNotArrive(bookedBooking);
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    Console.WriteLine($"Exception");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        private void PushNotiToCustomerWhenCustomerNotArrive(Booking? bookedBooking)
+        {
+            var titleCustomer = "Trạng thái đơn đặt";
+            var bodyCustomer = "Đơn của bạn đã bị hủy vì đã quá giờ đặt";
+
+            var pushNotificationMobile = new PushNotificationMobileModel
+            {
+                Title = titleCustomer,
+                Message = bodyCustomer,
+                TokenMobile = bookedBooking.User.Devicetoken,
+            };
+
+            _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
         }
 
         public void DeleteTimeSlotIn1Week()

@@ -101,9 +101,31 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var paymentMethod = request.BookingDto.PaymentMethod;
             try
             {
+
+                var includes = new List<Expression<Func<Domain.Entities.TimeSlot, object>>>
+                {
+                   x => x.Parkingslot,
+                   x => x.Parkingslot.Floor
+                };
+                var currentLstBookedSlot = await _timeSlotRepository.GetAllItemWithCondition(x =>
+                                                            x.ParkingSlotId == request.BookingDto.ParkingSlotId &&
+                                                            x.StartTime >= startTimeBooking &&
+                                                            x.EndTime <= endTimeBooking &&
+                                                            x.Status == "Booked", includes);
+                
+                if (currentLstBookedSlot.Any())
+                {
+                    return new ServiceResponse<string>
+                    {
+                        Message = "Chỗ đặt đã được đặt, vui lòng chọn chỗ khác.",
+                        StatusCode = 400,
+                        Success = true,
+                    };
+                }
+
                 var parkingSlot = await _parkingSlotRepository
                     .GetById(parkingSlotId);
-
+                
                 if (parkingSlot == null)
                 {
                     return new ServiceResponse<string>
@@ -173,14 +195,14 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     };
                 }
 
-                List<Expression<Func<ParkingHasPrice, object>>> includes = new List<Expression<Func<ParkingHasPrice, object>>>
+                List<Expression<Func<ParkingHasPrice, object>>> includess = new List<Expression<Func<ParkingHasPrice, object>>>
                 {
                     x => x.ParkingPrice!,
                     x => x.ParkingPrice!.Traffic!
                 };
 
                 var parkingHasPrice = await _parkingHasPriceRepository
-                        .GetAllItemWithCondition(x => x.ParkingId == parkingId, includes);
+                        .GetAllItemWithCondition(x => x.ParkingId == parkingId, includess);
 
                 var appliedParkingPriceId = parkingHasPrice
                     .Where(x => x.ParkingPrice!.Traffic!.TrafficId == trafficid)
@@ -215,20 +237,23 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 foreach (var timeSlot in timeSlotsBooking)
                 {
                     bookingDetails.Add(new BookingDetails{ BookingId = entity.BookingId, TimeSlotId = timeSlot.TimeSlotId });
-                    //timeSlot.Status = TimeSlotStatus.Booked.ToString();
+                    timeSlot.Status = TimeSlotStatus.Booked.ToString();
                 }
 
-                //await _timeSlotRepository.Save();
+                await _timeSlotRepository.Save();
                 await _bookingDetailsRepository.AddRange(bookingDetails);
                 var transaction = new Transaction
                 {
                     Price = expectedPrice,
-                    Status = UNPAID,
+                    Status = BookingPaymentStatus.Chua_thanh_toan.ToString(),
                     PaymentMethod = paymentMethod,
-                    WalletId = user.Wallet.WalletId,
                     BookingId = entity.BookingId
                 };
 
+                if (request.BookingDto.PaymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc))
+                {
+                    transaction.WalletId = user.Wallet.WalletId;
+                }
                 await _transactionRepository.Insert(transaction);
 
                 var titleManager = _configuration.GetSection("MessageTitle_Manager").GetSection("Success").Value;

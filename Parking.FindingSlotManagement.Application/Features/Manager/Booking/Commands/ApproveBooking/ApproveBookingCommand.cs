@@ -10,6 +10,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
     public class ApproveBookingCommand : IRequest<ServiceResponse<string>>
     {
         public int BookingId { get; set; }
+        // lấy trong JWT
+        public int BusinessId { get; set; }
         /*public DateTime CheckInTime { get; set; } = DateTime.UtcNow.AddHours(7);*/
     }
 }
