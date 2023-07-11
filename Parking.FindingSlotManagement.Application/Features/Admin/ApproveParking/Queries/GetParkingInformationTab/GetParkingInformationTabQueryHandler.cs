@@ -15,22 +15,19 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
         private readonly IFieldWorkParkingImgRepository _fieldWorkParkingImgRepository;
         private readonly ITimeSlotRepository _timeSlotRepository;
         private readonly IParkingSlotRepository _parkingSlotRepository;
-        private readonly IFloorRepository _floorRepository;
         private readonly IParkingHasPriceRepository _parkingHasPriceRepository;
 
         public GetParkingInformationTabQueryHandler(
             IParkingRepository parkingRepository, 
             IFieldWorkParkingImgRepository fieldWorkParkingImgRepository, 
             ITimeSlotRepository timeSlotRepository, 
-            IParkingSlotRepository parkingSlotRepository, 
-            IFloorRepository floorRepository, 
+            IParkingSlotRepository parkingSlotRepository,
             IParkingHasPriceRepository parkingHasPriceRepository)
         {
             _parkingRepository = parkingRepository;
             _fieldWorkParkingImgRepository = fieldWorkParkingImgRepository;
             _timeSlotRepository = timeSlotRepository;
             _parkingSlotRepository = parkingSlotRepository;
-            _floorRepository = floorRepository;
             _parkingHasPriceRepository = parkingHasPriceRepository;
         }
         public async Task<ServiceResponse<GetParkingInformationTabResponse>> Handle(GetParkingInformationTabQuery request, CancellationToken cancellationToken)
