@@ -14,5 +14,7 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         Task<Booking> GetBookingIncludeTransaction(int bookingId);
         Task<Booking> GetBookingIncludeUser(int bookingId);
         Task<Booking> GetBookingIncludeParkingSlot (int bookingId);
+        Task<Booking> GetBookingIncludeTimeSlot(int bookingId);
+        Task<Booking> GetBookingInclude(int bookingId);
     }
 }

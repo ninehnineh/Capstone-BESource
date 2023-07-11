@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Models.VehicleInfor
 {
-    public class VehicleInforDTO
+    public class BookingVehicleInforDTO
     {
         public string? LicensePlate { get; set; }
         public string? VehicleName { get; set; }

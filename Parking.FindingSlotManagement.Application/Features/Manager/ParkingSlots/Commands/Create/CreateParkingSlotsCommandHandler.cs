@@ -75,8 +75,8 @@ public class CreateParkingSlotsCommandHandler : IRequestHandler<CreateParkingSlo
                     StatusCode = 400
                 };
             }
-            RecurringJob.AddOrUpdate<IServiceManagement>(x => x.DeleteTimeSlotIn1Week(), Cron.Weekly);
-            RecurringJob.AddOrUpdate<IServiceManagement>(x => x.AddTimeSlotInFuture((int)request.FloorId), Cron.Weekly);
+            RecurringJob.AddOrUpdate<IServiceManagement>("DeleteTimeSlotIn1Week", x => x.DeleteTimeSlotIn1Week(), Cron.Weekly);
+            RecurringJob.AddOrUpdate<IServiceManagement>("AddTimeSlotInFuture", x => x.AddTimeSlotInFuture((int)request.FloorId), Cron.Weekly);
 
             return new ServiceResponse<int>
             {

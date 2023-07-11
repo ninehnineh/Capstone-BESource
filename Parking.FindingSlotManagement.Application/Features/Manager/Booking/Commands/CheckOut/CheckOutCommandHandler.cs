@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Models.PushNotification;
-using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Domain.Enum;
 using System.Linq.Expressions;
 
@@ -12,40 +11,40 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
     public class CheckOutCommandHandler : IRequestHandler<CheckOutCommand, ServiceResponse<string>>
     {
         private readonly IBookingRepository _bookingRepository;
-        private readonly IParkingPriceRepository _parkingPriceRepository;
-        private readonly IParkingHasPriceRepository _parkingHasPriceRepository;
-        private readonly ITimelineRepository _timelineRepository;
-        private readonly IVehicleInfoRepository _vehicleInfoRepository;
         private readonly IFireBaseMessageServices _fireBaseMessageServices;
         private readonly IConfiguration _configuration;
+        private readonly ITransactionRepository _transactionRepository;
+        private readonly IWalletRepository _walletRepository;
+        private readonly IParkingRepository _parkingRepository;
 
         public CheckOutCommandHandler(IBookingRepository bookingRepository,
-            IParkingPriceRepository parkingPriceRepository,
-            IParkingHasPriceRepository parkingHasPriceRepository,
-            ITimelineRepository timelineRepository,
-            IVehicleInfoRepository vehicleInfoRepository,
             IFireBaseMessageServices fireBaseMessageServices,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ITransactionRepository transactionRepository,
+            IWalletRepository walletRepository,
+            IParkingRepository parkingRepository)
         {
             _bookingRepository = bookingRepository;
-            _parkingPriceRepository = parkingPriceRepository;
-            _parkingHasPriceRepository = parkingHasPriceRepository;
-            _timelineRepository = timelineRepository;
-            _vehicleInfoRepository = vehicleInfoRepository;
             _fireBaseMessageServices = fireBaseMessageServices;
             _configuration = configuration;
+            _transactionRepository = transactionRepository;
+            _walletRepository = walletRepository;
+            _parkingRepository = parkingRepository;
         }
 
         public async Task<ServiceResponse<string>> Handle(CheckOutCommand request, CancellationToken cancellationToken)
         {
             var checkOutTime = DateTime.UtcNow.AddHours(7);
             var parkingId = request.ParkingId;
+            var paymentMethod = request.PaymentMethod;
+            //var moneyCustomerMustPayAfterCheckOut = request.TotalPrice;
             var bookingId = request.BookingId;
 
             try
             {
+
                 var booking = await _bookingRepository
-                    .GetBookingIncludeTransaction(bookingId);
+                    .GetBookingIncludeParkingSlot(bookingId);
 
                 if (booking == null)
                 {
@@ -57,94 +56,94 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                     };
                 }
 
-                var vehicleInfoId = booking.VehicleInforId;
-                var bookingEndtime = booking.EndTime;
-
-                booking.CheckoutTime = checkOutTime;
-
-                await _bookingRepository.Save();
-
-
-                var checkInTimeHour = booking.CheckinTime.Value.Date.AddHours(booking.CheckinTime.Value.Hour);
-
-                var includes = new List<Expression<Func<Domain.Entities.ParkingHasPrice, object>>>
+                var includesss = new List<Expression<Func<Domain.Entities.Parking, object>>>
                 {
-                    x => x.ParkingPrice!,
-                    x => x.ParkingPrice!.Traffic!
+                    x => x.BusinessProfile.User.Wallet
                 };
 
-                var parkingHasPrice = await _parkingHasPriceRepository
-                        .GetAllItemWithCondition(x => x.ParkingId == parkingId, includes);
+                var moneyCustomerMustPayAfterCheckOut = booking.UnPaidMoney;
 
-                var vehicle = await _vehicleInfoRepository.GetById(vehicleInfoId);
-                var trafficId = vehicle.TrafficId;
+                var parking = await _parkingRepository
+                    .GetItemWithCondition(x => x.ParkingId == parkingId, includesss, false);
 
-                var appliedParkingPriceId = parkingHasPrice
-                    .Where(x => x.ParkingPrice!.Traffic!.TrafficId == trafficId)
-                    .FirstOrDefault()!.ParkingPriceId;
-
-                var parkingPrice = await _parkingPriceRepository.GetById(appliedParkingPriceId!);
-
-                var timeLines = await _timelineRepository
-                    .GetAllItemWithCondition(x => x.ParkingPriceId == appliedParkingPriceId);
-
-
-                var penaltyPriceStepTime = parkingPrice.PenaltyPriceStepTime;
-                var penaltyPrice = parkingPrice.PenaltyPrice;
-
-                if (checkOutTime <= bookingEndtime)
+                if (parking == null)
                 {
-                    booking.Status = BookingStatus.Check_Out.ToString();
-                    //booking.ActualPrice = booking.TotalPrice;
-                    if (booking.Transactions.First().PaymentMethod.Equals(Domain.Enum.PaymentMethod.thanh_toan_online.ToString()))
+                    return new ServiceResponse<string>
                     {
-                        booking.Status = BookingStatus.Done.ToString();
-                        await _bookingRepository.Save();
-                        return new ServiceResponse<string>
-                        {
-                            StatusCode = 204,
-                            Message = "Thành công",
-                            Success = true,
-                        };
-                    }
-                    else
-                    {
-                        await _bookingRepository.Save();
-                    }
-
+                        Message = "Bãi xe không tồn tại",
+                        StatusCode = 200,
+                        Success = false
+                    };
                 }
-                else if (checkOutTime > bookingEndtime)
+
+                // Đã thanh toán trước, vào bãi, ra bãi đúng giờ, chỉ có một transaction
+                if (moneyCustomerMustPayAfterCheckOut == 0 &&
+                    string.IsNullOrEmpty(paymentMethod))
                 {
-                    //actualPrice += (decimal)penaltyPrice;
-                    var actualPriceLate = booking.TotalPrice;
-                    if (booking.Transactions.First().Equals(Domain.Enum.PaymentMethod.thanh_toan_online.ToString()))
-                    {
-                        actualPriceLate = 0;
-                    }
 
-                    if (penaltyPriceStepTime == 0)
-                    {
-                        actualPriceLate += (decimal)penaltyPrice;
-                    }
-                    else
-                    {
-                        if ((checkOutTime - bookingEndtime) <= TimeSpan.FromHours((double)penaltyPriceStepTime))
-                        {
-                            actualPriceLate += (decimal)penaltyPrice;
-                        }
-                        else
-                        {
-                            actualPriceLate += (decimal)penaltyPrice;
-                            var penaltyTime = checkOutTime.Hour - bookingEndtime.Value.Hour;
-                            var step = penaltyTime / penaltyPriceStepTime;
-                            actualPriceLate += ((decimal)step * (decimal)penaltyPrice);
-                        }
-                    }
-
-                    booking.Status = BookingStatus.Check_Out.ToString();
-                    //booking.ActualPrice = actualPriceLate;
+                    booking.Status = BookingStatus.Done.ToString();
                     await _bookingRepository.Save();
                 }
+
+                // Có nhiều transactions, và thanh toán online qua ví
+                else if (moneyCustomerMustPayAfterCheckOut > 0 &&
+                    paymentMethod.Equals(PaymentMethod.thanh_toan_online.ToString()))
+                {
+
+                    if (booking.User.Wallet.Balance < booking.TotalPrice)
+                    {
+                        return new ServiceResponse<string>
+                        {
+                            Message = "Số dư không đủ, vui lòng nạp thêm.",
+                        };
+                    }
+
+                    booking.User.Wallet.Balance -= (decimal)moneyCustomerMustPayAfterCheckOut;
+                    parking.BusinessProfile.User.Wallet.Balance += (decimal)moneyCustomerMustPayAfterCheckOut;
+                    await _walletRepository.Save();
+
+                    var transactions = booking.Transactions;
+
+                    var sumPrice = 0M;
+                    foreach (var transaction in transactions)
+                    {
+                        transaction.Status = BookingPaymentStatus.Da_thanh_toan.ToString();
+                        transaction.PaymentMethod = PaymentMethod.thanh_toan_online.ToString();
+                        transaction.WalletId = booking.User.Wallet.WalletId;
+                        sumPrice += transaction.Price;
+                    }
+                    await _transactionRepository.Save();
+
+                    booking.Status = BookingStatus.Done.ToString();
+                    booking.TotalPrice = sumPrice;
+                    booking.UnPaidMoney = 0;
+                    await _bookingRepository.Save();
+                }
+
+                // Có nhiều transactions, và thanh toán tiền mặt
+                else if (moneyCustomerMustPayAfterCheckOut > 0 &&
+                    paymentMethod.Equals(PaymentMethod.thanh_toan_tien_mat.ToString()))
+                {
+                    var transactions = booking.Transactions;
+
+                    var sumPrice = 0M;
+                    foreach (var transaction in transactions)
+                    {
+                        if (transaction.Status == BookingPaymentStatus.Chua_thanh_toan.ToString())
+                        {
+                            transaction.Status = BookingPaymentStatus.Da_thanh_toan.ToString();
+                            transaction.PaymentMethod = PaymentMethod.thanh_toan_tien_mat.ToString();
+                        }
+                        sumPrice += transaction.Price;
+                    }
+                    await _transactionRepository.Save();
+
+                    booking.Status = BookingStatus.Done.ToString();
+                    booking.TotalPrice = sumPrice;
+                    booking.UnPaidMoney = 0;
+                    await _bookingRepository.Save();
+                }
+
 
                 var titleCustomer = _configuration.GetSection("MessageTitle_Customer")
                     .GetSection("CheckOut").Value;
