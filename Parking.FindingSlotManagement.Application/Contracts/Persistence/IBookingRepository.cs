@@ -23,5 +23,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         Task<decimal> GetRevenueByParkingIdMethod(int parkingId);
         Task<int> GetTotalNumberOfOrdersInCurrentDayByParkingIdMethod(int parkingId);
         Task<int> GetTotalWaitingOrdersByParkingIdMethod(int parkingId);
+        Task<Booking> GetBookingDetailsByBookingIdMethod(int bookingId);
     }
 }

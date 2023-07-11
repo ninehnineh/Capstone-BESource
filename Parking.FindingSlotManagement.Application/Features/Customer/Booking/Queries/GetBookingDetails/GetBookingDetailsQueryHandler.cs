@@ -1,4 +1,4 @@
-/*using AutoMapper;
+using AutoMapper;
 using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Models.User;
@@ -9,50 +9,46 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-//namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetBookingDetails
-//{
-//    public class GetBookingDetailsQueryHandler : IRequestHandler<GetBookingDetailsQuery, ServiceResponse<GetBookingDetailsResponse>>
-//    {
-//        private readonly IBookingRepository _bookingRepository;
-//        private readonly IMapper _mapper;
+namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetBookingDetails
+{
+    public class GetBookingDetailsQueryHandler : IRequestHandler<GetBookingDetailsQuery, ServiceResponse<GetBookingDetailsResponse>>
+    {
+        private readonly IBookingRepository _bookingRepository;
+        private readonly IMapper _mapper;
 
-//        public GetBookingDetailsQueryHandler(IBookingRepository bookingRepository, IMapper mapper)
-//        {
-//            _bookingRepository = bookingRepository;
-//            _mapper = mapper;
-//        }
-//        public async Task<ServiceResponse<GetBookingDetailsResponse>> Handle(GetBookingDetailsQuery request, CancellationToken cancellationToken)
-//        {
-//            try
-//            {
-//                var includes = new List<Expression<Func<Domain.Entities.Booking, object>>>
-//                {
-//                    x => x.User,
-//                    x => x.VehicleInfor,
-//                    x => x.ParkingSlot,
-//                    x => x.ParkingSlot.Floor,
-//                };
+        public GetBookingDetailsQueryHandler(IBookingRepository bookingRepository, IMapper mapper)
+        {
+            _bookingRepository = bookingRepository;
+            _mapper = mapper;
+        }
+        public async Task<ServiceResponse<GetBookingDetailsResponse>> Handle(GetBookingDetailsQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
 
-//                var booking = await _bookingRepository
-//                    .GetItemWithCondition(x => x.BookingId == request.Bookingid, includes);
+                var booking = await _bookingRepository
+                    .GetBookingDetailsByBookingIdMethod(request.BookingId);
 
-//                if (booking == null)
-//                {
-//                    return new ServiceResponse<GetBookingDetailsResponse>
-//                    {
-//                        Message = "Đơn đặt không tồn tại",
-//                        StatusCode = 200,
-//                        Success = true,
-//                    };
-//                }
+                if (booking == null)
+                {
+                    return new ServiceResponse<GetBookingDetailsResponse>
+                    {
+                        Message = "Đơn đặt không tồn tại",
+                        StatusCode = 200,
+                        Success = true,
+                    };
+                }
 
-//                var response = new GetBookingDetailsResponse
-//                {
-//                    BookingDetails = _mapper.Map<BookingDetailsDto>(booking),
-//                    User = _mapper.Map<UserBookingDto>(booking.User),
-//                    VehicleInfor = _mapper.Map<VehicleInforDto>(booking.VehicleInfor),
-//                    ParkingSlot = _mapper.Map<BookedParkingSlotDto>(booking.ParkingSlot)
-//                };
+                var response = new GetBookingDetailsResponse
+                {
+                    BookingDetails = _mapper.Map<BookingDetailsDto>(booking),
+                    User = _mapper.Map<UserBookingDto>(booking.User),
+                    VehicleInfor = _mapper.Map<VehicleInforDto>(booking.VehicleInfor),
+                    ParkingSlotWithBookingDetailDto = _mapper.Map<ParkingSlotWithBookingDetailDto>(booking.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot),
+                    FloorWithBookingDetailDto = _mapper.Map<FloorWithBookingDetailDto>(booking.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor),
+                    ParkingWithBookingDetailDto = _mapper.Map<ParkingWithBookingDetailDto>(booking.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.Parking),
+                    TransactionWithBookingDetailDtos = _mapper.Map<List<TransactionWithBookingDetailDto>>(booking.Transactions)
+                };
 
                 return new ServiceResponse<GetBookingDetailsResponse>
                 {
@@ -69,4 +65,4 @@ using System.Threading.Tasks;
         }
     }
 }
-*/
+

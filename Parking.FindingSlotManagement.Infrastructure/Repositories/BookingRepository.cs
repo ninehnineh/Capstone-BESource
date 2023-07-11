@@ -258,5 +258,32 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             }
             return booking.Count();
         }
+
+        public async Task<Booking> GetBookingDetailsByBookingIdMethod(int bookingId)
+        {
+            try
+            {
+                var booking = await _dbContext.Bookings
+                                                .Include(x => x.User)
+                                                .Include(x => x.Transactions)
+                                                .Include(x => x.VehicleInfor)
+                                                .Include(x => x.BookingDetails)
+                                                    .ThenInclude(x => x.TimeSlot)
+                                                    .ThenInclude(x => x.Parkingslot)
+                                                    .ThenInclude(x => x.Floor)
+                                                    .ThenInclude(x => x.Parking)
+                                                .FirstOrDefaultAsync(x => x.BookingId == bookingId);
+                if(booking == null)
+                {
+                    return null;
+                }
+                return booking;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

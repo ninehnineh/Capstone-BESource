@@ -162,6 +162,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.BusinessProfileName, act => act.MapFrom(obj => obj.BusinessProfile.Name))
                 .ForMember(dto => dto.ApproveParkingStatus, act => act.MapFrom(obj => obj.ApproveParkings.FirstOrDefault().Status))
                 .ReverseMap();
+            CreateMap<Domain.Entities.Parking, ParkingWithBookingDetailDto>().ReverseMap();
             #endregion
 
             #region StaffParking Mapping
@@ -172,6 +173,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<Floor, GetListFloorResponse>().ReverseMap();
             CreateMap<Floor, FloorDto>().ReverseMap();
             CreateMap<Floor, GetListFloorByParkingIdResponse>().ReverseMap();
+            CreateMap<Floor, FloorWithBookingDetailDto>().ReverseMap();
             #endregion
 
             #region TimeLine Mapping
@@ -233,11 +235,11 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #region Parkingslots Mapping
             CreateMap<ParkingSlot, CreateParkingSlotsCommand>().ReverseMap();
             CreateMap<ParkingSlot, GetAvailableSlotsResponse>().ReverseMap();
-            CreateMap<ParkingSlot, BookedParkingSlotDto>().ReverseMap();
             CreateMap<ParkingSlot, GetParkingSlotsResponse>().ReverseMap();
             CreateMap<ParkingSlot, GetListParkingSlotByFloorIdResponse>().ReverseMap();
             CreateMap<ParkingSlot, ParkingSlotsDto>().ReverseMap();
             CreateMap<ParkingSlot, ParkingSlotDto>().ReverseMap();
+            CreateMap<ParkingSlot, ParkingSlotWithBookingDetailDto>().ReverseMap();
             #endregion
 
             #region Timeline Mapping
@@ -275,6 +277,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #endregion
             #region Transaction Mapping
             CreateMap<Transaction, CreateNewTransactionCommand>().ReverseMap();
+            CreateMap<Transaction, TransactionWithBookingDetailDto>().ReverseMap();
             #endregion
 
             #region Fee Mapping
