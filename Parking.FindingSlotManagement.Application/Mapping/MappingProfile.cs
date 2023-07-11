@@ -13,7 +13,7 @@ using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficM
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Queries.GetListTraffic;
 using Parking.FindingSlotManagement.Application.Features.Admin.Traffics.TrafficManagement.Queries.GetTraffic;
 using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Commands.CreateNewVnPay;
-using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Queries.GetVnPayByBusinessId;
+using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Queries.GetVnPayByUserId;
 using Parking.FindingSlotManagement.Application.Features.Customer.FavoriteAddress.FavoriteAddressManagement.Commands.CreateNewFavoriteAddress;
 using Parking.FindingSlotManagement.Application.Features.Customer.FavoriteAddress.FavoriteAddressManagement.Queries.GetFavoriteAddressById;
 using Parking.FindingSlotManagement.Application.Features.Customer.FavoriteAddress.FavoriteAddressManagement.Queries.GetFavoriteAddressByUserId;
@@ -127,9 +127,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
 
             #region VnPay Mapping
             CreateMap<VnPay, CreateNewVnPayCommand>().ReverseMap();
-            //CreateMap<VnPay, GetVnPayByBusinessIdResponse>()
-            //    .ForMember(dto => dto.BusinessName, act => act.MapFrom(obj => obj.Business.Name))
-            //    .ReverseMap();
+            CreateMap<VnPay, GetVnPayByUserIdResponse>()
+                .ForMember(dto => dto.UserName, act => act.MapFrom(obj => obj.User.Name))
+                .ReverseMap();
             #endregion
 
             #region PayPal Mapping
