@@ -7,7 +7,7 @@ using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Commands.CreateNewVnPay;
 using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Commands.DeleteVnPay;
 using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Commands.UpdateVnPay;
-using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Queries.GetVnPayByBusinessId;
+using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Queries.GetVnPayByUserId;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using System.Net;
 
@@ -127,15 +127,15 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Manager, Admin
         /// </summary>
-        [HttpGet("{businessId}", Name = "GetVnpayInforByManagerId")]
+        [HttpGet("{userId}", Name = "GetVnpayInforByManagerId")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ServiceResponse<GetVnPayByBusinessIdResponse>>> GetVnpayInforByManagerId(int businessId)
+        public async Task<ActionResult<ServiceResponse<GetVnPayByUserIdResponse>>> GetVnpayInforByManagerId(int userId)
         {
             try
             {
-                var query = new GetVnPayByBusinessIdQuery() { BusinessId = businessId };
+                var query = new GetVnPayByUserIdQuery() { UserId = userId };
                 var res = await _mediator.Send(query);
                 if (res.Message != "Thành công")
                 {

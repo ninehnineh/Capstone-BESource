@@ -15,22 +15,21 @@ public class GetBookingDetailsResponse
     public BookingDetailsDto BookingDetails { get; set; }
     public UserBookingDto? User { get; set; }
     public VehicleInforDto? VehicleInfor { get; set; }
-    public BookedParkingSlotDto ParkingSlot { get; set; }
+    public ParkingWithBookingDetailDto ParkingWithBookingDetailDto { get; set; }
+    public ParkingSlotWithBookingDetailDto ParkingSlotWithBookingDetailDto { get; set; }
+    public FloorWithBookingDetailDto FloorWithBookingDetailDto { get; set; }
+    public List<TransactionWithBookingDetailDto> TransactionWithBookingDetailDtos { get; set; }
 }
 
 public class BookingDetailsDto
 {
-    public DateTime StartTime { get; set; }
-    public DateTime DateBook { get; set; }
     public int BookingId { get; set; }
+    public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public decimal? ActualPrice { get; set; }
     public string? Status { get; set; }
     public string? GuestName { get; set; }
     public string? GuestPhone { get; set; }
     public decimal? TotalPrice { get; set; }
-    public string? PaymentMethod { get; set; }
-    public string? TmnCodeVnPay { get; set; }
     public string? QRImage { get; set; }
 }
 public class VehicleInforDto
@@ -42,10 +41,26 @@ public class VehicleInforDto
 
 }
 
-public class BookedParkingSlotDto
+public class ParkingWithBookingDetailDto
+{
+    public int ParkingId { get; set; }
+    public string? Name { get; set; }
+    public string? Address { get; set; }
+}
+public class ParkingSlotWithBookingDetailDto
 {
     public int ParkingSlotId { get; set; }
     public string? Name { get; set; }
-    public TrafficDto? Traffic { get; set; }
-    public FloorDto? Floor { get; set; }
+}
+public class FloorWithBookingDetailDto
+{
+    public int FloorId { get; set; }
+    public string? FloorName { get; set; }
+}
+public class TransactionWithBookingDetailDto
+{
+    public int TransactionId { get; set; }
+    public decimal Price { get; set; }
+    public string? Status { get; set; }
+    public string? PaymentMethod { get; set; }
 }

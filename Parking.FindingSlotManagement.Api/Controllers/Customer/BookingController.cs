@@ -266,7 +266,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
         }
 
 
-        [HttpGet("getbooked-booking")]
+        [HttpGet("getbooked-booking-detail")]
         public async Task<ActionResult<ServiceResponse<GetBookingDetailsResponse>>> GetBookingDetails(
             [FromQuery] GetBookingDetailsQuery query)
         {
