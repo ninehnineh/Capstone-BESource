@@ -128,7 +128,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
         }
 
-        public void AutoCancelBookingWhenOutOfEndTimeBooking(int bookingId, int business_Representatives)
+        public void AutoCancelBookingWhenOutOfEndTimeBooking(int bookingId)
         {
             try
             {

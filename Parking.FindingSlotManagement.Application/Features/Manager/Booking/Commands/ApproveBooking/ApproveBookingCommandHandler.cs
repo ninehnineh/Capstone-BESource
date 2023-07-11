@@ -78,7 +78,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                 else if (isPrePaid)
                 {
                     var timeToCancel = booking.EndTime.Value;
-                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOutOfEndTimeBooking(bookingId, business_Representatives), timeToCancel);
+                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOutOfEndTimeBooking(bookingId), timeToCancel);
                 }
 
 
