@@ -59,6 +59,9 @@ namespace Parking.FindingSlotManagement.Infrastructure
             services.AddScoped<IFieldWorkParkingImgRepository, FieldWorkParkingImgRepository>();
             services.AddScoped<IBookingDetailsRepository, BookingDetailsRepository>();
             services.AddScoped<IFeeRepository, FeeRepository>();
+=======
+            services.AddScoped<IBookingDetailsRepository, BookingDetailsRepository>();
+>>>>>>> Stashed changes
 
             FirebaseApp.Create(new AppOptions
             {
