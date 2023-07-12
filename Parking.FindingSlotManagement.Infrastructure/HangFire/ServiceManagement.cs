@@ -82,8 +82,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     .FirstOrDefault(x => x.BookingId == bookingId);
 
                 var guestArrived = bookedBooking.CheckinTime.HasValue;
+                var hitAllowedDelayTime = DateTime.Now >= bookedBooking.StartTime.AddHours(lateHoursAllowed);
 
-                if (!guestArrived)
+                if (!guestArrived && hitAllowedDelayTime)
                 {
                     bookedBooking.Status = BookingStatus.Cancel.ToString();
                     bookedBooking.Transactions.First().Status = BookingPaymentStatus.Huy.ToString();
@@ -97,7 +98,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
 
                     // bắn message, đơn của mày đã bị hủy + lý do
 
-                    //PushNotiToCustomerWhenOverLateAllowedTime(lateHoursAllowed, bookedBooking);
+                    PushNotiToCustomerWhenOverLateAllowedTime(lateHoursAllowed, bookedBooking);
 
                     _context.SaveChanges();
                 }
@@ -138,8 +139,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                         .FirstOrDefault(x => x.BookingId == bookingId);
 
                 var guestArrived = bookedBooking.CheckinTime.HasValue;
-                var isOutOfEndTimeBooking = DateTime.UtcNow.AddHours(7) >= bookedBooking.EndTime.Value;
-;
+                var isOutOfEndTimeBooking = bookedBooking.EndTime <= DateTime.Now;
+
                 if (!guestArrived && isOutOfEndTimeBooking)
                 {
                     bookedBooking.Status = BookingStatus.Cancel.ToString();
@@ -152,7 +153,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                         bookingDetail.TimeSlot.Status = TimeSlotStatus.Free.ToString();
                     }
                     // bắn message, đơn của mày đã bị hủy + lý do
-                    //PushNotiToCustomerWhenCustomerNotArrive(bookedBooking);
+                    PushNotiToCustomerWhenCustomerNotArrive(bookedBooking);
                     _context.SaveChanges();
                 }
                 else
