@@ -43,7 +43,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
         public async Task<ServiceResponse<string>> Handle(ApproveBookingCommand request, CancellationToken cancellationToken)
         {
             var bookingId = request.BookingId;
-            var business_Representatives = request.BusinessId;
             try
             {
 
