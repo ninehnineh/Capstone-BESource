@@ -14,7 +14,7 @@ using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 {
-    [Authorize(Roles = "Manager")]
+    
     [Route("api/floors")]
     [ApiController]
     public class FloorController : ControllerBase
@@ -53,8 +53,10 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
             }
         }
         /// <summary>
-        /// API For Manager
+        /// API For Manager, Customer
         /// </summary>
+        /// 
+        [Authorize(Roles = "Manager,Customer")]
         [HttpGet("parking/{parkingId}", Name = "GetListFloorByParkingId")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -82,6 +84,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remarks>
         /// SignalR: LoadFloorInManager
         /// </remarks>
+        /// 
+        [Authorize(Roles = "Manager")]
         [HttpPost("floor", Name = "CreateNewFloor")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
@@ -116,6 +120,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remarks>
         /// SignalR: LoadFloorInManager
         /// </remarks>
+        /// 
+        [Authorize(Roles = "Manager")]
         [HttpPut("floor/{floorId}", Name = "UpdateFloor")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -150,6 +156,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remarks>
         /// SignalR: LoadFloorInManager
         /// </remarks>
+        /// 
+        [Authorize(Roles = "Manager")]
         [HttpDelete("floor/{floorId}", Name = "DisableOrEnableFloor")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]

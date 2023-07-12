@@ -8,12 +8,13 @@ using Parking.FindingSlotManagement.Application.Features.Admin.BusinessProfile.B
 using Parking.FindingSlotManagement.Application.Features.Admin.BusinessProfile.BusinessProfileManagement.Queries.GetBusinessProfileById;
 using Parking.FindingSlotManagement.Application.Features.Manager.BusinessProfile.BusinessProfileManagement.Commands.CreateNewBusinessProfile;
 using Parking.FindingSlotManagement.Application.Features.Manager.BusinessProfile.BusinessProfileManagement.Queries.GetBusinessProfileByUserId;
+using Parking.FindingSlotManagement.Application.Features.Manager.BusinessProfile.BusinessProfileManagement.Queries.GetInforOfBusinessByManagerId;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 {
-    [Authorize(Roles = "Manager")]
+    
     [Route("api/business-profile")]
     [ApiController]
     public class BusinessProfileController : ControllerBase
@@ -32,6 +33,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remarks>
         /// SignalR: LoadBusinessProfileInAdmin
         /// </remarks>
+        /// 
+        [Authorize(Roles = "Manager")]
         [HttpPost( Name = "CreateNewBusinessProfile")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
@@ -63,6 +66,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <summary>
         /// API For Manager
         /// </summary>
+        /// 
+        [Authorize(Roles = "Manager")]
         [HttpGet("/user/{userId}/business-profile",Name = "GetBusinessProfileByUserId")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -84,6 +89,31 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
                 return StatusCode(500, "Internal server error: "+ex.Message);
             }
         }
-        
+        /// <summary>
+        /// API For Manager
+        /// </summary>
+        /// 
+        [Authorize(Roles = "Manager,Admin")]
+        [HttpGet("business-profile/{managerId}", Name = "GetInforOfBusinessByManagerId")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<GetInforOfBusinessByManagerIdResponse>>> GetInforOfBusinessByManagerId(int managerId)
+        {
+            try
+            {
+                var query = new GetInforOfBusinessByManagerIdQuery { ManagerId = managerId };
+                var res = await _mediator.Send(query);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
     }
 }

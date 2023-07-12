@@ -79,7 +79,9 @@ using Parking.FindingSlotManagement.Application.Features.Customer.ParkingNearest
 using Parking.FindingSlotManagement.Application.Features.Admin.Fee.Commands.CreateNewFee;
 using Parking.FindingSlotManagement.Application.Features.Admin.Fee.Queries.GetListFee;
 using Parking.FindingSlotManagement.Application.Features.Admin.Fee.Queries.GetFeeById;
-
+using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.GetAllCustomer.Queries.GetListCustomer;
+using Parking.FindingSlotManagement.Application.Features.Manager.BusinessProfile.BusinessProfileManagement.Queries.GetInforOfBusinessByManagerId;
+using Parking.FindingSlotManagement.Application.Features.Admin.ParkingManagement.Queries.GetAllParkingForAdmin;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -110,6 +112,17 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember<string>(dto => dto.ParkingName, act => act.MapFrom<string>(obj => obj.Parking.Name))
                 .ReverseMap();
             CreateMap<User, GetCustomerProfileByIdResponse>().ReverseMap();
+            CreateMap<User, GetListCustomerResponse>().ReverseMap();
+            CreateMap<User, GetInforOfBusinessByManagerIdResponse>()
+                .ForMember(dto => dto.RoleName, act => act.MapFrom(obj => obj.Role.Name))
+                .ForMember(dto => dto.BusinessProfileId, act => act.MapFrom(obj => obj.BusinessProfile.BusinessProfileId))
+                .ForMember(dto => dto.BusinessProfileName, act => act.MapFrom(obj => obj.BusinessProfile.Name))
+                .ForMember(dto => dto.Address, act => act.MapFrom(obj => obj.BusinessProfile.Address))
+                .ForMember(dto => dto.FrontIdentification, act => act.MapFrom(obj => obj.BusinessProfile.FrontIdentification))
+                .ForMember(dto => dto.BackIdentification, act => act.MapFrom(obj => obj.BusinessProfile.BackIdentification))
+                .ForMember(dto => dto.BusinessLicense, act => act.MapFrom(obj => obj.BusinessProfile.BusinessLicense))
+                .ForMember(dto => dto.Type, act => act.MapFrom(obj => obj.BusinessProfile.Type))
+                .ReverseMap();
             #endregion
 
             #region Traffic Mapping
@@ -167,6 +180,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.ApproveParkingStatus, act => act.MapFrom(obj => obj.ApproveParkings.FirstOrDefault().Status))
                 .ReverseMap();
             CreateMap<Domain.Entities.Parking, ParkingWithBookingDetailDto>().ReverseMap();
+            CreateMap<Domain.Entities.Parking, GetAllParkingForAdminResponse>().ReverseMap();
             #endregion
 
             #region StaffParking Mapping
