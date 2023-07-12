@@ -71,12 +71,12 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
 
                 if (isPostPaid)
                 {
-                    var timeToCancel = booking.StartTime.AddHours(1);
+                    var timeToCancel = booking.StartTime.AddHours(1) - DateTime.UtcNow.AddHours(7);
                     BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(bookingId), timeToCancel);
                 }
                 else if (isPrePaid)
                 {
-                    var timeToCancel = booking.EndTime.Value;
+                    var timeToCancel = booking.EndTime.Value - DateTime.UtcNow.AddHours(7);
                     BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOutOfEndTimeBooking(bookingId), timeToCancel);
                 }
 
