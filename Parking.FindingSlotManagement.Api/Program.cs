@@ -35,7 +35,7 @@ builder.Services.AddHangfire(hangfire =>
                  builder.Configuration.GetConnectionString("DefaultConnection"));
 
 });
-builder.Services.AddHangfireServer();
+
 builder.Services.AddTransient<IServiceManagement, ServiceManagement>();
 //For Register MiddleWare
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, AuthorizationMiddlewareHandlerService>();
@@ -144,6 +144,19 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
     endpoints.MapHub<MessageHub>("/parkz");
 });
-app.UseHangfireDashboard();
+var options = new DashboardOptions
+{
+    Authorization = new[] {
+                    new DashboardAuthorization(new[]
+                    {
+                        new HangfireUserCredentials
+                        {
+                            Username = "admin",
+                            Password = "123456"
+                        }
+                    })
+                }
+};
+app.UseHangfireDashboard("/hangfire", options);
 app.MapHangfireDashboard();
 app.Run();
