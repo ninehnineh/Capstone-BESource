@@ -87,6 +87,7 @@ using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Qu
 using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.GetAllCustomer.Queries.GetCustomerById;
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetApproveParkingById;
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetListParkingWaitingToAccept;
+using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetListParkingNewWNoApprove;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -189,6 +190,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ReverseMap();
             CreateMap<Domain.Entities.Parking, ParkingWithBookingDetailDto>().ReverseMap();
             CreateMap<Domain.Entities.Parking, GetAllParkingForAdminResponse>().ReverseMap();
+            CreateMap<Domain.Entities.Parking, GetListParkingNewWNoApproveResponse>().ReverseMap();
             #endregion
 
             #region StaffParking Mapping

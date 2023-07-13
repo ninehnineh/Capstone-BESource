@@ -4,11 +4,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Parking.FindingSlotManagement.Application;
+using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetListParkingWaitingToAccept;
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Commands.CreateNewApproveParking;
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Commands.SendRequestApproveParking;
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Commands.UpdateApproveParking;
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetApproveParkingById;
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetListApproveParkingByParkingId;
+using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetListParkingNewWNoApprove;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using System.Net;
 
@@ -184,6 +186,34 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Staff
             }
             catch (Exception ex)
             {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// API For Staff,Admin
+        /// </summary>
+        /// 
+        [Authorize(Roles = "Staff,Admin")]
+        [HttpGet("new-parkings/do-not-have-approve", Name = "GetListParkingNewWNoApprove")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<GetListParkingNewWNoApproveResponse>>>> GetListParkingNewWNoApprove([FromQuery] int PageNo, [FromQuery] int PageSize)
+        {
+            try
+            {
+                var query = new GetListParkingNewWNoApproveQuery()
+                {
+                    PageNo = PageNo,
+                    PageSize = PageSize
+                };
+                var res = await _mediator.Send(query);
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
