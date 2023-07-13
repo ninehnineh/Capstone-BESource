@@ -13,7 +13,7 @@ using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 {
-    [Authorize(Roles = "Manager")]
+    
     [Route("api/parkingSlot")]
     [ApiController]
     public class ParkingSlotController : ControllerBase
@@ -31,6 +31,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <summary>
         /// API For Manager
         /// </summary>
+        /// 
+        [Authorize(Roles = "Manager,Admin")]
         [HttpGet("floor/{floorId}", Name = "GetListParkingSlotByFloorId")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -59,6 +61,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remark>SignalR: LoadParkingSlot</remark>
         /// <param name="command"></param>
         /// <returns></returns>
+        /// 
+        [Authorize(Roles = "Manager")]
         [HttpPost("create")]
         public async Task<ActionResult<ServiceResponse<int>>> Create([FromBody] CreateParkingSlotsCommand command)
         {
@@ -83,6 +87,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remarks>
         /// SignalR: LoadParkingSlot
         /// </remarks>
+        /// 
+        [Authorize(Roles = "Manager")]
         [HttpPut(Name = "UpdateParkingSlot")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
