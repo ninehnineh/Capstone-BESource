@@ -72,13 +72,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                 managerExist.ParkingId = parkingEntity.ParkingId;
 
                 await _userRepository.Save();
-                var ap = new Domain.Entities.ApproveParking
-                {
-                    ParkingId = parkingEntity.ParkingId,
-                    CreatedDate = DateTime.UtcNow.AddHours(7),
-                    Status = Domain.Enum.ApproveParkingStatus.Chờ_duyệt.ToString()
-                };
-                await _approveParkingRepository.Insert(ap);
                 return new ServiceResponse<int>
                 {
                     Data = parkingEntity.ParkingId,

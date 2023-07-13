@@ -15,5 +15,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.Staf
         public DateTime? DateOfBirth { get; set; }
         public bool? IsActive { get; set; }
         public string RoleName { get; set; }
+        public string? Phone { get; set; }
+        public string? Gender { get; set; }
     }
 }

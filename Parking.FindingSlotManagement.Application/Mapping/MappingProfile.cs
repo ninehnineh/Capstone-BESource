@@ -82,6 +82,8 @@ using Parking.FindingSlotManagement.Application.Features.Admin.Fee.Queries.GetFe
 using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.GetAllCustomer.Queries.GetListCustomer;
 using Parking.FindingSlotManagement.Application.Features.Manager.BusinessProfile.BusinessProfileManagement.Queries.GetInforOfBusinessByManagerId;
 using Parking.FindingSlotManagement.Application.Features.Admin.ParkingManagement.Queries.GetAllParkingForAdmin;
+using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Commands.CreateNewApproveParking;
+using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetListApproveParkingByParkingId;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -305,6 +307,13 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<Fee, CreateNewFeeCommand>().ReverseMap();
             CreateMap<Fee, GetListFeeResponse>().ReverseMap();
             CreateMap<Fee, GetFeeByIdResponse>().ReverseMap();
+            #endregion
+
+            #region ApproveParking
+            CreateMap<ApproveParking, CreateNewApproveParkingCommand>().ReverseMap();
+            CreateMap<ApproveParking, GetListApproveParkingByParkingIdRes>()
+                .ForMember(dto => dto.StaffName, act => act.MapFrom(obj => obj.User.Name))
+                .ReverseMap();
             #endregion
         }
     }
