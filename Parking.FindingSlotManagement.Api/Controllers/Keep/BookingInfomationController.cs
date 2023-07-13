@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿/*using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Parking.FindingSlotManagement.Application;
@@ -17,7 +17,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Keep
             _mediator = mediator;
         }
 
-        [HttpPost]
+        [HttpGet]
         public async Task<ActionResult<ServiceResponse<BookingInformationResponse>>> BookingInformation([FromQuery] BookingInformationCommand command)
         {
             try
@@ -36,3 +36,4 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Keep
         } 
     }
 }
+*/

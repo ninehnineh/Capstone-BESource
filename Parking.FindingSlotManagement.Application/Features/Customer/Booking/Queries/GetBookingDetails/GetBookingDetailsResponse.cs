@@ -14,7 +14,7 @@ public class GetBookingDetailsResponse
 {
     public BookingDetailsDto BookingDetails { get; set; }
     public UserBookingDto? User { get; set; }
-    public VehicleInforDto? VehicleInfor { get; set; }
+    public VehicleInforDtoos? VehicleInfor { get; set; }
     public ParkingWithBookingDetailDto ParkingWithBookingDetailDto { get; set; }
     public ParkingSlotWithBookingDetailDto ParkingSlotWithBookingDetailDto { get; set; }
     public FloorWithBookingDetailDto FloorWithBookingDetailDto { get; set; }
@@ -32,7 +32,7 @@ public class BookingDetailsDto
     public decimal? TotalPrice { get; set; }
     public string? QRImage { get; set; }
 }
-public class VehicleInforDto
+public class VehicleInforDtoos
 {
     public int VehicleInforId { get; set; }
     public string? LicensePlate { get; set; }
