@@ -22,26 +22,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
         {
             try
             {
-                var parkingExist = await _parkingRepository.GetById(request.ParkingId);
-                if (parkingExist == null)
-                {
-                    return new ServiceResponse<string>
-                    {
-                        Message = "Không tìm thấy bãi giữ xe.",
-                        StatusCode = 200,
-                        Success = true
-                    };
-                }
-                if (parkingExist.IsActive == true)
-                {
-                    return new ServiceResponse<string>
-                    {
-                        Message = "Bãi đã được duyệt, không thể thực hiện thao tác.",
-                        StatusCode = 400,
-                        Success = false
-                    };
-                }
-                var approveParking = await _approveParkingRepository.GetItemWithCondition(x => x.ParkingId == request.ParkingId, null, false);
+                var approveParking = await _approveParkingRepository.GetItemWithCondition(x => x.ApproveParkingId == request.ApproveParkingId, null, false);
                 if (approveParking == null)
                 {
                     return new ServiceResponse<string>
@@ -60,6 +41,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                         Success = false
                     };
                 }
+                var parkingExist = await _parkingRepository.GetById(approveParking.ParkingId);
                 parkingExist.IsActive = false;
                 await _parkingRepository.Save();
                 approveParking.Status = Domain.Enum.ApproveParkingStatus.Từ_chối.ToString();

@@ -97,17 +97,17 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
-        [HttpPut("request/accept/{parkingId}", Name = "AcceptParkingRequest")]
+        [HttpPut("request/accept/{approveParkingId}", Name = "AcceptParkingRequest")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<ServiceResponse<string>>> AcceptParkingRequest(int parkingId)
+        public async Task<ActionResult<ServiceResponse<string>>> AcceptParkingRequest(int approveParkingId)
         {
             try
             {
                 var command = new AcceptParkingRequestCommand()
                 {
-                    ParkingId = parkingId
+                    ApproveParkingId = approveParkingId
                 };
                 var res = await _mediator.Send(command);
                 if (res.Message != "Thành công")
@@ -125,17 +125,17 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
-        [HttpPut("request/decline/{parkingId}", Name = "DeclineParkingRequest")]
+        [HttpPut("request/decline/{approveParkingId}", Name = "DeclineParkingRequest")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<ServiceResponse<string>>> DeclineParkingRequest(int parkingId)
+        public async Task<ActionResult<ServiceResponse<string>>> DeclineParkingRequest(int approveParkingId)
         {
             try
             {
                 var command = new DeclineParkingRequestCommand()
                 {
-                    ParkingId = parkingId
+                    ApproveParkingId = approveParkingId
                 };
                 var res = await _mediator.Send(command);
                 if (res.Message != "Thành công")

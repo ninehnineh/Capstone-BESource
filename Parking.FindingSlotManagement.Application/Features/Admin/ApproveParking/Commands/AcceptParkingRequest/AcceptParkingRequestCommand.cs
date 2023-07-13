@@ -9,6 +9,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
 {
     public class AcceptParkingRequestCommand : IRequest<ServiceResponse<string>>
     {
-        public int ParkingId { get; set; }
+        public int ApproveParkingId { get; set; }
     }
 }

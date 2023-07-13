@@ -70,7 +70,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
                     };
                 }
                 var approveParkingEntity = _mapper.Map<Domain.Entities.ApproveParking>(request);
-                approveParkingEntity.Status = ApproveParkingStatus.Chờ_duyệt.ToString();
+                approveParkingEntity.Status = ApproveParkingStatus.Tạo_mới.ToString();
                 approveParkingEntity.CreatedDate = DateTime.UtcNow.AddHours(7);
                 await _approveParkingRepository.Insert(approveParkingEntity);
                 if(!request.Images.Any())
@@ -82,10 +82,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
                         StatusCode = 400
                     };
                 }
-                List<FieldWorkParkingImg> lstFWPI = new();
+                List<Domain.Entities.FieldWorkParkingImg> lstFWPI = new();
                 foreach (var item in request.Images)
                 {
-                    FieldWorkParkingImg fwpi = new FieldWorkParkingImg
+                    Domain.Entities.FieldWorkParkingImg fwpi = new Domain.Entities.FieldWorkParkingImg
                     {
                         Url = item,
                         ApproveParkingId = approveParkingEntity.ApproveParkingId
@@ -97,7 +97,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
                 {
                     Message = "Thành công",
                     Success = true,
-                    StatusCode = 201
+                    StatusCode = 201,
+                    Data = approveParkingEntity.ApproveParkingId
                 };
 
             }

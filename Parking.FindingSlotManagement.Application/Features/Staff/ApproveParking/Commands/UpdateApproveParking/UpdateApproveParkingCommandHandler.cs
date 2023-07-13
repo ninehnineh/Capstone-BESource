@@ -27,7 +27,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
         {
             try
             {
-                var approveParking = await _approveParkingRepository.GetItemWithCondition(x => x.ParkingId == request.ParkingId, null, false);
+                var approveParking = await _approveParkingRepository.GetItemWithCondition(x => x.ApproveParkingId == request.ApproveParkingId, null, false);
                 if (approveParking == null)
                 {
                     return new ServiceResponse<int>
@@ -37,7 +37,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
                         StatusCode = 200
                     };
                 }
-                if (!approveParking.Status.Equals(Domain.Enum.ApproveParkingStatus.Chờ_duyệt.ToString()))
+                if (!approveParking.Status.Equals(Domain.Enum.ApproveParkingStatus.Tạo_mới.ToString()))
                 {
                     return new ServiceResponse<int>
                     {
@@ -46,39 +46,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
                         Success = false
                     };
                 }
-                var staffExist = await _userRepository.GetById(request.StaffId);
-                if(staffExist == null)
+                if(!string.IsNullOrEmpty(request.Note))
                 {
-                    return new ServiceResponse<int>
-                    {
-                        Message = "Không tìm thấy tài khoản.",
-                        Success = true,
-                        StatusCode = 200
-                    };
+                    approveParking.Note = request.Note;
                 }
-                if(staffExist.RoleId != 4)
-                {
-                    return new ServiceResponse<int>
-                    {
-                        Message = "Bạn không có quyền truy cập.",
-                        StatusCode = 400,
-                        Success = false
-                    };
-                }
-                approveParking.StaffId = request.StaffId;
-                approveParking.Note = request.Note;
                 await _approveParkingRepository.Update(approveParking);
-                List<FieldWorkParkingImg> lstFWPI = new();
-                foreach (var item in request.Images)
-                {
-                    FieldWorkParkingImg fwpi = new FieldWorkParkingImg
-                    {
-                        Url = item,
-                        ApproveParkingId = approveParking.ApproveParkingId
-                    };
-                    lstFWPI.Add(fwpi);
-                }
-                await _fieldWorkParkingImgRepository.AddRangeFieldWorkParkingImg(lstFWPI);
                 return new ServiceResponse<int>
                 {
                     Message = "Thành công",
