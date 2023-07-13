@@ -55,7 +55,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                     ParkingId = parkingExist.ParkingId,
                     BusinessId = parkingExist.BusinessId,
                     BusinessName = parkingExist.BusinessProfile.Name,
-                    ApproveParkingStatus = parkingExist.ApproveParkings.FirstOrDefault().Status,
+                    ApproveParkingStatus = parkingExist.ApproveParkings.FirstOrDefault(x => x.Status.Equals(Domain.Enum.ApproveParkingStatus.Đã_duyệt.ToString())).Status,
                     Stars = parkingExist.Stars,
                     Description = parkingExist.Description,
                     Address = parkingExist.Address,

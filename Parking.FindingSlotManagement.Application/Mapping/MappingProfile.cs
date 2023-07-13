@@ -85,6 +85,7 @@ using Parking.FindingSlotManagement.Application.Features.Admin.ParkingManagement
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Commands.CreateNewApproveParking;
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetListApproveParkingByParkingId;
 using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.GetAllCustomer.Queries.GetCustomerById;
+using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetApproveParkingById;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -319,6 +320,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<ApproveParking, GetListApproveParkingByParkingIdRes>()
                 .ForMember(dto => dto.StaffName, act => act.MapFrom(obj => obj.User.Name))
                 .ReverseMap();
+            #endregion
+            #region FieldWorkParkingImg
+            CreateMap<FieldWorkParkingImg, ImagesOfRequestApprove>();
             #endregion
         }
     }
