@@ -84,6 +84,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.BusinessProfile
 using Parking.FindingSlotManagement.Application.Features.Admin.ParkingManagement.Queries.GetAllParkingForAdmin;
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Commands.CreateNewApproveParking;
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetListApproveParkingByParkingId;
+using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.GetAllCustomer.Queries.GetCustomerById;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -124,6 +125,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.BackIdentification, act => act.MapFrom(obj => obj.BusinessProfile.BackIdentification))
                 .ForMember(dto => dto.BusinessLicense, act => act.MapFrom(obj => obj.BusinessProfile.BusinessLicense))
                 .ForMember(dto => dto.Type, act => act.MapFrom(obj => obj.BusinessProfile.Type))
+                .ReverseMap();
+            CreateMap<User, GetCustomerByIdResponse>()
+                .ForMember(dto => dto.RoleName, act => act.MapFrom(obj => obj.Role.Name))
                 .ReverseMap();
             #endregion
 
