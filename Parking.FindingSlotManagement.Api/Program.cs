@@ -1,7 +1,9 @@
 using Hangfire;
 using Hangfire.SqlServer;
+using HangfireBasicAuthenticationFilter;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Parking.FindingSlotManagement.Application;
@@ -139,24 +141,21 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    DashboardTitle = "My Website",
+    Authorization = new[]
+        {
+                new HangfireCustomBasicAuthenticationFilter{
+                    User = "admin",
+                    Pass = "123456"
+                }
+            }
+});
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
     endpoints.MapHub<MessageHub>("/parkz");
+    endpoints.MapHangfireDashboard();
 });
-var options = new DashboardOptions
-{
-    Authorization = new[] {
-                    new DashboardAuthorization(new[]
-                    {
-                        new HangfireUserCredentials
-                        {
-                            Username = "admin",
-                            Password = "123456"
-                        }
-                    })
-                }
-};
-app.UseHangfireDashboard("/hangfire", options);
-app.MapHangfireDashboard();
 app.Run();

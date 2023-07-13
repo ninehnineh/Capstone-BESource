@@ -17,7 +17,7 @@ using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 {
-    [Authorize(Roles = "Manager")]
+
     [Route("api/parkings")]
     [ApiController]
     public class ParkingManagementController : ControllerBase
@@ -36,6 +36,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remarks>
         /// SignalR: LoadParkingInAdmin
         /// </remarks>
+        /// 
+        [Authorize(Roles = "Manager")]
         [HttpPost("parking", Name = "CreateNewParking")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
@@ -70,6 +72,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remarks>
         /// SignalR: LoadParkingInAdmin
         /// </remarks>
+        /// 
+        [Authorize(Roles = "Manager")]
         [HttpPut("parking/location/{parkingId}", Name = "UpdateLocationOfParking")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -104,6 +108,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remarks>
         /// SignalR: LoadParkingInAdmin
         /// </remarks>
+        /// 
+        [Authorize(Roles = "Manager")]
         [HttpDelete("parking/{parkingId}", Name = "DisableOrEnableParking")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -133,6 +139,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remarks>
         /// SignalR: LoadParkingInAdmin
         /// </remarks>
+        /// 
+        [Authorize(Roles = "Manager")]
         [HttpPut("parking/{parkingId}", Name = "UpdateParking")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -167,6 +175,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remarks>
         /// SignalR: LoadParkingInAdmin
         /// </remarks>
+        /// 
+        [Authorize(Roles = "Manager")]
         [Authorize(Roles = "Manager,Keeper")]
         [HttpPut("parking/full/{parkingId}", Name = "UpdateStatusFullOfParking")]
         [Produces("application/json")]
@@ -205,6 +215,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// API For Manager
         /// </summary>
         /// 
+        [Authorize(Roles = "Manager,Admin")]
         [HttpGet(Name = "GetListParkingByManagerId")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -229,6 +240,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// API For Manager
         /// </summary>
         /// 
+        [Authorize(Roles = "Manager,Admin")]
         [HttpGet("{parkingId}", Name = "GetParkingById")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -237,7 +249,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         {
             try
             {
-                var query = new GetParkingByIdQuery() { ParkingId = parkingId};
+                var query = new GetParkingByIdQuery() { ParkingId = parkingId };
                 var res = await _mediator.Send(query);
 
                 return StatusCode((int)res.StatusCode, res);
@@ -253,6 +265,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// API For Manager
         /// </summary>
         /// 
+        [Authorize(Roles = "Manager")]
         [HttpGet("parking-price/{parkingPriceId}", Name = "GetParkingByParkingPriceId")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
