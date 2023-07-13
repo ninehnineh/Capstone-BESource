@@ -43,7 +43,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Qu
                 {
                     BookingDetails = _mapper.Map<BookingDetailsDto>(booking),
                     User = _mapper.Map<UserBookingDto>(booking.User),
-                    VehicleInfor = _mapper.Map<VehicleInforDto>(booking.VehicleInfor),
+                    VehicleInfor = _mapper.Map<VehicleInforDtoos>(booking.VehicleInfor),
                     ParkingSlotWithBookingDetailDto = _mapper.Map<ParkingSlotWithBookingDetailDto>(booking.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot),
                     FloorWithBookingDetailDto = _mapper.Map<FloorWithBookingDetailDto>(booking.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor),
                     ParkingWithBookingDetailDto = _mapper.Map<ParkingWithBookingDetailDto>(booking.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.Parking),

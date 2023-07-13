@@ -233,6 +233,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<VehicleInfor, VehicleInfoForGuestCommand>().ReverseMap();
             CreateMap<VehicleInfor, GetVehicleInfoForGuestByIdResponse>().ReverseMap();
             CreateMap<VehicleInfor, BookingVehicleInforDTO>().ReverseMap();
+            CreateMap<VehicleInfor, VehicleInforDtoos>().ReverseMap();
             #endregion
 
             #region ParkingHasPrice Mapping
