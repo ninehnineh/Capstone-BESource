@@ -55,7 +55,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                     ParkingId = parkingExist.ParkingId,
                     BusinessId = parkingExist.BusinessId,
                     BusinessName = parkingExist.BusinessProfile.Name,
-                    ApproveParkingStatus = parkingExist.ApproveParkings.FirstOrDefault(x => x.Status.Equals(Domain.Enum.ApproveParkingStatus.Đã_duyệt.ToString())).Status,
+                    ApproveParkingStatus = parkingExist.ApproveParkings.LastOrDefault().Status,
                     Stars = parkingExist.Stars,
                     Description = parkingExist.Description,
                     Address = parkingExist.Address,
@@ -99,7 +99,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                     totalSlotBooked += lstParkingSlotHasBooked.Count();
                 }
                 entityRes.SlotHasBooked = totalSlotBooked;
-                var lstImages = await _fieldWorkParkingImgRepository.GetAllItemWithConditionByNoInclude(x => x.ApproveParkingId == parkingExist.ApproveParkings.FirstOrDefault().ApproveParkingId);
+                var lstImages = await _fieldWorkParkingImgRepository.GetAllItemWithConditionByNoInclude(x => x.ApproveParkingId == parkingExist.ApproveParkings.LastOrDefault().ApproveParkingId);
                 List<string> imgRes = new();
                 foreach (var item in lstImages)
                 {

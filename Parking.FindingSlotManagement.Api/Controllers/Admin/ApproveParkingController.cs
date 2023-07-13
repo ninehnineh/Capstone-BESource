@@ -6,6 +6,7 @@ using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Co
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Commands.DeclineParkingRequest;
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetAllParkingRequest;
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetFieldInforByParkingId;
+using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetListParkingWaitingToAccept;
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetParkingInformationTab;
 using System.Net;
 
@@ -24,7 +25,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
-        [HttpGet("field-information/{parkingId}", Name = "GetFieldInforByParkingId")]
+        [HttpGet("all-field-information/{parkingId}", Name = "GetFieldInforByParkingId")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -57,6 +58,31 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             try
             {
                 var query = new GetAllParkingRequestQuery()
+                {
+                    PageNo = PageNo,
+                    PageSize = PageSize
+                };
+                var res = await _mediator.Send(query);
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
+        [HttpGet("request/waiting-accept", Name = "GetListParkingWaitingToAccept")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<GetListParkingWaitingToAcceptResponse>>> GetListParkingWaitingToAccept([FromQuery] int PageNo, [FromQuery] int PageSize)
+        {
+            try
+            {
+                var query = new GetListParkingWaitingToAcceptQuery()
                 {
                     PageNo = PageNo,
                     PageSize = PageSize
