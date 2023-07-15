@@ -8,6 +8,7 @@ namespace Parking.FindingSlotManagement.Domain.Enum
 {
     public enum ApproveParkingStatus
     {
+        Tạo_mới,
         Đã_duyệt,
         Chờ_duyệt,
         Từ_chối

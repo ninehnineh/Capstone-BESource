@@ -6,6 +6,7 @@ using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Co
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Commands.DeclineParkingRequest;
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetAllParkingRequest;
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetFieldInforByParkingId;
+using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetListParkingWaitingToAccept;
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetParkingInformationTab;
 using System.Net;
 
@@ -24,7 +25,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
-        [HttpGet("field-information/{parkingId}", Name = "GetFieldInforByParkingId")]
+        [HttpGet("all-field-information/{parkingId}", Name = "GetFieldInforByParkingId")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -73,6 +74,31 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
+        [HttpGet("request/waiting-accept", Name = "GetListParkingWaitingToAccept")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<GetListParkingWaitingToAcceptResponse>>> GetListParkingWaitingToAccept([FromQuery] int PageNo, [FromQuery] int PageSize)
+        {
+            try
+            {
+                var query = new GetListParkingWaitingToAcceptQuery()
+                {
+                    PageNo = PageNo,
+                    PageSize = PageSize
+                };
+                var res = await _mediator.Send(query);
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Admin
+        /// </summary>
         [HttpGet("parking-information-tab/{parkingId}", Name = "GetParkingInformationTab")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -97,17 +123,17 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
-        [HttpPut("request/accept/{parkingId}", Name = "AcceptParkingRequest")]
+        [HttpPut("request/accept/{approveParkingId}", Name = "AcceptParkingRequest")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<ServiceResponse<string>>> AcceptParkingRequest(int parkingId)
+        public async Task<ActionResult<ServiceResponse<string>>> AcceptParkingRequest(int approveParkingId)
         {
             try
             {
                 var command = new AcceptParkingRequestCommand()
                 {
-                    ParkingId = parkingId
+                    ApproveParkingId = approveParkingId
                 };
                 var res = await _mediator.Send(command);
                 if (res.Message != "Thành công")
@@ -125,17 +151,17 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
-        [HttpPut("request/decline/{parkingId}", Name = "DeclineParkingRequest")]
+        [HttpPut("request/decline/{approveParkingId}", Name = "DeclineParkingRequest")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<ServiceResponse<string>>> DeclineParkingRequest(int parkingId)
+        public async Task<ActionResult<ServiceResponse<string>>> DeclineParkingRequest(int approveParkingId)
         {
             try
             {
                 var command = new DeclineParkingRequestCommand()
                 {
-                    ParkingId = parkingId
+                    ApproveParkingId = approveParkingId
                 };
                 var res = await _mediator.Send(command);
                 if (res.Message != "Thành công")

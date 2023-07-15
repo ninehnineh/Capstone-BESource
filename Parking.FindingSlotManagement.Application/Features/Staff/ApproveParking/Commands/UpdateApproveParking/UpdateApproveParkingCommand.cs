@@ -9,9 +9,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
 {
     public class UpdateApproveParkingCommand : IRequest<ServiceResponse<int>>
     {
-        public int StaffId { get; set; }
-        public int ParkingId { get; set; }
+        public int ApproveParkingId { get; set; }
         public string Note { get; set; }
-        public List<string> Images { get; set; }
     }
 }
