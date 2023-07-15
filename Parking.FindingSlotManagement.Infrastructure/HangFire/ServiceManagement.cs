@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Org.BouncyCastle.Ocsp;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
+using Parking.FindingSlotManagement.Application.Models;
 using Parking.FindingSlotManagement.Application.Models.PushNotification;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Domain.Enum;
@@ -23,14 +24,17 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
         private readonly ParkZDbContext _context;
         private readonly ILogger<ServiceManagement> _logger;
         private readonly IFireBaseMessageServices _fireBaseMessageServices;
+        private readonly IEmailService _emailService;
 
         public ServiceManagement(ParkZDbContext context,
             ILogger<ServiceManagement> logger,
-            IFireBaseMessageServices fireBaseMessageServices)
+            IFireBaseMessageServices fireBaseMessageServices,
+            IEmailService emailService)
         {
             _context = context;
             _logger = logger;
             _fireBaseMessageServices = fireBaseMessageServices;
+            _emailService = emailService;
         }
 
         public void AddTimeSlotInFuture(int floorId)
@@ -139,7 +143,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
 
                 var guestArrived = bookedBooking.CheckinTime.HasValue;
                 var isOutOfEndTimeBooking = DateTime.UtcNow.AddHours(7) >= bookedBooking.EndTime.Value;
-;
+
                 if (!guestArrived && isOutOfEndTimeBooking)
                 {
                     bookedBooking.Status = BookingStatus.Cancel.ToString();
@@ -205,5 +209,65 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
         {
             Console.WriteLine($"Sync Data: Long running task {DateTime.UtcNow.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss")}");
         }
+
+        public void ChargeMoneyFor1MonthUsingSystem(Fee fee, int bussinesId, int billId, User user)
+        {
+            try
+            {
+                var userWallet = _context.Wallets.FirstOrDefault(x => x.UserId == user.UserId);
+                var billExist = _context.Bills.FirstOrDefault(x => x.BillId == billId);
+                if (userWallet.Balance >= fee.Price)
+                {
+                    userWallet.Balance -= fee.Price;
+                }
+                else if (userWallet.Balance < fee.Price)
+                {
+                    userWallet.Balance -= fee.Price;
+                    if (userWallet.Balance < 0)
+                    {
+                        userWallet.Debt += userWallet.Balance;
+                    }
+
+                }
+                billExist.WalletId = userWallet.WalletId;
+                billExist.Status = BillStatus.Đã_Thanh_Toán.ToString();
+                _context.SaveChanges();
+                var newBill = new Bill()
+                {
+                    Time = DateTime.UtcNow.AddHours(7),
+                    Status = BillStatus.Chờ_Thanh_Toán.ToString(),
+                    Price = fee.Price,
+                    BusinessId = bussinesId
+                };
+                _context.Bills.Add(newBill);
+                _context.SaveChanges();
+                EmailModel emailModel = new EmailModel();
+                emailModel.To = user.Email;
+                emailModel.Subject = "Thông báo: Trừ tiền từ tài khoản ví của bạn";
+
+                string body = $"Dear {user.Name},\n\n";
+                body += "Chúng tôi xin thông báo rằng hệ thống của chúng tôi đã trừ một khoản tiền từ tài khoản ví của bạn.\n";
+                body += $"Số tiền đã trừ: {fee.Price} đồng\n";
+                body += $"Ngày trừ tiền: {DateTime.UtcNow.AddHours(7)}\n";
+                body += $"Gói sử dụng: {fee.Name}\n\n";
+                body += "Xin lưu ý rằng việc trừ tiền này đảm bảo bạn tiếp tục sử dụng các tính năng và dịch vụ của hệ thống chúng tôi.\n\n";
+                body += "Nếu bạn có bất kỳ câu hỏi hoặc cần hỗ trợ thêm, xin vui lòng liên hệ với chúng tôi qua địa chỉ email hoặc số điện thoại dưới đây. Chúng tôi luôn sẵn sàng hỗ trợ bạn.\n\n";
+                body += "Chân thành cảm ơn sự tin tưởng và ủng hộ của bạn đối với hệ thống của chúng tôi.\n\n";
+                body += "Trân trọng,\n";
+                body += "ParkZ\n";
+                body += "Địa chỉ công ty: Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 700000\n";
+                body += "Số điện thoại công ty: 0793808821\n";
+                body += "Địa chỉ email công ty: parkz.thichthicodeteam@gmail.com\r\n";
+                _emailService.SendMail(emailModel);
+                Console.WriteLine("done email");
+                //RecurringJob.AddOrUpdate<IServiceManagement>(x => x.ChargeMoneyFor1MonthUsingSystem(fee, bussinesId, newBill.BillId, user), Cron.MinuteInterval(6));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Hangfire:" + ex.Message);
+            }
+
+        }
+
     }
 }

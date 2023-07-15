@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Parking.FindingSlotManagement.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,5 +16,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Infrastructure
         void AddTimeSlotInFuture(int floorId);
         void AutoCancelBookingWhenOverAllowTimeBooking(int bookingId);
         void AutoCancelBookingWhenOutOfEndTimeBooking(int bookingId);
+        void ChargeMoneyFor1MonthUsingSystem(Fee fee, int bussinesId, int billId, User user);
     }
 }

@@ -1,5 +1,5 @@
 using Hangfire;
-using Hangfire.SqlServer;
+using HangfireBasicAuthenticationFilter;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
@@ -113,7 +113,6 @@ builder.Services.AddSignalR();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -139,11 +138,23 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    DashboardTitle = "My Website",
+    Authorization = new[]
+        {
+                new HangfireCustomBasicAuthenticationFilter{
+                    User = "admin",
+                    Pass = "123"
+                }
+            }
+});
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
     endpoints.MapHub<MessageHub>("/parkz");
+    endpoints.MapHangfireDashboard();
 });
-app.UseHangfireDashboard();
-app.MapHangfireDashboard();
+
 app.Run();
