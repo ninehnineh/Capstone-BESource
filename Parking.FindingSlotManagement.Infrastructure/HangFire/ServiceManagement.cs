@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Org.BouncyCastle.Ocsp;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
+using Parking.FindingSlotManagement.Application.Features.Manager.Account.RegisterCensorshipBusinessAccount.Commands.RegisterBusinessAccount;
 using Parking.FindingSlotManagement.Application.Models;
 using Parking.FindingSlotManagement.Application.Models.PushNotification;
 using Parking.FindingSlotManagement.Domain.Entities;
@@ -258,9 +259,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 body += "Địa chỉ công ty: Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 700000\n";
                 body += "Số điện thoại công ty: 0793808821\n";
                 body += "Địa chỉ email công ty: parkz.thichthicodeteam@gmail.com\r\n";
+                emailModel.Body = body;
                 _emailService.SendMail(emailModel);
                 Console.WriteLine("done email");
-                //RecurringJob.AddOrUpdate<IServiceManagement>(x => x.ChargeMoneyFor1MonthUsingSystem(fee, bussinesId, newBill.BillId, user), Cron.MinuteInterval(6));
+                BackgroundJob.Schedule<IServiceManagement>(
+                    x => x.ChargeMoneyFor1MonthUsingSystem(fee, bussinesId, newBill.BillId, user), TimeSpan.FromMinutes(6));
             }
             catch (Exception ex)
             {

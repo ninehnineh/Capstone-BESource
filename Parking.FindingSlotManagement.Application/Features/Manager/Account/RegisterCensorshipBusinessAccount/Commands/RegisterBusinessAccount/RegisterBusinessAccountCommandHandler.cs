@@ -70,7 +70,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Account.Reg
                     BusinessId = businessProfileEntity.BusinessProfileId
                 };
                 await _billRepository.Insert(entityBill);
-                var timeToCancel = TimeSpan.FromMinutes(1);
+                var timeToCancel = TimeSpan.FromMinutes(3);
 
                 var a = BackgroundJob.Schedule<IServiceManagement>(
                     x => x.ChargeMoneyFor1MonthUsingSystem(feeExist, businessProfileEntity.BusinessProfileId, entityBill.BillId, getUser), timeToCancel);
