@@ -13,6 +13,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Account.Reg
         public string? FrontIdentification { get; set; }
         public string? BackIdentification { get; set; }
         public string? BusinessLicense { get; set; }
-        public int? FreeId { get; set; }
+        public int? FeeId { get; set; }
     }
 }
