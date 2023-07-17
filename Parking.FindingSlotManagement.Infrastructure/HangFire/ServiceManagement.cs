@@ -242,28 +242,10 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 };
                 _context.Bills.Add(newBill);
                 _context.SaveChanges();
-                EmailModel emailModel = new EmailModel();
-                emailModel.To = user.Email;
-                emailModel.Subject = "Thông báo: Trừ tiền từ tài khoản ví của bạn";
 
-                string body = $"Dear {user.Name},\n\n";
-                body += "Chúng tôi xin thông báo rằng hệ thống của chúng tôi đã trừ một khoản tiền từ tài khoản ví của bạn.\n";
-                body += $"Số tiền đã trừ: {fee.Price} đồng\n";
-                body += $"Ngày trừ tiền: {DateTime.UtcNow.AddHours(7)}\n";
-                body += $"Gói sử dụng: {fee.Name}\n\n";
-                body += "Xin lưu ý rằng việc trừ tiền này đảm bảo bạn tiếp tục sử dụng các tính năng và dịch vụ của hệ thống chúng tôi.\n\n";
-                body += "Nếu bạn có bất kỳ câu hỏi hoặc cần hỗ trợ thêm, xin vui lòng liên hệ với chúng tôi qua địa chỉ email hoặc số điện thoại dưới đây. Chúng tôi luôn sẵn sàng hỗ trợ bạn.\n\n";
-                body += "Chân thành cảm ơn sự tin tưởng và ủng hộ của bạn đối với hệ thống của chúng tôi.\n\n";
-                body += "Trân trọng,\n";
-                body += "ParkZ\n";
-                body += "Địa chỉ công ty: Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 700000\n";
-                body += "Số điện thoại công ty: 0793808821\n";
-                body += "Địa chỉ email công ty: parkz.thichthicodeteam@gmail.com\r\n";
-                emailModel.Body = body;
-                _emailService.SendMail(emailModel);
-                Console.WriteLine("done email");
-                BackgroundJob.Schedule<IServiceManagement>(
-                    x => x.ChargeMoneyFor1MonthUsingSystem(fee, bussinesId, newBill.BillId, user), TimeSpan.FromMinutes(6));
+                SendMailToManager(fee, user);
+                SetNewJob(fee, bussinesId, user, newBill);
+                //RecurringJob.AddOrUpdate<IServiceManagement>(x => x.ChargeMoneyFor1MonthUsingSystem(fee, bussinesId, newBill.BillId, user), Cron.MinuteInterval(6));
             }
             catch (Exception ex)
             {
@@ -272,5 +254,36 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
 
         }
 
+        private void SendMailToManager(Fee fee, User user)
+        {
+            EmailModel emailModel = new EmailModel();
+            emailModel.To = user.Email;
+            emailModel.Subject = "Thông báo: Trừ tiền từ tài khoản ví của bạn";
+
+            string body = $"Dear {user.Name},\n\n";
+            body += "Chúng tôi xin thông báo rằng hệ thống của chúng tôi đã trừ một khoản tiền từ tài khoản ví của bạn.\n";
+            body += $"Số tiền đã trừ: {fee.Price} đồng\n";
+            body += $"Ngày trừ tiền: {DateTime.UtcNow.AddHours(7)}\n";
+            body += $"Gói sử dụng: {fee.Name}\n\n";
+            body += "Xin lưu ý rằng việc trừ tiền này đảm bảo bạn tiếp tục sử dụng các tính năng và dịch vụ của hệ thống chúng tôi.\n\n";
+            body += "Nếu bạn có bất kỳ câu hỏi hoặc cần hỗ trợ thêm, xin vui lòng liên hệ với chúng tôi qua địa chỉ email hoặc số điện thoại dưới đây. Chúng tôi luôn sẵn sàng hỗ trợ bạn.\n\n";
+            body += "Chân thành cảm ơn sự tin tưởng và ủng hộ của bạn đối với hệ thống của chúng tôi.\n\n";
+            body += "Trân trọng,\n";
+            body += "ParkZ\n";
+            body += "Địa chỉ công ty: Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 700000\n";
+            body += "Số điện thoại công ty: 0793808821\n";
+            body += "Địa chỉ email công ty: parkz.thichthicodeteam@gmail.com\r\n";
+            emailModel.Body = body;
+            _emailService.SendMail(emailModel);
+            Console.WriteLine("done email");
+        }
+
+        private static void SetNewJob(Fee fee, int bussinesId, User user, Bill newBill)
+        {
+            var timeToCancel = DateTime.UtcNow.AddDays(1);
+
+            BackgroundJob.Schedule<IServiceManagement>(
+                x => x.ChargeMoneyFor1MonthUsingSystem(fee, bussinesId, newBill.BillId, user), timeToCancel);
+        }
     }
 }
