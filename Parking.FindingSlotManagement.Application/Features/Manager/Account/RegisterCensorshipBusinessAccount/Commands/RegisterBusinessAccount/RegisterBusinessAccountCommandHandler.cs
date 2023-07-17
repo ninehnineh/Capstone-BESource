@@ -20,18 +20,20 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Account.Reg
         private readonly IBusinessProfileRepository _businessProfileRepository;
         private readonly IBillRepository _billRepository;
         private readonly IFeeRepository _feeRepository;
+        private readonly IWalletRepository _walletRepository;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MappingProfile());
         });
 
         public RegisterBusinessAccountCommandHandler(IUserRepository userRepository, IBusinessProfileRepository businessProfileRepository,
-            IBillRepository billRepository, IFeeRepository feeRepository)
+            IBillRepository billRepository, IFeeRepository feeRepository, IWalletRepository walletRepository)
         {
             _userRepository = userRepository;
             _businessProfileRepository = businessProfileRepository;
             _billRepository = billRepository;
             _feeRepository = feeRepository;
+            _walletRepository = walletRepository;
         }
         public async Task<ServiceResponse<int>> Handle(RegisterBusinessAccountCommand request, CancellationToken cancellationToken)
         {
@@ -49,6 +51,13 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Account.Reg
                 userEntity.IsCensorship = false;
                 userEntity.RoleId = 1;
                 await _userRepository.Insert(userEntity);
+                var entityWallet = new Wallet
+                {
+                    Balance = 0.0M,
+                    Debt = 0.0M,
+                    UserId = userEntity.UserId
+                };
+                await _walletRepository.Insert(entityWallet);
                 businessProfileEntity.UserId = userEntity.UserId;
                 await _businessProfileRepository.Insert(businessProfileEntity);
                 var feeExist = await _feeRepository.GetItemWithCondition(x => x.FeeId == businessProfileEntity.FeeId);
@@ -70,7 +79,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Account.Reg
                     BusinessId = businessProfileEntity.BusinessProfileId
                 };
                 await _billRepository.Insert(entityBill);
-                var timeToCancel = DateTime.UtcNow.AddDays(1);
+                var timeToCancel = DateTime.UtcNow.AddHours(7).AddDays(30);
 
                 var a = BackgroundJob.Schedule<IServiceManagement>(
                     x => x.ChargeMoneyFor1MonthUsingSystem(feeExist, businessProfileEntity.BusinessProfileId, entityBill.BillId, getUser), timeToCancel);

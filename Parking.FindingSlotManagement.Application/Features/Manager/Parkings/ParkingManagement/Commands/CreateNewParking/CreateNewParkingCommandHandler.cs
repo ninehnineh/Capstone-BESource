@@ -68,10 +68,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                 parkingEntity.Code = "BX" + parkingEntity.ParkingId;
                 parkingEntity.Stars = (float)0.0;
                 await _parkingRepository.Save();
-                var managerExist = await _userRepository.GetById(checkBusinessExist.UserId);
+                /*var managerExist = await _userRepository.GetById(checkBusinessExist.UserId);
                 managerExist.ParkingId = parkingEntity.ParkingId;
 
-                await _userRepository.Save();
+                await _userRepository.Save();*/
                 return new ServiceResponse<int>
                 {
                     Data = parkingEntity.ParkingId,
