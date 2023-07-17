@@ -7,6 +7,7 @@ using Parking.FindingSlotManagement.Domain.Enum;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -313,6 +314,66 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task<IEnumerable<Booking>> SearchRequestBookingMethod(int parkingId, string searchString)
+        {
+            var booking = await _dbContext.Bookings
+                                                .Include(x => x.User)
+                                                .Include(x => x.VehicleInfor)
+                                                .Include(x => x.BookingDetails)
+                                                    .ThenInclude(x => x.TimeSlot)
+                                                    .ThenInclude(x => x.Parkingslot)
+                                                    .ThenInclude(x => x.Floor)
+                                                .Where(x => x.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.ParkingId == parkingId &&
+                                                x.User.Name.Contains(searchString.ToString()) && x.EndTime.Value.Date >= DateTime.UtcNow.Date
+                                                ).ToListAsync();
+            if(!booking.Any())
+            {
+                var booking2 = await _dbContext.Bookings
+                                                .Include(x => x.User)
+                                                .Include(x => x.VehicleInfor)
+                                                .Include(x => x.BookingDetails)
+                                                    .ThenInclude(x => x.TimeSlot)
+                                                    .ThenInclude(x => x.Parkingslot)
+                                                    .ThenInclude(x => x.Floor)
+                                                .Where(x => x.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.ParkingId == parkingId &&
+                                                x.VehicleInfor.LicensePlate.Contains(searchString.ToString()) && x.EndTime.Value.Date >= DateTime.UtcNow.Date
+                                                ).ToListAsync();
+                if (!booking2.Any())
+                {
+                    return null;
+                }
+                return booking2;
+            }
+            return booking;
+        }
+
+        public async Task<IEnumerable<Booking>> GetAllBookingByParkingIdMethod(int parkingId, int pageNo, int pageSize)
+        {
+            try
+            {
+                var booking = await _dbContext.Bookings
+                                                .Include(x => x.User)
+                                                .Include(x => x.VehicleInfor)
+                                                .Include(x => x.BookingDetails)
+                                                    .ThenInclude(x => x.TimeSlot)
+                                                    .ThenInclude(x => x.Parkingslot)
+                                                    .ThenInclude(x => x.Floor)
+                                                .Where(x => x.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.ParkingId == parkingId).ToListAsync();
+                if (!booking.Any())
+                {
+                    return null;
+                }
+                return booking.Skip(((int)pageNo - 1) * (int)pageSize)
+                        .Take((int)pageSize);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+            
         }
     }
 }

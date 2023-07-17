@@ -128,7 +128,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <summary>
         /// API For Manager, Customer, Keeper
         /// </summary>
-        [Authorize(Roles = "Manager,Customer,Keeper")]
+        [Authorize(Roles = "Manager,Customer,Keeper,Admin")]
         [HttpGet("{parkingId}", Name = "GetListParkingSpotImage")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
