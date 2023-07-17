@@ -37,7 +37,7 @@ builder.Services.AddHangfire(hangfire =>
                  builder.Configuration.GetConnectionString("DefaultConnection"));
 
 });
-
+builder.Services.AddHangfireServer();
 builder.Services.AddTransient<IServiceManagement, ServiceManagement>();
 //For Register MiddleWare
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, AuthorizationMiddlewareHandlerService>();
