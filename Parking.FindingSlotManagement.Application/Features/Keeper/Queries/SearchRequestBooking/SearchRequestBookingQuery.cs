@@ -9,7 +9,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.Sear
 {
     public class SearchRequestBookingQuery : IRequest<ServiceResponse<IEnumerable<SearchRequestBookingResponse>>>
     {
-        public int ParkingId { get; set; }
+        public int KeeperId { get; set; }
         public string SearchString { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetAllBookingByKeeperId;
 using Parking.FindingSlotManagement.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -14,12 +15,14 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.Sear
     public class SearchRequestBookingQueryHandler : IRequestHandler<SearchRequestBookingQuery, ServiceResponse<IEnumerable<SearchRequestBookingResponse>>>
     {
         private readonly IBookingRepository _bookingRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly IParkingRepository _parkingRepository;
 
-        public SearchRequestBookingQueryHandler(IBookingRepository bookingRepository, IMapper mapper, IParkingRepository parkingRepository)
+        public SearchRequestBookingQueryHandler(IBookingRepository bookingRepository, IUserRepository userRepository, IMapper mapper, IParkingRepository parkingRepository)
         {
             _bookingRepository = bookingRepository;
+            _userRepository = userRepository;
             _mapper = mapper;
             _parkingRepository = parkingRepository;
         }
@@ -27,8 +30,27 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.Sear
         {
             try
             {
-                var parkingExist = await _parkingRepository.GetById(request.ParkingId);
-                if(parkingExist == null)
+                var KeeperExist = await _userRepository.GetById(request.KeeperId);
+                if (KeeperExist == null)
+                {
+                    return new ServiceResponse<IEnumerable<SearchRequestBookingResponse>>
+                    {
+                        Message = "Không tìm thấy tài khoản.",
+                        Success = false,
+                        StatusCode = 404
+                    };
+                }
+                if (KeeperExist.RoleId != 2)
+                {
+                    return new ServiceResponse<IEnumerable<SearchRequestBookingResponse>>
+                    {
+                        Message = "Tài khoản không phải là nhân viên bãi xe.",
+                        Success = false,
+                        StatusCode = 400
+                    };
+                }
+                var parkingExist = await _parkingRepository.GetById(KeeperExist.ParkingId);
+                if (parkingExist == null)
                 {
                     return new ServiceResponse<IEnumerable<SearchRequestBookingResponse>>
                     {
@@ -38,7 +60,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.Sear
 
                     };
                 }
-                var lstBooking = await _bookingRepository.SearchRequestBookingMethod(request.ParkingId, request.SearchString);
+                var lstBooking = await _bookingRepository.SearchRequestBookingMethod(parkingExist.ParkingId, request.SearchString);
                 if(lstBooking == null)
                 {
                     return new ServiceResponse<IEnumerable<SearchRequestBookingResponse>>

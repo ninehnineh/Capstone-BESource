@@ -28,8 +28,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetA
         {
             try
             {
-                var staffExist = await _userRepository.GetById(request.StaffId);
-                if(staffExist == null)
+                var KeeperExist = await _userRepository.GetById(request.KeeperId);
+                if(KeeperExist == null)
                 {
                     return new ServiceResponse<IEnumerable<GetAllBookingByKeeperIdResponse>>
                     {
@@ -38,7 +38,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetA
                         StatusCode = 404
                     };
                 }
-                if(staffExist.RoleId != 2)
+                if(KeeperExist.RoleId != 2)
                 {
                     return new ServiceResponse<IEnumerable<GetAllBookingByKeeperIdResponse>>
                     {
@@ -47,7 +47,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetA
                         StatusCode = 400
                     };
                 }
-                var parkingExist = await _parkingRepository.GetById(staffExist.ParkingId);
+                var parkingExist = await _parkingRepository.GetById(KeeperExist.ParkingId);
                 if (parkingExist == null)
                 {
                     return new ServiceResponse<IEnumerable<GetAllBookingByKeeperIdResponse>>

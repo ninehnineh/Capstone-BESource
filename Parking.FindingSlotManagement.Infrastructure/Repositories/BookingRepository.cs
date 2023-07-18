@@ -318,7 +318,29 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 
         public async Task<IEnumerable<Booking>> SearchRequestBookingMethod(int parkingId, string searchString)
         {
-            var booking = await _dbContext.Bookings
+            int number;
+            if (int.TryParse(searchString, out number))
+            {
+                var booking0 = await _dbContext.Bookings
+                                                .Include(x => x.User)
+                                                .Include(x => x.VehicleInfor)
+                                                .Include(x => x.BookingDetails)
+                                                    .ThenInclude(x => x.TimeSlot)
+                                                    .ThenInclude(x => x.Parkingslot)
+                                                    .ThenInclude(x => x.Floor)
+                                                .Where(x => x.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.ParkingId == parkingId &&
+                                                x.BookingId == int.Parse(searchString)
+                                                ).ToListAsync();
+                if (!booking0.Any())
+                {
+                    return null;
+                }
+                return booking0;
+
+            }
+            else
+            {
+                var booking = await _dbContext.Bookings
                                                 .Include(x => x.User)
                                                 .Include(x => x.VehicleInfor)
                                                 .Include(x => x.BookingDetails)
@@ -328,25 +350,27 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                                                 .Where(x => x.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.ParkingId == parkingId &&
                                                 x.User.Name.Contains(searchString.ToString()) && x.EndTime.Value.Date >= DateTime.UtcNow.Date
                                                 ).ToListAsync();
-            if(!booking.Any())
-            {
-                var booking2 = await _dbContext.Bookings
-                                                .Include(x => x.User)
-                                                .Include(x => x.VehicleInfor)
-                                                .Include(x => x.BookingDetails)
-                                                    .ThenInclude(x => x.TimeSlot)
-                                                    .ThenInclude(x => x.Parkingslot)
-                                                    .ThenInclude(x => x.Floor)
-                                                .Where(x => x.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.ParkingId == parkingId &&
-                                                x.VehicleInfor.LicensePlate.Contains(searchString.ToString()) && x.EndTime.Value.Date >= DateTime.UtcNow.Date
-                                                ).ToListAsync();
-                if (!booking2.Any())
+                if (!booking.Any())
                 {
-                    return null;
+                    var booking2 = await _dbContext.Bookings
+                                                    .Include(x => x.User)
+                                                    .Include(x => x.VehicleInfor)
+                                                    .Include(x => x.BookingDetails)
+                                                        .ThenInclude(x => x.TimeSlot)
+                                                        .ThenInclude(x => x.Parkingslot)
+                                                        .ThenInclude(x => x.Floor)
+                                                    .Where(x => x.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.ParkingId == parkingId &&
+                                                    x.VehicleInfor.LicensePlate.Contains(searchString.ToString()) && x.EndTime.Value.Date >= DateTime.UtcNow.Date
+                                                    ).ToListAsync();
+                    if (!booking2.Any())
+                    {
+                        return null;
+                    }
+                    return booking2;
                 }
-                return booking2;
+                return booking;
             }
-            return booking;
+            return null;
         }
 
         public async Task<IEnumerable<Booking>> GetAllBookingByParkingIdMethod(int parkingId, int pageNo, int pageSize)
