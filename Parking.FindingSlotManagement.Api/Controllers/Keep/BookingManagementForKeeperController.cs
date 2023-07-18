@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Features.Admin.Paypal.PaypalManagement.Queries.GetPaypalByManagerId;
+using Parking.FindingSlotManagement.Application.Features.Keeper.Queries.FilterBookingForKeeper;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetAllBookingByKeeperId;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Queries.SearchRequestBooking;
 using System.Net;
@@ -64,6 +65,32 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Keep
             try
             {
                 var query = new GetAllBookingByKeeperIdQuery() { KeeperId = keeperId, PageNo = pageNo, PageSize = pageSize };
+                var res = await _mediator.Send(query);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Keeper
+        /// </summary>
+        /// 
+        [HttpGet("filters/{keeperId}/parkings", Name = "FilterBookingForKeeper")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<GetAllBookingByKeeperIdResponse>>>> FilterBookingForKeeper(int keeperId, [FromQuery]DateTime? date, [FromQuery]string? status, [FromQuery] int pageNo, [FromQuery] int pageSize)
+        {
+            try
+            {
+                var query = new FilterBookingForKeeperQuery() { KeeperId = keeperId, Date = date, Status = status, PageNo = pageNo, PageSize = pageSize };
                 var res = await _mediator.Send(query);
                 if (res.Message != "Thành công")
                 {

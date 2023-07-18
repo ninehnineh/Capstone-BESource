@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Models.Booking;
@@ -398,6 +399,71 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 throw new Exception(ex.Message);
             }
             
+        }
+
+        public async Task<IEnumerable<Booking>> FilterBookingForKeeperMethod(int parkingId, DateTime? date, string? status, int pageNo, int pageSize)
+        {
+            try
+            {
+                List<Booking> booking = new();
+                if (date != null && status != null)
+                {
+                    booking = await _dbContext.Bookings
+                                                .Include(x => x.User)
+                                                .Include(x => x.VehicleInfor)
+                                                .Include(x => x.BookingDetails)
+                                                    .ThenInclude(x => x.TimeSlot)
+                                                    .ThenInclude(x => x.Parkingslot)
+                                                    .ThenInclude(x => x.Floor)
+                                                .Where(x => x.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.ParkingId == parkingId && x.DateBook.Date == date.Value.Date && x.Status.Equals(status.ToString())).ToListAsync();
+                    if (!booking.Any())
+                    {
+                        return null;
+                    }
+                    return booking.Skip(((int)pageNo - 1) * (int)pageSize)
+                            .Take((int)pageSize);
+                }
+                else if (date != null)
+                {
+                    booking = await _dbContext.Bookings
+                                                .Include(x => x.User)
+                                                .Include(x => x.VehicleInfor)
+                                                .Include(x => x.BookingDetails)
+                                                    .ThenInclude(x => x.TimeSlot)
+                                                    .ThenInclude(x => x.Parkingslot)
+                                                    .ThenInclude(x => x.Floor)
+                                                .Where(x => x.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.ParkingId == parkingId && x.DateBook.Date == date.Value.Date).ToListAsync();
+                    if (!booking.Any())
+                    {
+                        return null;
+                    }
+                    return booking.Skip(((int)pageNo - 1) * (int)pageSize)
+                            .Take((int)pageSize);
+                }
+                else if (status != null)
+                {
+                    booking = await _dbContext.Bookings
+                                                .Include(x => x.User)
+                                                .Include(x => x.VehicleInfor)
+                                                .Include(x => x.BookingDetails)
+                                                    .ThenInclude(x => x.TimeSlot)
+                                                    .ThenInclude(x => x.Parkingslot)
+                                                    .ThenInclude(x => x.Floor)
+                                                .Where(x => x.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.ParkingId == parkingId && x.Status.Equals(status.ToString())).ToListAsync();
+                    if (!booking.Any())
+                    {
+                        return null;
+                    }
+                    return booking.Skip(((int)pageNo - 1) * (int)pageSize)
+                            .Take((int)pageSize);
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
         }
     }
 }
