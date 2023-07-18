@@ -100,6 +100,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                 }
                 entityRes.SlotHasBooked = totalSlotBooked;
                 var lstImages = await _fieldWorkParkingImgRepository.GetAllItemWithConditionByNoInclude(x => x.ApproveParkingId == parkingExist.ApproveParkings.LastOrDefault().ApproveParkingId);
+                if(!lstImages.Any())
+                {
+                    return new ServiceResponse<GetParkingInformationTabResponse>
+                    {
+                        Message = "Không tìm thấy hình ảnh thực địa.",
+                        Success = false,
+                        StatusCode = 404
+                    };
+                }
                 List<string> imgRes = new();
                 foreach (var item in lstImages)
                 {
