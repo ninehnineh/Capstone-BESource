@@ -182,7 +182,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             }
             Console.WriteLine($"Add TimeSlot In Future: Long running task {DateTime.UtcNow.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss")}");
             
-            var timeToDelete = DateTime.UtcNow.AddHours(7).AddDays(7);
+            var timeToDelete = DateTime.UtcNow.AddDays(7);
 
             var deleteJobId = BackgroundJob.Schedule<IServiceManagement>(x => x.DeleteTimeSlotIn1Week(), timeToDelete);
             BackgroundJob.ContinueJobWith<IServiceManagement>(deleteJobId, x => x.AddTimeSlotInFuture(parkingSlotId));
