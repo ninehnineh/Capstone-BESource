@@ -36,6 +36,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
         /// <summary>
         /// API For Customer
         /// </summary>
+        /// <remark>
+        /// SignalR: CustomerCreateBookingSuccess
+        /// </remark>
         [HttpPost]
         public async Task<ActionResult<ServiceResponse<int>>> CreateBooking([FromBody] CreateBookingCommand command)
         {
@@ -65,6 +68,10 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
         /// <summary>
         /// API For Customer
         /// </summary>
+        /// 
+        /// <remark>
+        /// SignalR: CustomerCreateBookingSuccess
+        /// </remark>
         [HttpPost("booking/prepaid-online-booking/already-paid")]
         public async Task<ActionResult<ServiceResponse<int>>> CreateBookingwhenAlreadyPaid([FromBody] CreateBookingWhenAlreadyPaidCommand command)
         {
