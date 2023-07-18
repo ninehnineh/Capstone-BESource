@@ -89,6 +89,7 @@ using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Qu
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetListParkingWaitingToAccept;
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetListParkingNewWNoApprove;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Queries.SearchRequestBooking;
+using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.CreateBookingForPasserby;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -247,6 +248,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<VehicleInfor, VehicleInforSearchResult>()
                 .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.Traffic.Name))
                 .ReverseMap();
+            CreateMap<VehicleInfor, VehicleInformationForPasserby>().ReverseMap();
             #endregion
 
             #region ParkingHasPrice Mapping

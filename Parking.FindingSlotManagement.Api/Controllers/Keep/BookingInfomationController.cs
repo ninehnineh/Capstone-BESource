@@ -1,4 +1,4 @@
-﻿/*using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Parking.FindingSlotManagement.Application;
@@ -33,7 +33,6 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Keep
             {
                 throw new Exception(ex.Message);
             }
-        } 
+        }
     }
 }
-*/
