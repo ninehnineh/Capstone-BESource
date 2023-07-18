@@ -10,7 +10,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
     public class CaculateTotalPriceAfterSelectSlotCommand : IRequest<ServiceResponse<decimal>>
     {
         public int ParkingId { get; set; }
-        public int ParkingSlotId { get; set; }
 
         public DateTime StartimeBooking { get; set; }
         public int DesiredHour { get; set; }

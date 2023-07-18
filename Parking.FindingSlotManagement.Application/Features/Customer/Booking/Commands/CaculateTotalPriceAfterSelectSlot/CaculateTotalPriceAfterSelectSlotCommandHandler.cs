@@ -15,13 +15,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
     public class CaculateTotalPriceAfterSelectSlotCommandHandler : IRequestHandler<CaculateTotalPriceAfterSelectSlotCommand, ServiceResponse<decimal>>
     {
         private readonly IParkingHasPriceRepository _parkingHasPriceRepository;
-        private readonly IParkingSlotRepository _parkingSlotRepository;
 
-        public CaculateTotalPriceAfterSelectSlotCommandHandler(IParkingHasPriceRepository parkingHasPriceRepository,
-            IParkingSlotRepository parkingSlotRepository, IParkingRepository parkingRepository)
+        public CaculateTotalPriceAfterSelectSlotCommandHandler(IParkingHasPriceRepository parkingHasPriceRepository)
         {
             _parkingHasPriceRepository = parkingHasPriceRepository;
-            _parkingSlotRepository = parkingSlotRepository;
         }
 
         public async Task<ServiceResponse<decimal>> Handle(CaculateTotalPriceAfterSelectSlotCommand request, CancellationToken cancellationToken)
@@ -31,11 +28,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var endTimeBooking = request.StartimeBooking
                 .AddHours(request.DesiredHour);
             var currentParkingId = request.ParkingId;
-            var bookedParkingSlotId = request.ParkingSlotId;
+            
 
             try
             {
-                var bookedTraffic = await _parkingSlotRepository.GetById(bookedParkingSlotId);
+                
 
                 List<Expression<Func<ParkingHasPrice, object>>> includes = new List<Expression<Func<ParkingHasPrice, object>>>
                 {
@@ -44,7 +41,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
                 var parkingHasPrice = await _parkingHasPriceRepository
                     .GetAllItemWithCondition(x => x.Parking.ParkingId == currentParkingId &&
-                    x.ParkingPrice.Traffic.TrafficId == bookedTraffic.TrafficId, includes); 
+                    x.ParkingPrice.Traffic.TrafficId == 1, includes); 
 
                 var parkingPrice = parkingHasPrice.FirstOrDefault().ParkingPrice;
 
