@@ -181,14 +181,19 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 _context.SaveChanges();
             }
             Console.WriteLine($"Add TimeSlot In Future: Long running task {DateTime.UtcNow.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss")}");
+            
+            var timeToDelete = DateTime.UtcNow.AddHours(7).AddDays(7);
 
-            var deleteJobId = BackgroundJob.Schedule<IServiceManagement>(x => x.DeleteTimeSlotIn1Week(), DateTime.UtcNow.AddDays(7));
+            var deleteJobId = BackgroundJob.Schedule<IServiceManagement>(x => x.DeleteTimeSlotIn1Week(), timeToDelete);
             BackgroundJob.ContinueJobWith<IServiceManagement>(deleteJobId, x => x.AddTimeSlotInFuture(parkingSlotId));
+            Console.WriteLine($"One week ago to delete time slot: {timeToDelete}");
+
         }
 
         public void DeleteTimeSlotIn1Week()
         {
-            var oneWeekAgo = DateTime.Now.AddDays(-7);
+            var oneWeekAgo = DateTime.UtcNow.AddHours(7).AddDays(-7);
+            Console.WriteLine($"One week ago to delete time slot: {oneWeekAgo}" );
             var dataToDelete = _context.TimeSlots.Where(x => x.CreatedDate <= oneWeekAgo);
             if (dataToDelete.Any())
             {
