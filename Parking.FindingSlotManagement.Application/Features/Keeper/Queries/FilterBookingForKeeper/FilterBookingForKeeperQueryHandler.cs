@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetAllBookingByKeeperId;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Queries.SearchRequestBooking;
 using System;
 using System.Collections.Generic;
@@ -8,39 +9,39 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetAllBookingByKeeperId
+namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.FilterBookingForKeeper
 {
-    public class GetAllBookingByKeeperIdQueryHandler : IRequestHandler<GetAllBookingByKeeperIdQuery, ServiceResponse<IEnumerable<GetAllBookingByKeeperIdResponse>>>
+    public class FilterBookingForKeeperQueryHandler : IRequestHandler<FilterBookingForKeeperQuery, ServiceResponse<IEnumerable<FilterBookingForKeeperResponse>>>
     {
-        private readonly IUserRepository _userRepository;
         private readonly IBookingRepository _bookingRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IParkingRepository _parkingRepository;
         private readonly IMapper _mapper;
 
-        public GetAllBookingByKeeperIdQueryHandler(IUserRepository userRepository, IBookingRepository bookingRepository, IParkingRepository parkingRepository, IMapper mapper)
+        public FilterBookingForKeeperQueryHandler(IBookingRepository bookingRepository, IUserRepository userRepository, IParkingRepository parkingRepository, IMapper mapper)
         {
-            _userRepository = userRepository;
             _bookingRepository = bookingRepository;
+            _userRepository = userRepository;
             _parkingRepository = parkingRepository;
             _mapper = mapper;
         }
-        public async Task<ServiceResponse<IEnumerable<GetAllBookingByKeeperIdResponse>>> Handle(GetAllBookingByKeeperIdQuery request, CancellationToken cancellationToken)
+        public async Task<ServiceResponse<IEnumerable<FilterBookingForKeeperResponse>>> Handle(FilterBookingForKeeperQuery request, CancellationToken cancellationToken)
         {
             try
             {
                 var KeeperExist = await _userRepository.GetById(request.KeeperId);
-                if(KeeperExist == null)
+                if (KeeperExist == null)
                 {
-                    return new ServiceResponse<IEnumerable<GetAllBookingByKeeperIdResponse>>
+                    return new ServiceResponse<IEnumerable<FilterBookingForKeeperResponse>>
                     {
                         Message = "Không tìm thấy tài khoản.",
                         Success = false,
                         StatusCode = 404
                     };
                 }
-                if(KeeperExist.RoleId != 2)
+                if (KeeperExist.RoleId != 2)
                 {
-                    return new ServiceResponse<IEnumerable<GetAllBookingByKeeperIdResponse>>
+                    return new ServiceResponse<IEnumerable<FilterBookingForKeeperResponse>>
                     {
                         Message = "Tài khoản không phải là nhân viên bãi xe.",
                         Success = false,
@@ -50,7 +51,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetA
                 var parkingExist = await _parkingRepository.GetById(KeeperExist.ParkingId);
                 if (parkingExist == null)
                 {
-                    return new ServiceResponse<IEnumerable<GetAllBookingByKeeperIdResponse>>
+                    return new ServiceResponse<IEnumerable<FilterBookingForKeeperResponse>>
                     {
                         Message = "Không tìm thấy bãi giữ xe.",
                         Success = false,
@@ -58,20 +59,28 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetA
 
                     };
                 }
-                var lstBooking = await _bookingRepository.GetAllBookingByParkingIdMethod(parkingExist.ParkingId, request.PageNo, request.PageSize);
-                if (lstBooking == null)
+                if(request.Date.ToString() == null)
                 {
-                    return new ServiceResponse<IEnumerable<GetAllBookingByKeeperIdResponse>>
+                    request.Date = null;
+                }
+                if(request.Status == null)
+                {
+                    request.Status = null;
+                }
+                var lstBooking = await _bookingRepository.FilterBookingForKeeperMethod(parkingExist.ParkingId, request.Date, request.Status, request.PageNo, request.PageSize);
+                if(lstBooking == null)
+                {
+                    return new ServiceResponse<IEnumerable<FilterBookingForKeeperResponse>>
                     {
-                        Message = "Không tìm thấy đơn đặt",
+                        Message = "Không tìm thấy đơn.",
                         Success = false,
                         StatusCode = 404
                     };
                 }
-                List<GetAllBookingByKeeperIdResponse> lstReturn = new();
+                List<FilterBookingForKeeperResponse> lstReturn = new();
                 foreach (var booking in lstBooking)
                 {
-                    var eachEntity = new GetAllBookingByKeeperIdResponse
+                    var eachEntity = new FilterBookingForKeeperResponse
                     {
                         BookingSearchResult = _mapper.Map<BookingSearchResult>(booking),
                         VehicleInforSearchResult = _mapper.Map<VehicleInforSearchResult>(booking.VehicleInfor),
@@ -80,7 +89,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetA
                     };
                     lstReturn.Add(eachEntity);
                 }
-                return new ServiceResponse<IEnumerable<GetAllBookingByKeeperIdResponse>>
+                return new ServiceResponse<IEnumerable<FilterBookingForKeeperResponse>>
                 {
                     Data = lstReturn.OrderByDescending(x => x.BookingSearchResult.BookingId),
                     Message = "Thành công",
