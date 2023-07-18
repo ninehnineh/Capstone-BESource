@@ -27,16 +27,16 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Keep
         /// <param name="searchString"></param>
         /// <returns></returns>
         /// 
-        [Authorize(Roles = "Keeper")]
-        [HttpGet("parkings/{parkingId}", Name = "SearchRequestBooking")]
+        /*[Authorize(Roles = "Keeper")]*/
+        [HttpGet("keeper/{keeperId}", Name = "SearchRequestBooking")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ServiceResponse<IEnumerable<SearchRequestBookingResponse>>>> SearchRequestBooking(int parkingId, [FromQuery]string searchString)
+        public async Task<ActionResult<ServiceResponse<IEnumerable<SearchRequestBookingResponse>>>> SearchRequestBooking(int keeperId, [FromQuery]string searchString)
         {
             try
             {
-                var query = new SearchRequestBookingQuery() { ParkingId = parkingId, SearchString = searchString };
+                var query = new SearchRequestBookingQuery() { KeeperId = keeperId, SearchString = searchString };
                 var res = await _mediator.Send(query);
                 if (res.Message != "Thành công")
                 {
@@ -54,16 +54,16 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Keep
         /// API For Keeper
         /// </summary>
         /// 
-        [Authorize(Roles = "Keeper")]
-        [HttpGet("{staffId}/parkings", Name = "GetAllBookingByKeeperId")]
+        /*[Authorize(Roles = "Keeper")]*/
+        [HttpGet("{keeperId}/parkings", Name = "GetAllBookingByKeeperId")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ServiceResponse<IEnumerable<GetAllBookingByKeeperIdResponse>>>> GetAllBookingByKeeperId(int staffId, [FromQuery]int pageNo, [FromQuery]int pageSize)
+        public async Task<ActionResult<ServiceResponse<IEnumerable<GetAllBookingByKeeperIdResponse>>>> GetAllBookingByKeeperId(int keeperId, [FromQuery]int pageNo, [FromQuery]int pageSize)
         {
             try
             {
-                var query = new GetAllBookingByKeeperIdQuery() { StaffId = staffId, PageNo = pageNo, PageSize = pageSize };
+                var query = new GetAllBookingByKeeperIdQuery() { KeeperId = keeperId, PageNo = pageNo, PageSize = pageSize };
                 var res = await _mediator.Send(query);
                 if (res.Message != "Thành công")
                 {

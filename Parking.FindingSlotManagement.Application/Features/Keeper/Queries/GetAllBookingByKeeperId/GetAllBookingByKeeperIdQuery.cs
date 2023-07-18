@@ -10,7 +10,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetA
 {
     public class GetAllBookingByKeeperIdQuery : IRequest<ServiceResponse<IEnumerable<GetAllBookingByKeeperIdResponse>>>
     {
-        public int StaffId { get; set; }
+        public int KeeperId { get; set; }
         public int PageNo { get; set; }
         public int PageSize { get; set; }
     }
