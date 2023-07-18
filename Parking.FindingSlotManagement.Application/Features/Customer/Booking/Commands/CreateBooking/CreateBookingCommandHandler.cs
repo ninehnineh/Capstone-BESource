@@ -333,7 +333,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             QRCodeGenerator qrGenerator = new QRCodeGenerator();
 
             // Generate a QR code with the given data
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode(bookingId.ToString(), QRCodeGenerator.ECCLevel.Q);
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode("pz-"+bookingId.ToString(), QRCodeGenerator.ECCLevel.Q);
 
             // Create a QR code object from the QR code data
             QRCode qrCode = new QRCode(qrCodeData);

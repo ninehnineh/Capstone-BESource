@@ -32,7 +32,6 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// API For Manager
         /// </summary>
         /// 
-        [Authorize(Roles = "Manager,Admin,Staff")]
         [HttpGet("floor/{floorId}", Name = "GetListParkingSlotByFloorId")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]

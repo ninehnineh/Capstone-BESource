@@ -72,6 +72,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
                 var approveParkingEntity = _mapper.Map<Domain.Entities.ApproveParking>(request);
                 approveParkingEntity.Status = ApproveParkingStatus.Tạo_mới.ToString();
                 approveParkingEntity.CreatedDate = DateTime.UtcNow.AddHours(7);
+                approveParkingEntity.NoteForAdmin = null;
                 await _approveParkingRepository.Insert(approveParkingEntity);
                 if(!request.Images.Any())
                 {

@@ -88,6 +88,7 @@ using Parking.FindingSlotManagement.Application.Features.Admin.Accounts.GetAllCu
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetApproveParkingById;
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetListParkingWaitingToAccept;
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetListParkingNewWNoApprove;
+using Parking.FindingSlotManagement.Application.Features.Keeper.Queries.SearchRequestBooking;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -191,6 +192,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<Domain.Entities.Parking, ParkingWithBookingDetailDto>().ReverseMap();
             CreateMap<Domain.Entities.Parking, GetAllParkingForAdminResponse>().ReverseMap();
             CreateMap<Domain.Entities.Parking, GetListParkingNewWNoApproveResponse>().ReverseMap();
+            CreateMap < Domain.Entities.Parking, ParkingSearchResult>().ReverseMap();
             #endregion
 
             #region StaffParking Mapping
@@ -242,6 +244,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<VehicleInfor, GetVehicleInfoForGuestByIdResponse>().ReverseMap();
             CreateMap<VehicleInfor, BookingVehicleInforDTO>().ReverseMap();
             CreateMap<VehicleInfor, VehicleInforDtoos>().ReverseMap();
+            CreateMap<VehicleInfor, VehicleInforSearchResult>()
+                .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.Traffic.Name))
+                .ReverseMap();
             #endregion
 
             #region ParkingHasPrice Mapping
@@ -269,6 +274,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<ParkingSlot, ParkingSlotsDto>().ReverseMap();
             CreateMap<ParkingSlot, ParkingSlotDto>().ReverseMap();
             CreateMap<ParkingSlot, ParkingSlotWithBookingDetailDto>().ReverseMap();
+            CreateMap<ParkingSlot, ParkingSlotSearchResult>().ReverseMap();
             #endregion
 
             #region Timeline Mapping
@@ -304,6 +310,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.ParkingId, act => act.MapFrom(obj => obj.BookingDetails.First().TimeSlot.Parkingslot.Floor.ParkingId))
                 .ReverseMap();
             CreateMap<Booking, BookingCheckoutDto>().ReverseMap();
+            CreateMap<Booking, BookingSearchResult>().ReverseMap();
             #endregion
 
             #region Transaction Mapping
@@ -328,6 +335,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.ParkingName, act => act.MapFrom(obj => obj.Parking.Name))
                 .ReverseMap();
             #endregion
+
             #region FieldWorkParkingImg
             CreateMap<FieldWorkParkingImg, ImagesOfRequestApprove>();
             #endregion

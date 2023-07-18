@@ -10,6 +10,7 @@ namespace Parking.FindingSlotManagement.Domain.Entities
     {
         public int ApproveParkingId { get; set; }
         public string? Note { get; set; }
+        public string? NoteForAdmin { get; set; }
         public DateTime CreatedDate { get; set; }
         public string Status { get; set; }
 

@@ -13,6 +13,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
         public string? Note { get; set; }
         public int? StaffId { get; set; }
         public string? StaffName { get; set; }
-        public List<ImagesOfRequestApprove> Images { get; set; }
+        public string Status { get; set; }
+        /*        public List<ImagesOfRequestApprove> Images { get; set; }*/
     }
 }

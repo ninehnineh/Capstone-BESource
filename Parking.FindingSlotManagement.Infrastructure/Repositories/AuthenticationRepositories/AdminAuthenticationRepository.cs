@@ -21,16 +21,19 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories.Authenticati
     {
 
         private readonly IConfiguration _configuration;
+        private readonly IStaffAuthenticationRepository _staffAuthenticationRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ParkZDbContext _dbContext;
         private readonly JwtSettings _jwtSettings;
 
         public AdminAuthenticationRepository(IConfiguration configuration,
             IOptions<JwtSettings> jwtSettings,
+            IStaffAuthenticationRepository staffAuthenticationRepository,
             IHttpContextAccessor httpContextAccessor,
             ParkZDbContext DbContext)
         {
             _configuration = configuration;
+            _staffAuthenticationRepository = staffAuthenticationRepository;
             _httpContextAccessor = httpContextAccessor;
             _dbContext = DbContext;
             _jwtSettings = jwtSettings.Value;
@@ -47,12 +50,12 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories.Authenticati
             {
                 return GenerateTokenForAdminNotManagedByPersistences(response, adminEmail);
             }
-
-            response.Success = false;
+            var staff = await _staffAuthenticationRepository.StaffLogin(request);
+            /*response.Success = false;
             response.StatusCode = 404;
-            response.Message = "Đăng nhập thất bại";
+            response.Message = "Đăng nhập thất bại";*/
 
-            return response;
+            return staff;
         }
 
         private ServiceResponse<AuthResponse> GenerateTokenForAdminNotManagedByPersistences(

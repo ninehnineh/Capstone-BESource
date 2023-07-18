@@ -26,5 +26,8 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         Task<int> GetTotalNumberOfOrdersInCurrentDayByParkingIdMethod(int parkingId);
         Task<int> GetTotalWaitingOrdersByParkingIdMethod(int parkingId);
         Task<Booking> GetBookingDetailsByBookingIdMethod(int bookingId);
+        Task<IEnumerable<Booking>> SearchRequestBookingMethod(int parkingId, string searchString);
+        Task<IEnumerable<Booking>> GetAllBookingByParkingIdMethod(int parkingId, int pageNo, int pageSize);
+        Task<IEnumerable<Booking>> FilterBookingForKeeperMethod(int parkingId, DateTime? date, string? status, int pageNo, int pageSize);
     }
 }

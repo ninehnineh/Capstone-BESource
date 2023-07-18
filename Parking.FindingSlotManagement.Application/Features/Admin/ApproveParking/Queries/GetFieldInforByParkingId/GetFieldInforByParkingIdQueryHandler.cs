@@ -41,8 +41,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                 }
                 List<Expression<Func<Domain.Entities.ApproveParking, object>>> includes = new List<Expression<Func<Domain.Entities.ApproveParking, object>>>
                 {
-                    x => x.User,
-                    x => x.FieldWorkParkingImgs
+                    x => x.User
                 };
                 var approveParkingInfo = await _approveParkingRepository.GetAllItemWithCondition(x => x.ParkingId == request.ParkingId, includes);
                 /*List<string> imgs = new();
@@ -78,7 +77,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                         Note = item.Note,
                         StaffId = item.StaffId,
                         StaffName = item.User.Name,
-                        Images = _mapper.Map< List<ImagesOfRequestApprove>> (item.FieldWorkParkingImgs)
+                        Status = item.Status
+                       /* Images = _mapper.Map< List<ImagesOfRequestApprove>> (item.FieldWorkParkingImgs)*/
                     };
                     resReturn.Add(response);
                 }
