@@ -82,6 +82,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Keep
         /// API For Keeper
         /// </summary>
         /// 
+        [Authorize(Roles = "Keeper")]
         [HttpGet("filters/{keeperId}/parkings", Name = "FilterBookingForKeeper")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
