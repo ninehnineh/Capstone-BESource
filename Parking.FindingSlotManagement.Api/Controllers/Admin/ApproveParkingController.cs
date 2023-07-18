@@ -123,18 +123,14 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
-        [HttpPut("request/accept/{approveParkingId}", Name = "AcceptParkingRequest")]
+        [HttpPut("request/accept", Name = "AcceptParkingRequest")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<ServiceResponse<string>>> AcceptParkingRequest(int approveParkingId)
+        public async Task<ActionResult<ServiceResponse<string>>> AcceptParkingRequest(AcceptParkingRequestCommand command)
         {
             try
             {
-                var command = new AcceptParkingRequestCommand()
-                {
-                    ApproveParkingId = approveParkingId
-                };
                 var res = await _mediator.Send(command);
                 if (res.Message != "Thành công")
                 {
@@ -151,18 +147,14 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
-        [HttpPut("request/decline/{approveParkingId}", Name = "DeclineParkingRequest")]
+        [HttpPut("request/decline", Name = "DeclineParkingRequest")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<ServiceResponse<string>>> DeclineParkingRequest(int approveParkingId)
+        public async Task<ActionResult<ServiceResponse<string>>> DeclineParkingRequest(DeclineParkingRequestCommand command)
         {
             try
             {
-                var command = new DeclineParkingRequestCommand()
-                {
-                    ApproveParkingId = approveParkingId
-                };
                 var res = await _mediator.Send(command);
                 if (res.Message != "Thành công")
                 {
