@@ -27,7 +27,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Keep
         /// <param name="searchString"></param>
         /// <returns></returns>
         /// 
-        /*[Authorize(Roles = "Keeper")]*/
+        [Authorize(Roles = "Keeper")]
         [HttpGet("keeper/{keeperId}", Name = "SearchRequestBooking")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -54,7 +54,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Keep
         /// API For Keeper
         /// </summary>
         /// 
-        /*[Authorize(Roles = "Keeper")]*/
+        [Authorize(Roles = "Keeper")]
         [HttpGet("{keeperId}/parkings", Name = "GetAllBookingByKeeperId")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
