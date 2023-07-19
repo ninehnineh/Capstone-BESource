@@ -50,12 +50,21 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                         Success = true
                     };
                 }
+                /*if (parkingExist.ApproveParkings == null || parkingExist.ApproveParkings.Count() == 0)
+                {
+                    return new ServiceResponse<GetParkingInformationTabResponse>
+                    {
+                        Message = "Bãi chưa có yêu cầu duyệt nào.Vui lòng tạo yêu cầu duyệt!!!",
+                        StatusCode = 404,
+                        Success = false
+                    };
+                }*/
                 GetParkingInformationTabResponse entityRes = new()
                 {
                     ParkingId = parkingExist.ParkingId,
                     BusinessId = parkingExist.BusinessId,
                     BusinessName = parkingExist.BusinessProfile.Name,
-                    ApproveParkingStatus = parkingExist.ApproveParkings.LastOrDefault().Status,
+                    ApproveParkingStatus = !parkingExist.ApproveParkings.Any()? "Chưa_có_trạng_thái" : parkingExist.ApproveParkings.LastOrDefault().Status,
                     Stars = parkingExist.Stars,
                     Description = parkingExist.Description,
                     Address = parkingExist.Address,
@@ -99,14 +108,39 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                     totalSlotBooked += lstParkingSlotHasBooked.Count();
                 }
                 entityRes.SlotHasBooked = totalSlotBooked;
-                var lstImages = await _fieldWorkParkingImgRepository.GetAllItemWithConditionByNoInclude(x => x.ApproveParkingId == parkingExist.ApproveParkings.LastOrDefault().ApproveParkingId);
-                if(!lstImages.Any())
+                if(!parkingExist.ApproveParkings.Any())
                 {
+                    entityRes.Images = null;
                     return new ServiceResponse<GetParkingInformationTabResponse>
                     {
-                        Message = "Không tìm thấy hình ảnh thực địa.",
-                        Success = false,
-                        StatusCode = 404
+                        Data = entityRes,
+                        Message = "Thành công",
+                        Success = true,
+                        StatusCode = 200
+                    };
+                }
+                var approveParkingId = parkingExist.ApproveParkings.LastOrDefault().ApproveParkingId;
+                var lstImages = await _fieldWorkParkingImgRepository.GetAllItemWithConditionByNoInclude(x => x.ApproveParkingId == approveParkingId);
+                if(lstImages == null)
+                {
+                    entityRes.Images = null;
+                    return new ServiceResponse<GetParkingInformationTabResponse>
+                    {
+                        Data = entityRes,
+                        Message = "Thành công",
+                        Success = true,
+                        StatusCode = 200
+                    };
+                }
+                else if(!lstImages.Any())
+                {
+                    entityRes.Images = null;
+                    return new ServiceResponse<GetParkingInformationTabResponse>
+                    {
+                        Data = entityRes,
+                        Message = "Thành công",
+                        Success = true,
+                        StatusCode = 200
                     };
                 }
                 List<string> imgRes = new();
