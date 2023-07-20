@@ -397,7 +397,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
                     await _timeSlotRepository.Save();
                     await _bookingDetailsRepository.AddRange(bookingDetails);
-                    var transaction = new Transaction
+                    var transaction = new Domain.Entities.Transaction
                     {
                         Price = expectedPrice,
                         Status = BookingPaymentStatus.Chua_thanh_toan.ToString(),
@@ -531,7 +531,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         }
         private async Task CreateNewTransaction(string? paymentMethod, User user, Domain.Entities.Booking entity, decimal expectedPrice)
         {
-            var transaction = new Transaction
+            var transaction = new Domain.Entities.Transaction
             {
                 Price = expectedPrice,
                 Status = BookingPaymentStatus.Da_thanh_toan.ToString(),

@@ -54,7 +54,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Authentica
                 entity.IsActive = true;
                 entity.RoleId = 3;
                 await _userRepository.Insert(entity);
-                var entityWallet = new Wallet
+                var entityWallet = new Domain.Entities.Wallet
                 {
                     Balance = 0.0M,
                     Debt = 0.0M,
