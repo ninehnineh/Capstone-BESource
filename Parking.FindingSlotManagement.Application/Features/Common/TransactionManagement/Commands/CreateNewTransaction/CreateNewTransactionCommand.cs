@@ -12,5 +12,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Common.TransactionM
         public decimal? Price { get; set; }
         public string? Status { get; set; }
         public int? WalletId { get; set; }
+        public string? Description { get; set; }
     }
 }

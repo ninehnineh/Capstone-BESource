@@ -268,7 +268,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
         private async Task CreateNewTransaction(string? paymentMethod, User user, Domain.Entities.Booking entity, decimal expectedPrice)
         {
-            var transaction = new Transaction
+            var transaction = new Domain.Entities.Transaction
             {
                 Price = expectedPrice,
                 Status = BookingPaymentStatus.Da_thanh_toan.ToString(),
