@@ -41,5 +41,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.Sear
         public string? Name { get; set; }
         public int? RowIndex { get; set; }
         public int? ColumnIndex { get; set; }
+        public string FloorName { get; set; }
     }
 }
