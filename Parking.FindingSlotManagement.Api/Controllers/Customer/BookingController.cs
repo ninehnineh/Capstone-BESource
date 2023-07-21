@@ -1,7 +1,9 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Parking.FindingSlotManagement.Application;
+using Parking.FindingSlotManagement.Application.Features.Admin.Paypal.PaypalManagement.Queries.GetPaypalByManagerId;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CaculateTotalPriceAfterSelectSlot;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CancelBooking;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.ChangeStatusToAlreadyPaid;
@@ -13,10 +15,13 @@ using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Comman
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.PrePaidOnline;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetAvailableSlot;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetBookingDetails;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetCustomerActivities;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetListBookingFollowCalendar;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetUpcommingBooking;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.CheckIn;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
+using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Customer
 {
@@ -32,6 +37,60 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
         {
             _mediator = mediator;
             _hubContext = hubContext;
+        }
+        /// <summary>
+        /// API For Customer
+        /// </summary>
+        /// 
+        [Authorize(Roles = "Customer")]
+        [HttpGet("upcomming/{userId}", Name = "GetUpcommingBookingByUserId")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<GetUpcommingBookingResponse>>>> GetUpcommingBookingByUserId(int userId)
+        {
+            try
+            {
+                var query = new GetUpcommingBookingQuery() { UserId = userId };
+                var res = await _mediator.Send(query);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Customer
+        /// </summary>
+        /// 
+        [Authorize(Roles = "Customer")]
+        [HttpGet("activities/{userId}", Name = "GetCustomerActivitiesByUserId")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<GetCustomerActivitiesResponse>>>> GetCustomerActivitiesByUserId(int userId)
+        {
+            try
+            {
+                var query = new GetCustomerActivitiesQuery() { UserId = userId };
+                var res = await _mediator.Send(query);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
         }
         /// <summary>
         /// API For Customer

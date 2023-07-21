@@ -278,7 +278,9 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<ParkingSlot, ParkingSlotsDto>().ReverseMap();
             CreateMap<ParkingSlot, ParkingSlotDto>().ReverseMap();
             CreateMap<ParkingSlot, ParkingSlotWithBookingDetailDto>().ReverseMap();
-            CreateMap<ParkingSlot, ParkingSlotSearchResult>().ReverseMap();
+            CreateMap<ParkingSlot, ParkingSlotSearchResult>()
+                .ForMember(dto => dto.FloorName, act => act.MapFrom(obj => obj.Floor.FloorName))
+                .ReverseMap();
             #endregion
 
             #region Timeline Mapping
