@@ -17,6 +17,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Infrastructure
         void AutoCancelBookingWhenOverAllowTimeBooking(int bookingId);
         void AutoCancelBookingWhenOutOfEndTimeBooking(int bookingId);
         void ChargeMoneyFor1MonthUsingSystem(Fee fee, int bussinesId, int billId, User user);
-        void CheckIfBookingIsLateOrNot(int bookingId, int parkingId, List<string> Token, User ManagerOfParking, string jobId);
+        void CheckIfBookingIsLateOrNot(int bookingId, int parkingId, List<string> Token, User ManagerOfParking);
     }
 }
