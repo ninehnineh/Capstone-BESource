@@ -43,6 +43,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences
         public DbSet<ApproveParking> ApproveParkings { get; set; } = null!;
         public DbSet<Domain.Entities.VnPay> VnPays { get; set; } = null!;
         public DbSet<BookingDetails> BookingDetails { get; set; }
+        public DbSet<ConflictRequest> ConflictRequests { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
