@@ -1,4 +1,5 @@
-﻿using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+﻿using Microsoft.EntityFrameworkCore;
+using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using System;
@@ -23,6 +24,24 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
         {
             await _dbContext.AddRangeAsync(bookingDetails);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteRange(List<BookingDetails> bookingDetails)
+        {
+            _dbContext.RemoveRange(bookingDetails);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<BookingDetails>> GetParkingSlotIdByBookingDetail(int bookingId)
+        {
+            var booking = await _dbContext.BookingDetails
+                                                .Include(x => x.TimeSlot)
+                                                .Where(x => x.BookingId == bookingId).ToListAsync();
+            if(!booking.Any())
+            {
+                return null;
+            }
+            return booking;
         }
     }
 }
