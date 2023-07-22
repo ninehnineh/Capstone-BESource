@@ -253,6 +253,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         Data = entity.BookingId,
                         StatusCode = 201,
                         Success = true,
+                        Message = "Thành công"
                     };
                 }
                 else
@@ -467,6 +468,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         Data = entity.BookingId,
                         StatusCode = 201,
                         Success = true,
+                        Message = "Thành công"
                     };
                 }
                 

@@ -10,5 +10,7 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
     public interface IBookingDetailsRepository : IGenericRepository<BookingDetails>
     {
         Task AddRange(List<BookingDetails> bookingDetails);
+        Task DeleteRange(List<BookingDetails> bookingDetails);
+        Task<IEnumerable<BookingDetails>> GetParkingSlotIdByBookingDetail(int bookingId);
     }
 }
