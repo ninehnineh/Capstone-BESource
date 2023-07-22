@@ -13,5 +13,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Transactio
         public string? Status { get; set; }
         public string? PaymentMethod { get; set; }
         public string? Description { get; set; }
+        public DateTime? CreatedDate { get; set; }
     }
 }
