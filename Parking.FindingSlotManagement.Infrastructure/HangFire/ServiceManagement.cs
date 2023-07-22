@@ -302,7 +302,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 x => x.ChargeMoneyFor1MonthUsingSystem(fee, bussinesId, newBill.BillId, user), timeToCancel);
         }
 
-        public void CheckIfBookingIsLateOrNot(int bookingId, int parkingId, List<string> token, User ManagerOfParking, string jobId)
+        public void CheckIfBookingIsLateOrNot(int bookingId, int parkingId, List<string> token, User ManagerOfParking)
         {
             Console.WriteLine("Background Job CheckIfBookingIsLateOrNot Called");
             var bookedBooking = _context.Bookings
@@ -316,11 +316,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
 
 
             //Delete job
-            if (customerIsCheckOut)
+/*            if (customerIsCheckOut)
             {
                 BackgroundJob.Delete(jobId);
-            }
-            else if (!customerIsCheckOut && nextTimeSlot.Status.Equals(TimeSlotStatus.Free.ToString()))
+            }*/
+            if (!customerIsCheckOut && nextTimeSlot.Status.Equals(TimeSlotStatus.Free.ToString()))
             {
                 var newJobId = "";
                 nextTimeSlot.Status = TimeSlotStatus.Booked.ToString();
@@ -336,7 +336,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 DateTime end = DateTime.Parse(nextTimeSlot.EndTime.ToString()).AddMinutes(1);
                 DateTimeOffset timeToCallMethod = new DateTimeOffset(end, new TimeSpan(7, 0, 0));
                 newJobId = BackgroundJob.Schedule<IServiceManagement>(
-                x => x.CheckIfBookingIsLateOrNot(bookingId, parkingId, token, ManagerOfParking, newJobId),
+                x => x.CheckIfBookingIsLateOrNot(bookingId, parkingId, token, ManagerOfParking),
                 timeToCallMethod);
             }
             else if (!customerIsCheckOut && nextTimeSlot.Status.Equals(TimeSlotStatus.Booked.ToString()))

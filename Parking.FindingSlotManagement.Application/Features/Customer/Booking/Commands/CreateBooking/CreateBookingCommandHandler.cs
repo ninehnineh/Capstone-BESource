@@ -282,7 +282,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     };
             var managerExist = await _parkingRepository.GetItemWithCondition(x => x.ParkingId == parking.ParkingId, includesParking);
             var ManagerOfParking = managerExist.BusinessProfile.User;
-            SetJob(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, ManagerOfParking);
+            var managerToGetDeviceToken = await _userRepository.GetItemWithCondition(x => x.UserId == ManagerOfParking.UserId);
+            SetJob(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, managerToGetDeviceToken);
 
             await PushNotiToManager(parkingSlot, floor, parking);
             await PushNoTiToCustomer(request, parkingSlot, floor);
@@ -437,7 +438,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
             await _timeSlotRepository.Save();
             await _bookingDetailsRepository.AddRange(bookingDetails);
-            var transaction = new Transaction
+            var transaction = new Domain.Entities.Transaction
             {
                 Price = expectedPrice,
                 Status = BookingPaymentStatus.Chua_thanh_toan.ToString(),
@@ -460,8 +461,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     };
             var managerExist = await _parkingRepository.GetItemWithCondition(x => x.ParkingId == parking.ParkingId, includesParking);
             var ManagerOfParking = managerExist.BusinessProfile.User;
-
-            SetJob(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, ManagerOfParking);
+            var managerToGetDeviceToken = await _userRepository.GetItemWithCondition(x => x.UserId == ManagerOfParking.UserId);
+            SetJob(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, managerToGetDeviceToken);
 
             await PushNotiToManager(parkingSlot, floor, parking);
             await PushNoTiToCustomer(request, parkingSlot, floor);
@@ -476,14 +477,14 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
         private void SetJob(int bookingId, DateTime? endTime, int parkingId, List<string> Token, User ManagerOfParking)
         {
-            var jobId = "";
+
 
             DateTime end = DateTime.Parse(endTime.ToString()).AddMinutes(1);
             // var timeToCa = DateTimeOffset.UtcNow.AddHours(7).AddMinutes(1); // 7 ngay + 1 phut chay tren server
             DateTimeOffset timeToCallMethod = new DateTimeOffset(end, new TimeSpan(7, 0, 0));
 
-            jobId = BackgroundJob.Schedule<IServiceManagement>(
-                x => x.CheckIfBookingIsLateOrNot(bookingId, parkingId, Token, ManagerOfParking, jobId),
+            var jobId = BackgroundJob.Schedule<IServiceManagement>(
+                x => x.CheckIfBookingIsLateOrNot(bookingId, parkingId, Token, ManagerOfParking),
                 timeToCallMethod);
 
             BackgroundJob.Schedule(
