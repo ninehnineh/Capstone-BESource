@@ -141,7 +141,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                         Status = Domain.Enum.BookingPaymentStatus.Chua_thanh_toan.ToString(),
                         PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(),
                         Description = "Phí phạt ra bãi trễ",
-                        BookingId = booking.BookingId
+                        BookingId = booking.BookingId,
+                        CreatedDate = DateTime.UtcNow.AddHours(7),
                     };
 
                     await _transactionRepository.Insert(bp);
@@ -176,7 +177,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                         Status = Domain.Enum.BookingPaymentStatus.Chua_thanh_toan.ToString(),
                         PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(),
                         Description = "Phí vào sớm hơn dự kiến",
-                        BookingId = booking.BookingId
+                        BookingId = booking.BookingId,
+                        CreatedDate = DateTime.UtcNow.AddHours(7),
                     };
 
                     await _transactionRepository.Insert(bp);
@@ -211,7 +213,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                         Status = Domain.Enum.BookingPaymentStatus.Chua_thanh_toan.ToString(),
                         PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(),
                         Description = "Phí vào sớm hơn dự kiến",
-                        BookingId = booking.BookingId
+                        BookingId = booking.BookingId,
+                        CreatedDate = DateTime.UtcNow.AddHours(7),
                     };
 
                     await _transactionRepository.Insert(bp);
@@ -242,7 +245,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                         Status = Domain.Enum.BookingPaymentStatus.Chua_thanh_toan.ToString(),
                         PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(),
                         Description = "Phí phạt ra bãi trễ",
-                        BookingId = booking.BookingId
+                        BookingId = booking.BookingId,
+                        CreatedDate = DateTime.UtcNow.AddHours(7),
                     };
 
                     await _transactionRepository.Insert(bp1);

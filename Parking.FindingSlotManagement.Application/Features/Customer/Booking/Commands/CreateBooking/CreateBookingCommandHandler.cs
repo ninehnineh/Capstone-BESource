@@ -443,7 +443,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 Price = expectedPrice,
                 Status = BookingPaymentStatus.Chua_thanh_toan.ToString(),
                 PaymentMethod = paymentMethod,
-                BookingId = entity.BookingId
+                BookingId = entity.BookingId,
+                CreatedDate = DateTime.UtcNow.AddHours(7),
             };
 
             if (request.BookingDto.PaymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc))
@@ -539,7 +540,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 Status = BookingPaymentStatus.Da_thanh_toan.ToString(),
                 PaymentMethod = paymentMethod,
                 WalletId = user.Wallet.WalletId,
-                BookingId = entity.BookingId
+                BookingId = entity.BookingId,
+                CreatedDate = DateTime.UtcNow.AddHours(7),
             };
             await _transactionRepository.Insert(transaction);
         }
