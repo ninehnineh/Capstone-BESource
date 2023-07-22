@@ -64,7 +64,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                         {
                             Price = wallet.Balance,
                             WalletId = walletAdd.WalletId,
-                            Status = Domain.Enum.TransactionStatus.Nap_tien_vao_vi_khong_thanh_cong.ToString()
+                            Status = Domain.Enum.TransactionStatus.Nap_tien_vao_vi_khong_thanh_cong.ToString(),
+                            Description = "Nạp tiền vào ví."
                         };
                         var entityToAdd = _mapper.Map<Transaction>(transactionEntityCommand);
                         await _transactionRepository.CreateNewTransactionWithDeposit(entityToAdd);
@@ -74,7 +75,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                     {
                         Price = wallet.Balance,
                         WalletId = walletAdd.WalletId,
-                        Status = Domain.Enum.TransactionStatus.Nap_tien_vao_vi_thanh_cong.ToString()
+                        Status = Domain.Enum.TransactionStatus.Nap_tien_vao_vi_thanh_cong.ToString(),
+                        Description = "Nạp tiền vào ví."
                     };
                     var entityToAdd2 = _mapper.Map<Transaction>(transactionEntityCommand2);
                     await _transactionRepository.CreateNewTransactionWithDeposit(entityToAdd2);
@@ -106,7 +108,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                     {
                         Price = wallet.Balance,
                         WalletId = checkUserExistInWallet.WalletId,
-                        Status = Domain.Enum.TransactionStatus.Nap_tien_vao_vi_khong_thanh_cong.ToString()
+                        Status = Domain.Enum.TransactionStatus.Nap_tien_vao_vi_khong_thanh_cong.ToString(),
+                        Description = "Nạp tiền vào ví."
                     };
                     var entityToAdd = _mapper.Map<Transaction>(transactionEntityCommand);
                     await _transactionRepository.CreateNewTransactionWithDeposit(entityToAdd);
@@ -116,7 +119,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 {
                     Price = wallet.Balance,
                     WalletId = checkUserExistInWallet.WalletId,
-                    Status = Domain.Enum.TransactionStatus.Nap_tien_vao_vi_thanh_cong.ToString()
+                    Status = Domain.Enum.TransactionStatus.Nap_tien_vao_vi_thanh_cong.ToString(),
+                    Description = "Nạp tiền vào ví."
                 };
                 var entityToAdd3 = _mapper.Map<Transaction>(transactionEntityCommand3);
                 await _transactionRepository.CreateNewTransactionWithDeposit(entityToAdd3);

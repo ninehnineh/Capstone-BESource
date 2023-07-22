@@ -268,7 +268,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
         private async Task CreateNewTransaction(string? paymentMethod, User user, Domain.Entities.Booking entity, decimal expectedPrice)
         {
-            var transaction = new Transaction
+            var transaction = new Domain.Entities.Transaction
             {
                 Price = expectedPrice,
                 Status = BookingPaymentStatus.Da_thanh_toan.ToString(),
@@ -357,7 +357,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             QRCodeGenerator qrGenerator = new QRCodeGenerator();
 
             // Generate a QR code with the given data
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode(bookingId.ToString(), QRCodeGenerator.ECCLevel.Q);
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode("pz-"+bookingId.ToString(), QRCodeGenerator.ECCLevel.Q);
 
             // Create a QR code object from the QR code data
             QRCode qrCode = new QRCode(qrCodeData);

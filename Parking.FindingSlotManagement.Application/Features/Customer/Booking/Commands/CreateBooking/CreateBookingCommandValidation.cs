@@ -25,7 +25,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 .Length(10).WithMessage("'Số điện thoại' không được vượt quá 10 số");
 
             RuleFor(x => x.BookingDto.GuestName)
-                .Length(50).WithMessage("'Tên' không được vượt quá 50 ký tự");
+                .MaximumLength(50).WithMessage("'Tên' không được vượt quá 50 ký tự");
         }
     }
 }

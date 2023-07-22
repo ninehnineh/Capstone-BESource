@@ -149,7 +149,18 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                     .GetSection("CheckOut").Value;
                 var bodyCustomer = _configuration.GetSection("MessageBody_Customer")
                     .GetSection("CheckOut").Value;
+                if (booking.User == null)
+                {
+                    return new ServiceResponse<string>
+                    {
+                        StatusCode = 204,
+                        Message = "Thành công",
+                        Success = true,
+                    };
+                }
                 var userDiviceToken = booking.User!.Devicetoken;
+                
+                
 
                 var pushNotificationMobile = new PushNotificationMobileModel
                 {

@@ -325,6 +325,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 var booking0 = await _dbContext.Bookings
                                                 .Include(x => x.User)
                                                 .Include(x => x.VehicleInfor)
+                                                    .ThenInclude(x => x.Traffic)
                                                 .Include(x => x.BookingDetails)
                                                     .ThenInclude(x => x.TimeSlot)
                                                     .ThenInclude(x => x.Parkingslot)
@@ -344,6 +345,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 var booking = await _dbContext.Bookings
                                                 .Include(x => x.User)
                                                 .Include(x => x.VehicleInfor)
+                                                    .ThenInclude(x => x.Traffic)
                                                 .Include(x => x.BookingDetails)
                                                     .ThenInclude(x => x.TimeSlot)
                                                     .ThenInclude(x => x.Parkingslot)
@@ -356,6 +358,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                     var booking2 = await _dbContext.Bookings
                                                     .Include(x => x.User)
                                                     .Include(x => x.VehicleInfor)
+                                                        .ThenInclude(x => x.Traffic)
                                                     .Include(x => x.BookingDetails)
                                                         .ThenInclude(x => x.TimeSlot)
                                                         .ThenInclude(x => x.Parkingslot)
@@ -381,6 +384,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 var booking = await _dbContext.Bookings
                                                 .Include(x => x.User)
                                                 .Include(x => x.VehicleInfor)
+                                                    .ThenInclude(x => x.Traffic)
                                                 .Include(x => x.BookingDetails)
                                                     .ThenInclude(x => x.TimeSlot)
                                                     .ThenInclude(x => x.Parkingslot)
@@ -411,6 +415,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                     booking = await _dbContext.Bookings
                                                 .Include(x => x.User)
                                                 .Include(x => x.VehicleInfor)
+                                                    .ThenInclude(x => x.Traffic)
                                                 .Include(x => x.BookingDetails)
                                                     .ThenInclude(x => x.TimeSlot)
                                                     .ThenInclude(x => x.Parkingslot)
@@ -428,6 +433,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                     booking = await _dbContext.Bookings
                                                 .Include(x => x.User)
                                                 .Include(x => x.VehicleInfor)
+                                                    .ThenInclude(x => x.Traffic)
                                                 .Include(x => x.BookingDetails)
                                                     .ThenInclude(x => x.TimeSlot)
                                                     .ThenInclude(x => x.Parkingslot)
@@ -445,6 +451,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                     booking = await _dbContext.Bookings
                                                 .Include(x => x.User)
                                                 .Include(x => x.VehicleInfor)
+                                                    .ThenInclude(x => x.Traffic)
                                                 .Include(x => x.BookingDetails)
                                                     .ThenInclude(x => x.TimeSlot)
                                                     .ThenInclude(x => x.Parkingslot)
@@ -464,6 +471,46 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task<IEnumerable<Booking>> GetUpcommingBookingByUserIdMethod(int userId)
+        {
+            var booking = await _dbContext.Bookings
+                                                 .Include(x => x.VehicleInfor)
+                                                    .ThenInclude(x => x.Traffic)
+                                                 .Include(x => x.BookingDetails)
+                                                     .ThenInclude(x => x.TimeSlot)
+                                                     .ThenInclude(x => x.Parkingslot)
+                                                     .ThenInclude(x => x.Floor)
+                                                     .ThenInclude(x => x.Parking)
+                                                 .Where(x => x.UserId == userId && x.Status.Equals(BookingStatus.Initial.ToString()) || 
+                                                 x.UserId == userId && x.Status.Equals(BookingStatus.Success.ToString()) || 
+                                                 x.UserId == userId && x.Status.Equals(BookingStatus.Check_In.ToString()) || 
+                                                 x.UserId == userId && x.Status.Equals(BookingStatus.Check_Out.ToString())).ToListAsync();
+            if (!booking.Any())
+            {
+                return null;
+            }
+            return booking;
+        }
+
+        public async Task<IEnumerable<Booking>> GetCustomerActivitiesByUserIdMethod(int userId)
+        {
+            var booking = await _dbContext.Bookings
+                                                 .Include(x => x.VehicleInfor)
+                                                    .ThenInclude(x => x.Traffic)
+                                                 .Include(x => x.BookingDetails)
+                                                     .ThenInclude(x => x.TimeSlot)
+                                                     .ThenInclude(x => x.Parkingslot)
+                                                     .ThenInclude(x => x.Floor)
+                                                     .ThenInclude(x => x.Parking)
+                                                 .Where(x => x.UserId == userId && x.Status.Equals(BookingStatus.Done.ToString()) ||
+                                                 x.UserId == userId && x.Status.Equals(BookingStatus.Cancel.ToString())).ToListAsync();
+            if (!booking.Any())
+            {
+                return null;
+            }
+            return booking;
         }
     }
 }
