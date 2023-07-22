@@ -34,6 +34,28 @@ namespace Parking.FindingSlotManagement.Infrastructure.Firebase.PushService
             return response;
         }
 
+        public void SendNotificationToMobileAsyncV2(PushNotificationMobileModel pushNotificationMobileModel)
+        {
+            var messaging = FirebaseMessaging.DefaultInstance;
+
+            // Construct the notification message
+            var notification = new Notification
+            {
+                Title = pushNotificationMobileModel.Title,
+                Body = pushNotificationMobileModel.Message
+            };
+
+            // Construct the message payload
+            var messagePayload = new Message
+            {
+                Notification = notification,
+                Token = pushNotificationMobileModel.TokenMobile
+            };
+
+            // Send the message
+            var response = messaging.SendAsync(messagePayload);
+        }
+
         public async Task<string> SendNotificationToWebAsync(PushNotificationWebModel pushNotificationModel)
         {
             var message = new Message()
@@ -54,6 +76,27 @@ namespace Parking.FindingSlotManagement.Infrastructure.Firebase.PushService
             };
             var response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
             return response;
+        }
+
+        public void SendNotificationToWebAsyncV2(PushNotificationWebModel pushNotificationModel)
+        {
+            var message = new Message()
+            {
+                Notification = new Notification()
+                {
+                    Title = pushNotificationModel.Title,
+                    Body = pushNotificationModel.Message
+                },
+                Webpush = new WebpushConfig()
+                {
+                    Notification = new WebpushNotification()
+                    {
+                        Icon = "https://cdn-icons-png.flaticon.com/512/147/147142.png",
+                    },
+                },
+                Token = pushNotificationModel.TokenWeb,
+            };
+            var response =  FirebaseMessaging.DefaultInstance.SendAsync(message);
         }
     }
 }

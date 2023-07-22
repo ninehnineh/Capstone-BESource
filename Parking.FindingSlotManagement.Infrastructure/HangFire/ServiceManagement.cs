@@ -38,6 +38,10 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             _emailService = emailService;
         }
 
+
+
+
+
         public void AutoCancelBookingWhenOverAllowTimeBooking(int bookingId)
         {
             var lateHoursAllowed = 1;
@@ -181,7 +185,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 _context.SaveChanges();
             }
             Console.WriteLine($"Add TimeSlot In Future: Long running task {DateTime.UtcNow.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss")}");
-            
+
             var timeToDelete = DateTime.UtcNow.AddDays(7);
 
             var deleteJobId = BackgroundJob.Schedule<IServiceManagement>(x => x.DeleteTimeSlotIn1Week(), timeToDelete);
@@ -193,7 +197,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
         public void DeleteTimeSlotIn1Week()
         {
             var oneWeekAgo = DateTime.UtcNow.AddHours(7).AddDays(-7);
-            Console.WriteLine($"One week ago to delete time slot: {oneWeekAgo}" );
+            Console.WriteLine($"One week ago to delete time slot: {oneWeekAgo}");
             var dataToDelete = _context.TimeSlots.Where(x => x.CreatedDate <= oneWeekAgo);
             if (dataToDelete.Any())
             {
@@ -212,9 +216,10 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             Console.WriteLine($"Generate Merchandise: Long running task {DateTime.UtcNow.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss")}");
         }
 
-        public void SendEmail()
+        public void SendEmail(int entity)
         {
-            Console.WriteLine($"Send Email: Long running task {DateTime.UtcNow.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss")}");
+            Console.WriteLine("blabla send email");
+            Console.WriteLine($"Send Email: Long running task {DateTime.UtcNow.AddHours(7).ToString("dd-MM-yyyy HH:mm:ss")}");
         }
 
         public void SyncData()
@@ -265,7 +270,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             }
 
         }
-
         private void SendMailToManager(Fee fee, User user)
         {
             EmailModel emailModel = new EmailModel();
@@ -296,6 +300,86 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
 
             BackgroundJob.Schedule<IServiceManagement>(
                 x => x.ChargeMoneyFor1MonthUsingSystem(fee, bussinesId, newBill.BillId, user), timeToCancel);
+        }
+
+        public void CheckIfBookingIsLateOrNot(int bookingId, int parkingId, List<string> token, User ManagerOfParking, string jobId)
+        {
+            Console.WriteLine("Background Job CheckIfBookingIsLateOrNot Called");
+            var bookedBooking = _context.Bookings
+                                        .Include(x => x.BookingDetails!).ThenInclude(x => x.TimeSlot)
+                                        .FirstOrDefault(x => x.BookingId == bookingId);
+
+            var customerIsCheckOut = bookedBooking.CheckoutTime != null;
+            var bookedTimeSlot = bookedBooking.BookingDetails.Last().TimeSlotId;
+
+            var nextTimeSlot = _context.TimeSlots.Find(bookedTimeSlot + 1);
+
+
+            //Delete job
+            if (customerIsCheckOut)
+            {
+                BackgroundJob.Delete(jobId);
+            }
+            else if (!customerIsCheckOut && nextTimeSlot.Status.Equals(TimeSlotStatus.Free.ToString()))
+            {
+                var newJobId = "";
+                nextTimeSlot.Status = TimeSlotStatus.Booked.ToString();
+                var newBookingDetail = new BookingDetails
+                {
+                    BookingId = bookingId,
+                    TimeSlotId = nextTimeSlot.TimeSlotId
+                };
+
+                _context.BookingDetails.Add(newBookingDetail);
+                _context.SaveChanges();
+                
+                DateTime end = DateTime.Parse(nextTimeSlot.EndTime.ToString()).AddMinutes(1);
+                DateTimeOffset timeToCallMethod = new DateTimeOffset(end, new TimeSpan(7, 0, 0));
+                newJobId = BackgroundJob.Schedule<IServiceManagement>(
+                x => x.CheckIfBookingIsLateOrNot(bookingId, parkingId, token, ManagerOfParking, newJobId),
+                timeToCallMethod);
+            }
+            else if (!customerIsCheckOut && nextTimeSlot.Status.Equals(TimeSlotStatus.Booked.ToString()))
+            {
+                Console.WriteLine("Background Job: co request can xu ly");
+                var conflictBooking = _context.BookingDetails.FirstOrDefault(x => x.TimeSlotId == nextTimeSlot.TimeSlotId);
+
+                var newConflictRequest = new ConflictRequest
+                {
+                    BookingId = (int)conflictBooking.BookingId,
+                    Message = "Có request cần xử lý",
+                    ParkingId = parkingId,
+                    Status = "Process",
+                };
+
+                _context.ConflictRequests.Add(newConflictRequest);
+                _context.SaveChanges();
+
+                if (token.Any())
+                {
+                    foreach (var item in token)
+                    {
+                        var pushNotificationModel = new PushNotificationWebModel
+                        {
+                            // Title = titleManager,
+                            // Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                            TokenWeb = item,
+                        };
+                        _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
+                    }
+                }
+                else
+                {
+                    var manager =  _context.Users.Find(ManagerOfParking.UserId!);
+                    var pushNotificationModel = new PushNotificationWebModel
+                    {
+                        // Title = titleManager,
+                        // Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                        TokenWeb = manager.Devicetoken,
+                    };
+                    _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
+                }
+            }
         }
     }
 }

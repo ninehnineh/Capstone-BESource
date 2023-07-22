@@ -1,4 +1,5 @@
 using AutoMapper;
+using Hangfire;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CreateBookingWhenAlreadyPaid;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commons;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetBookingDetails;
 using Parking.FindingSlotManagement.Application.Models.Booking;
@@ -24,9 +26,10 @@ using static System.Reflection.Metadata.BlobBuilder;
 
 namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CreateBooking
 {
-    public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand, ServiceResponse<string>>
+    public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand, ServiceResponse<int>>
     {
         const int CUSTOMER = 3;
+        const int MANAGER = 1;
         const string BOOKED = "Booked";
         const string UNPAID = "Unpaid";
         const string PAID = "Paid";
@@ -50,6 +53,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         private readonly IBookingDetailsRepository _bookingDetailsRepository;
         private readonly ITimeSlotRepository _timeSlotRepository;
         private readonly ITransactionRepository _transactionRepository;
+        private readonly IWalletRepository _walletRepository;
         private readonly HttpClient _client;
 
         public CreateBookingCommandHandler(IBookingRepository bookingRepository,
@@ -68,8 +72,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             IFireBaseMessageServices fireBaseMessageServices,
             IVehicleInfoRepository vehicleInfoRepository,
             IBookingDetailsRepository bookingDetailsRepository,
-            ITimeSlotRepository timeSlotRepository, 
-            ITransactionRepository transactionRepository)
+            ITimeSlotRepository timeSlotRepository,
+            ITransactionRepository transactionRepository,
+            IWalletRepository walletRepository)
         {
             _bookingRepository = bookingRepository;
             _parkingSlotRepository = parkingSlotRepository;
@@ -89,11 +94,12 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             _bookingDetailsRepository = bookingDetailsRepository;
             _timeSlotRepository = timeSlotRepository;
             _transactionRepository = transactionRepository;
+            _walletRepository = walletRepository;
             _client = new HttpClient();
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Client-ID", "886d0b92410e625");
         }
 
-        public async Task<ServiceResponse<string>> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
+        public async Task<ServiceResponse<int>> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
         {
             var startTimeBooking = request.BookingDto.StartTime;
             var endTimeBooking = request.BookingDto.EndTime;
@@ -101,219 +107,22 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var paymentMethod = request.BookingDto.PaymentMethod;
             try
             {
-
-                var includes = new List<Expression<Func<Domain.Entities.TimeSlot, object>>>
+                // shecudle
+                if (paymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc))
                 {
-                   x => x.Parkingslot,
-                   x => x.Parkingslot.Floor
-                };
-                var currentLstBookedSlot = await _timeSlotRepository.GetAllItemWithCondition(x =>
-                                                            x.ParkingSlotId == request.BookingDto.ParkingSlotId &&
-                                                            x.StartTime >= startTimeBooking &&
-                                                            x.EndTime <= endTimeBooking &&
-                                                            x.Status == "Booked", includes);
-                
-                if (currentLstBookedSlot.Any())
-                {
-                    return new ServiceResponse<string>
-                    {
-                        Message = "Chỗ đặt đã được đặt, vui lòng chọn chỗ khác.",
-                        StatusCode = 400,
-                        Success = true,
-                    };
-                }
-
-                var parkingSlot = await _parkingSlotRepository
-                    .GetById(parkingSlotId);
-                
-                if (parkingSlot == null)
-                {
-                    return new ServiceResponse<string>
-                    {
-                        Message = "Chỗ để xe không khả dụng",
-                        Success = true,
-                        StatusCode = 200
-                    };
-                }
-                var vehicleInfor = await _vehicleInfoRepository
-                    .GetById(request.BookingDto.VehicleInforId);
-
-                if (vehicleInfor == null)
-                {
-                    return new ServiceResponse<string>
-                    {
-                        Message = "Loại xe không tồn tại",
-                        Success = true,
-                        StatusCode = 200
-                    };
-                }
-
-                List<Expression<Func<User, object>>> includesWallet = new()
-                {
-                    x => x.Wallet,
-                };
-
-                var user = await _userRepository
-                    .GetItemWithCondition(x => x.UserId == request.BookingDto.UserId &&
-                                            x.IsActive == true &&
-                                            x.RoleId == CUSTOMER, includesWallet);
-                if (user == null)
-                {
-                    return new ServiceResponse<string>
-                    {
-                        Message = "Người dùng không tồn tại",
-                        Success = true,
-                        StatusCode = 200
-                    };
-                }
-
-                var entity = _mapper.Map<Domain.Entities.Booking>(request.BookingDto);
-                entity.Status = BookingStatus.Initial.ToString();
-                var floor = await _floorRepository.GetById(parkingSlot.FloorId!);
-                var parkingId = floor.ParkingId;
-
-                var parking = await _parkingRepository.GetById(parkingId!);
-
-                var trafficid = vehicleInfor.TrafficId;
-
-                if (parking.CarSpot <= 0 && trafficid == OTO)
-                {
-                    return new ServiceResponse<string>
-                    {
-                        Message = "Bãi không giữ xe ô tô, vui lòng chọn bãi khác",
-                        Success = true,
-                        StatusCode = 200,
-                    };
-                }
-                else if (parking.MotoSpot <= 0 && trafficid == MOTO)
-                {
-                    return new ServiceResponse<string>
-                    {
-                        Message = "Bãi không giữ xe máy, vui lòng chọn bãi khác",
-                        Success = true,
-                        StatusCode = 200,
-                    };
-                }
-
-                List<Expression<Func<ParkingHasPrice, object>>> includess = new List<Expression<Func<ParkingHasPrice, object>>>
-                {
-                    x => x.ParkingPrice!,
-                    x => x.ParkingPrice!.Traffic!
-                };
-
-                var parkingHasPrice = await _parkingHasPriceRepository
-                        .GetAllItemWithCondition(x => x.ParkingId == parkingId, includess);
-
-                var appliedParkingPriceId = parkingHasPrice
-                    .Where(x => x.ParkingPrice!.Traffic!.TrafficId == trafficid)
-                    .FirstOrDefault()!.ParkingPriceId;
-
-                var parkingPrice = await _parkingPriceRepository.GetById(appliedParkingPriceId);
-
-                var timeLines = await _timelineRepository
-                    .GetAllItemWithCondition(x => x.ParkingPriceId == appliedParkingPriceId);
-
-                decimal expectedPrice = CaculatePriceBooking
-                    .CaculateExpectedPrice(request.BookingDto.StartTime, request.BookingDto.EndTime,
-                    parkingPrice, timeLines);
-
-                entity.TotalPrice = expectedPrice;
-                entity.DateBook = DateTime.UtcNow.AddHours(7);
-
-                await _bookingRepository.Insert(entity);
-
-                var linkQRImage = await UploadQRImagess(entity.BookingId);
-                var currentBooking = await _bookingRepository
-                    .GetItemWithCondition(x => x.BookingId == entity.BookingId, null!, false);
-                currentBooking.QRImage = linkQRImage;
-
-                await _bookingRepository.Save();
-
-                var timeSlotsBooking = await _timeSlotRepository
-                    .GetAllTimeSlotsBooking(startTimeBooking, endTimeBooking, parkingSlotId);
-
-                var bookingDetails = new List<BookingDetails>();
-
-                foreach (var timeSlot in timeSlotsBooking)
-                {
-                    bookingDetails.Add(new BookingDetails{ BookingId = entity.BookingId, TimeSlotId = timeSlot.TimeSlotId });
-                    timeSlot.Status = TimeSlotStatus.Booked.ToString();
-                }
-
-                await _timeSlotRepository.Save();
-                await _bookingDetailsRepository.AddRange(bookingDetails);
-                var transaction = new Transaction
-                {
-                    Price = expectedPrice,
-                    Status = BookingPaymentStatus.Chua_thanh_toan.ToString(),
-                    PaymentMethod = paymentMethod,
-                    BookingId = entity.BookingId
-                };
-
-                if (request.BookingDto.PaymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc))
-                {
-                    transaction.WalletId = user.Wallet.WalletId;
-                }
-                await _transactionRepository.Insert(transaction);
-
-                var titleManager = _configuration.GetSection("MessageTitle_Manager").GetSection("Success").Value;
-                var bodyManager = _configuration.GetSection("MessageBody_Manager").GetSection("Success").Value;
-
-                var deviceToken = "";
-                var managerAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
-                var lstStaff = managerAccount.Where(x => x.RoleId == 2);
-                var ManagerOfParking = managerAccount.FirstOrDefault(x => x.RoleId == 1);
-
-                if (lstStaff.Any())
-                {
-                    foreach (var item in lstStaff)
-                    {
-                        deviceToken = item.Devicetoken.ToString();
-                        var pushNotificationModel = new PushNotificationWebModel
-                        {
-                            Title = titleManager,
-                            Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                            TokenWeb = deviceToken,
-                        };
-                        await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
-                    }
+                    return await Tratruoc(request, startTimeBooking, endTimeBooking, parkingSlotId, paymentMethod);
                 }
                 else
                 {
-                    var manager = await _userRepository.GetById(ManagerOfParking.UserId!);
-                    var pushNotificationModel = new PushNotificationWebModel
-                    {
-                        Title = titleManager,
-                        Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                        TokenWeb = manager.Devicetoken,
-                    };
-                    await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
+                    return await Trasau(request, startTimeBooking, endTimeBooking, parkingSlotId, paymentMethod);
                 }
 
-                var titleCustomer = _configuration.GetSection("MessageTitle_Customer").GetSection("Success").Value;
-                var bodyCustomer = _configuration.GetSection("MessageBody_Customer").GetSection("Success").Value;
-
-                var pushNotificationMobile = new PushNotificationMobileModel
-                {
-                    Title = titleCustomer,
-                    Message = bodyCustomer + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                    TokenMobile = request.DeviceToKenMobile,
-                };
-
-                await _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
-
-                return new ServiceResponse<string>
-                {
-                    Data = entity.BookingId.ToString(),
-                    StatusCode = 201,
-                    Success = true,
-                };
             }
             catch (DbUpdateException ex)
             {
                 if (ex.InnerException!.Message.Contains("duplicate"))
                 {
-                    return new ServiceResponse<string>
+                    return new ServiceResponse<int>
                     {
                         Message = "Chỗ đỗ xe đã được người khác đặt, vui lòng chọn chỗ mới",
                         Success = false,
@@ -327,13 +136,367 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             }
         }
 
+        private async Task<ServiceResponse<int>> Tratruoc(CreateBookingCommand request, DateTime startTimeBooking, DateTime endTimeBooking, int parkingSlotId, string? paymentMethod)
+        {
+            var includes = new List<Expression<Func<Domain.Entities.TimeSlot, object>>>
+                    {
+                       x => x.Parkingslot,
+                       x => x.Parkingslot.Floor
+                    };
+            var currentLstBookedSlot = await _timeSlotRepository
+                .GetAllItemWithCondition(x => x.ParkingSlotId == request.BookingDto.ParkingSlotId &&
+                                              x.StartTime >= startTimeBooking &&
+                                              x.EndTime <= endTimeBooking &&
+                                              x.Status == "Booked", includes);
+
+            if (currentLstBookedSlot.Any())
+            {
+                return new ServiceResponse<int>
+                {
+                    Message = "Chỗ đặt đã được đặt, vui lòng chọn chỗ khác.",
+                    StatusCode = 400,
+                    Success = true,
+                };
+            }
+
+            var parkingSlot = await _parkingSlotRepository
+                .GetById(parkingSlotId);
+
+            if (parkingSlot == null)
+            {
+                return new ServiceResponse<int>
+                {
+                    Message = "Chỗ để xe không khả dụng",
+                    Success = true,
+                    StatusCode = 200
+                };
+            }
+
+            var vehicleInfor = await _vehicleInfoRepository
+                .GetById(request.BookingDto.VehicleInforId);
+
+            if (vehicleInfor == null)
+            {
+                return new ServiceResponse<int>
+                {
+                    Message = "Loại xe không tồn tại",
+                    Success = true,
+                    StatusCode = 200
+                };
+            }
+
+            List<Expression<Func<User, object>>> includesWallet = new()
+                    {
+                        x => x.Wallet,
+                    };
+
+            var user = await _userRepository
+                .GetItemWithCondition(x => x.UserId == request.BookingDto.UserId &&
+                                        x.IsActive == true &&
+                                        x.RoleId == CUSTOMER, includesWallet, false);
+
+            if (user == null)
+            {
+                return new ServiceResponse<int>
+                {
+                    Message = "Người dùng không tồn tại",
+                    Success = true,
+                    StatusCode = 200
+                };
+            }
+
+            var entity = _mapper.Map<Domain.Entities.Booking>(request.BookingDto);
+            entity.Status = BookingStatus.Initial.ToString();
+            var floor = await _floorRepository.GetById(parkingSlot.FloorId!);
+            var parkingId = floor.ParkingId;
+            var parking = await _parkingRepository.GetById(parkingId!);
+            var trafficid = vehicleInfor.TrafficId;
+
+            if (parking.CarSpot <= 0 && trafficid == OTO)
+            {
+                return new ServiceResponse<int>
+                {
+                    Message = "Bãi không giữ xe ô tô, vui lòng chọn bãi khác",
+                    Success = true,
+                    StatusCode = 200,
+                };
+            }
+            else if (parking.MotoSpot <= 0 && trafficid == MOTO)
+            {
+                return new ServiceResponse<int>
+                {
+                    Message = "Bãi không giữ xe máy, vui lòng chọn bãi khác",
+                    Success = true,
+                    StatusCode = 200,
+                };
+            }
+
+            decimal expectedPrice = await CaculateExpectedPrice(request, parkingId, trafficid);
+
+            if (user.Wallet.Balance < expectedPrice)
+            {
+                return new ServiceResponse<int>
+                {
+                    Message = "Số dư ví không đủ, vui lòng nạp thêm hoặc chọn phương thức thanh toán khác.",
+                };
+            }
+            else
+            {
+                var managerWallet = await _userRepository
+                    .GetItemWithCondition(x => x.ParkingId == parkingId && x.RoleId == MANAGER, includesWallet, false);
+
+                managerWallet.Wallet!.Balance += expectedPrice;
+                user.Wallet.Balance -= expectedPrice;
+                await _walletRepository.Save();
+            }
+
+            entity.TotalPrice = expectedPrice;
+            entity.DateBook = DateTime.Now;
+            await _bookingRepository.Insert(entity);
+
+            var linkQRImage = await UploadQRImagess(entity.BookingId);
+            var currentBooking = await _bookingRepository
+                .GetItemWithCondition(x => x.BookingId == entity.BookingId, null!, false);
+            currentBooking.QRImage = linkQRImage;
+            await _bookingRepository.Save();
+
+            var timeSlotsBooking = await _timeSlotRepository
+                .GetAllTimeSlotsBooking(startTimeBooking, endTimeBooking, parkingSlotId);
+            var bookingDetails = new List<BookingDetails>();
+            foreach (var timeSlot in timeSlotsBooking)
+            {
+                bookingDetails.Add(new BookingDetails { BookingId = entity.BookingId, TimeSlotId = timeSlot.TimeSlotId });
+                timeSlot.Status = TimeSlotStatus.Booked.ToString();
+            }
+
+            await _timeSlotRepository.Save();
+            await _bookingDetailsRepository.AddRange(bookingDetails);
+
+            await CreateNewTransaction(paymentMethod, user, entity, expectedPrice);
+
+            var staffAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
+            var lstStaffToken = staffAccount.Where(x => x.RoleId == 2).Select(x => x.Devicetoken).ToList();
+            List<Expression<Func<Domain.Entities.Parking, object>>> includesParking = new()
+                    {
+                        x => x.BusinessProfile.User
+                    };
+            var managerExist = await _parkingRepository.GetItemWithCondition(x => x.ParkingId == parking.ParkingId, includesParking);
+            var ManagerOfParking = managerExist.BusinessProfile.User;
+            SetJob(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, ManagerOfParking);
+
+            await PushNotiToManager(parkingSlot, floor, parking);
+            await PushNoTiToCustomer(request, parkingSlot, floor);
+
+            return new ServiceResponse<int>
+            {
+                Data = entity.BookingId,
+                StatusCode = 201,
+                Success = true,
+            };
+        }
+
+        private async Task<ServiceResponse<int>> Trasau(CreateBookingCommand request, DateTime startTimeBooking, DateTime endTimeBooking, int parkingSlotId, string? paymentMethod)
+        {
+            var includes = new List<Expression<Func<Domain.Entities.TimeSlot, object>>>
+                    {
+                       x => x.Parkingslot,
+                       x => x.Parkingslot.Floor
+                    };
+            var currentLstBookedSlot = await _timeSlotRepository.GetAllItemWithCondition(x =>
+                                                        x.ParkingSlotId == request.BookingDto.ParkingSlotId &&
+                                                        x.StartTime >= startTimeBooking &&
+                                                        x.EndTime <= endTimeBooking &&
+                                                        x.Status == "Booked", includes);
+
+            if (currentLstBookedSlot.Any())
+            {
+                return new ServiceResponse<int>
+                {
+                    Message = "Chỗ đặt đã được đặt, vui lòng chọn chỗ khác.",
+                    StatusCode = 400,
+                    Success = true,
+                };
+            }
+
+            var parkingSlot = await _parkingSlotRepository
+                .GetById(parkingSlotId);
+
+            if (parkingSlot == null)
+            {
+                return new ServiceResponse<int>
+                {
+                    Message = "Chỗ để xe không khả dụng",
+                    Success = true,
+                    StatusCode = 200
+                };
+            }
+            var vehicleInfor = await _vehicleInfoRepository
+                .GetById(request.BookingDto.VehicleInforId);
+
+            if (vehicleInfor == null)
+            {
+                return new ServiceResponse<int>
+                {
+                    Message = "Loại xe không tồn tại",
+                    Success = true,
+                    StatusCode = 200
+                };
+            }
+
+            List<Expression<Func<User, object>>> includesWallet = new()
+                    {
+                        x => x.Wallet,
+                    };
+
+            var user = await _userRepository
+                .GetItemWithCondition(x => x.UserId == request.BookingDto.UserId &&
+                                        x.IsActive == true &&
+                                        x.RoleId == CUSTOMER, includesWallet);
+            if (user == null)
+            {
+                return new ServiceResponse<int>
+                {
+                    Message = "Người dùng không tồn tại",
+                    Success = true,
+                    StatusCode = 200
+                };
+            }
+
+            var entity = _mapper.Map<Domain.Entities.Booking>(request.BookingDto);
+            entity.Status = BookingStatus.Initial.ToString();
+            var floor = await _floorRepository.GetById(parkingSlot.FloorId!);
+            var parkingId = floor.ParkingId;
+
+            var parking = await _parkingRepository.GetById(parkingId!);
+
+            var trafficid = vehicleInfor.TrafficId;
+
+            if (parking.CarSpot <= 0 && trafficid == OTO)
+            {
+                return new ServiceResponse<int>
+                {
+                    Message = "Bãi không giữ xe ô tô, vui lòng chọn bãi khác",
+                    Success = true,
+                    StatusCode = 200,
+                };
+            }
+            else if (parking.MotoSpot <= 0 && trafficid == MOTO)
+            {
+                return new ServiceResponse<int>
+                {
+                    Message = "Bãi không giữ xe máy, vui lòng chọn bãi khác",
+                    Success = true,
+                    StatusCode = 200,
+                };
+            }
+
+            List<Expression<Func<ParkingHasPrice, object>>> includess = new List<Expression<Func<ParkingHasPrice, object>>>
+                    {
+                        x => x.ParkingPrice!,
+                        x => x.ParkingPrice!.Traffic!
+                    };
+
+            var parkingHasPrice = await _parkingHasPriceRepository
+                    .GetAllItemWithCondition(x => x.ParkingId == parkingId, includess);
+
+            var appliedParkingPriceId = parkingHasPrice
+                .Where(x => x.ParkingPrice!.Traffic!.TrafficId == trafficid)
+                .FirstOrDefault()!.ParkingPriceId;
+
+            var parkingPrice = await _parkingPriceRepository.GetById(appliedParkingPriceId);
+
+            var timeLines = await _timelineRepository
+                .GetAllItemWithCondition(x => x.ParkingPriceId == appliedParkingPriceId);
+
+            decimal expectedPrice = CaculatePriceBooking
+                .CaculateExpectedPrice(request.BookingDto.StartTime, request.BookingDto.EndTime,
+                parkingPrice, timeLines);
+
+            entity.TotalPrice = expectedPrice;
+            entity.DateBook = DateTime.UtcNow.AddHours(7);
+
+            await _bookingRepository.Insert(entity);
+
+            var linkQRImage = await UploadQRImagess(entity.BookingId);
+            var currentBooking = await _bookingRepository
+                .GetItemWithCondition(x => x.BookingId == entity.BookingId, null!, false);
+            currentBooking.QRImage = linkQRImage;
+
+            await _bookingRepository.Save();
+
+            var timeSlotsBooking = await _timeSlotRepository
+                .GetAllTimeSlotsBooking(startTimeBooking, endTimeBooking, parkingSlotId);
+
+            var bookingDetails = new List<BookingDetails>();
+
+            foreach (var timeSlot in timeSlotsBooking)
+            {
+                bookingDetails.Add(new BookingDetails { BookingId = entity.BookingId, TimeSlotId = timeSlot.TimeSlotId });
+                timeSlot.Status = TimeSlotStatus.Booked.ToString();
+            }
+
+            await _timeSlotRepository.Save();
+            await _bookingDetailsRepository.AddRange(bookingDetails);
+            var transaction = new Transaction
+            {
+                Price = expectedPrice,
+                Status = BookingPaymentStatus.Chua_thanh_toan.ToString(),
+                PaymentMethod = paymentMethod,
+                BookingId = entity.BookingId
+            };
+
+            if (request.BookingDto.PaymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc))
+            {
+                transaction.WalletId = user.Wallet.WalletId;
+            }
+            await _transactionRepository.Insert(transaction);
+
+            var staffAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
+            var lstStaffToken = staffAccount.Where(x => x.RoleId == 2).Select(x => x.Devicetoken).ToList();
+
+            List<Expression<Func<Domain.Entities.Parking, object>>> includesParking = new()
+                    {
+                        x => x.BusinessProfile.User
+                    };
+            var managerExist = await _parkingRepository.GetItemWithCondition(x => x.ParkingId == parking.ParkingId, includesParking);
+            var ManagerOfParking = managerExist.BusinessProfile.User;
+
+            SetJob(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, ManagerOfParking);
+
+            await PushNotiToManager(parkingSlot, floor, parking);
+            await PushNoTiToCustomer(request, parkingSlot, floor);
+
+            return new ServiceResponse<int>
+            {
+                Data = entity.BookingId,
+                StatusCode = 201,
+                Success = true,
+            };
+        }
+
+        private void SetJob(int bookingId, DateTime? endTime, int parkingId, List<string> Token, User ManagerOfParking)
+        {
+            var jobId = "";
+
+            DateTime end = DateTime.Parse(endTime.ToString()).AddMinutes(1);
+            // var timeToCa = DateTimeOffset.UtcNow.AddHours(7).AddMinutes(1); // 7 ngay + 1 phut chay tren server
+            DateTimeOffset timeToCallMethod = new DateTimeOffset(end, new TimeSpan(7, 0, 0));
+
+            jobId = BackgroundJob.Schedule<IServiceManagement>(
+                x => x.CheckIfBookingIsLateOrNot(bookingId, parkingId, Token, ManagerOfParking, jobId),
+                timeToCallMethod);
+
+            BackgroundJob.Schedule(
+            () => Console.WriteLine($"{timeToCallMethod} timeToCallMethodx mekiep hangfire"),
+            timeToCallMethod);
+        }
 
         private async Task<string> UploadQRImagess(int bookingId)
         {
             QRCodeGenerator qrGenerator = new QRCodeGenerator();
 
             // Generate a QR code with the given data
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode("pz-"+bookingId.ToString(), QRCodeGenerator.ECCLevel.Q);
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode("pz-" + bookingId.ToString(), QRCodeGenerator.ECCLevel.Q);
 
             // Create a QR code object from the QR code data
             QRCode qrCode = new QRCode(qrCodeData);
@@ -366,6 +529,96 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var formFile = new FormFile(stream, 0, stream.Length, "qrCodeImage", fileName);
 
             return formFile;
+        }
+        private async Task CreateNewTransaction(string? paymentMethod, User user, Domain.Entities.Booking entity, decimal expectedPrice)
+        {
+            var transaction = new Transaction
+            {
+                Price = expectedPrice,
+                Status = BookingPaymentStatus.Da_thanh_toan.ToString(),
+                PaymentMethod = paymentMethod,
+                WalletId = user.Wallet.WalletId,
+                BookingId = entity.BookingId
+            };
+            await _transactionRepository.Insert(transaction);
+        }
+
+        private async Task PushNoTiToCustomer(CreateBookingCommand request, Domain.Entities.ParkingSlot parkingSlot, Floor floor)
+        {
+            var titleCustomer = _configuration.GetSection("MessageTitle_Customer").GetSection("Success").Value;
+            var bodyCustomer = _configuration.GetSection("MessageBody_Customer").GetSection("Success").Value;
+
+            var pushNotificationMobile = new PushNotificationMobileModel
+            {
+                Title = titleCustomer,
+                Message = bodyCustomer + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                TokenMobile = request.DeviceToKenMobile,
+            };
+
+            await _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
+        }
+
+        private async Task PushNotiToManager(Domain.Entities.ParkingSlot parkingSlot, Floor floor, Domain.Entities.Parking parking)
+        {
+            var titleManager = _configuration.GetSection("MessageTitle_Manager").GetSection("Success").Value;
+            var bodyManager = _configuration.GetSection("MessageBody_Manager").GetSection("Success").Value;
+
+            var deviceToken = "";
+            var staffAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
+            var lstStaff = staffAccount.Where(x => x.RoleId == 2);
+            List<Expression<Func<Domain.Entities.Parking, object>>> includesParking = new()
+                    {
+                        x => x.BusinessProfile.User
+                    };
+            var managerExist = await _parkingRepository.GetItemWithCondition(x => x.ParkingId == parking.ParkingId, includesParking);
+            var ManagerOfParking = managerExist.BusinessProfile.User;
+
+            if (lstStaff.Any())
+            {
+                foreach (var item in lstStaff)
+                {
+                    deviceToken = item.Devicetoken.ToString();
+                    var pushNotificationModel = new PushNotificationWebModel
+                    {
+                        Title = titleManager,
+                        Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                        TokenWeb = deviceToken,
+                    };
+                    await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
+                }
+            }
+            else
+            {
+                var manager = await _userRepository.GetById(ManagerOfParking.UserId!);
+                var pushNotificationModel = new PushNotificationWebModel
+                {
+                    Title = titleManager,
+                    Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                    TokenWeb = manager.Devicetoken,
+                };
+                await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
+            }
+        }
+
+        private async Task<decimal> CaculateExpectedPrice(CreateBookingCommand request, int? parkingId, int? trafficid)
+        {
+            List<Expression<Func<ParkingHasPrice, object>>> includess = new List<Expression<Func<ParkingHasPrice, object>>>
+                {
+                    x => x.ParkingPrice!,
+                    x => x.ParkingPrice!.Traffic!
+                };
+            var parkingHasPrice = await _parkingHasPriceRepository
+                    .GetAllItemWithCondition(x => x.ParkingId == parkingId, includess);
+            var appliedParkingPriceId = parkingHasPrice
+                .Where(x => x.ParkingPrice!.Traffic!.TrafficId == trafficid)
+                .FirstOrDefault()!.ParkingPriceId;
+            var parkingPrice = await _parkingPriceRepository.GetById(appliedParkingPriceId);
+            var timeLines = await _timelineRepository
+                .GetAllItemWithCondition(x => x.ParkingPriceId == appliedParkingPriceId);
+            decimal expectedPrice = CaculatePriceBooking
+                .CaculateExpectedPrice(request.BookingDto.StartTime, request.BookingDto.EndTime,
+                parkingPrice, timeLines);
+            return expectedPrice;
         }
     }
 }

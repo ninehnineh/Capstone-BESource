@@ -11,5 +11,8 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Infrastructure
     {
         Task<string> SendNotificationToWebAsync(PushNotificationWebModel pushNotificationModel);
         Task<string> SendNotificationToMobileAsync(PushNotificationMobileModel pushNotificationModel);
+
+        void SendNotificationToWebAsyncV2(PushNotificationWebModel pushNotificationModel);
+        void SendNotificationToMobileAsyncV2(PushNotificationMobileModel pushNotificationModel);
     }
 }
