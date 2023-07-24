@@ -92,6 +92,7 @@ using Parking.FindingSlotManagement.Application.Features.Keeper.Queries.SearchRe
 using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.CreateBookingForPasserby;
 using Parking.FindingSlotManagement.Application.Features.Customer.Wallet.Queries.GetWalletByUserId;
 using Parking.FindingSlotManagement.Application.Features.Customer.Transaction.Queries.GetAllTransactionByUserId;
+using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetApproveParkingWithIntial;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -341,6 +342,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.StaffName, act => act.MapFrom(obj => obj.User.Name))
                 .ForMember(dto => dto.ParkingName, act => act.MapFrom(obj => obj.Parking.Name))
                 .ReverseMap();
+            CreateMap<ApproveParking, GetApproveParkingWithIntialResponse>().ReverseMap();
             #endregion
 
             #region FieldWorkParkingImg

@@ -9,6 +9,7 @@ using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Co
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Commands.SendRequestApproveParking;
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Commands.UpdateApproveParking;
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetApproveParkingById;
+using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetApproveParkingWithIntial;
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetListApproveParkingByParkingId;
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetListParkingNewWNoApprove;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
@@ -177,6 +178,32 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Staff
             try
             {
                 var query = new GetApproveParkingByIdQuery { ApproveParkingId = approveParkingId };
+                var res = await _mediator.Send(query);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Staff, Admin
+        /// </summary>
+        /// 
+        [Authorize(Roles = "Staff,Admin")]
+        [HttpGet("approve-parking/initial/{parkingId}", Name = "GetApproveParkingWithIntial")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<GetApproveParkingWithIntialResponse>>> GetApproveParkingWithIntial(int parkingId)
+        {
+            try
+            {
+                var query = new GetApproveParkingWithIntialQuery { ParkingId = parkingId };
                 var res = await _mediator.Send(query);
                 if (res.Message != "Thành công")
                 {
