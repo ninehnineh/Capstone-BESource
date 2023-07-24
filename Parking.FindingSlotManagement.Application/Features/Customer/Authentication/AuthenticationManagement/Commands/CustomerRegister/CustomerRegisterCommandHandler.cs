@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Customer.Authentication.AuthenticationManagement.Queries.CustomerLogin;
+using Parking.FindingSlotManagement.Application.Features.Manager.Account.RegisterCensorshipBusinessAccount.Commands.RegisterBusinessAccount;
 using Parking.FindingSlotManagement.Application.Mapping;
 using Parking.FindingSlotManagement.Application.Models;
 using Parking.FindingSlotManagement.Domain.Entities;
@@ -19,15 +20,17 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Authentica
     public class CustomerRegisterCommandHandler : IRequestHandler<CustomerRegisterCommand, ServiceResponse<string>>
     {
         private readonly IUserRepository _userRepository;
+        private readonly IWalletRepository _walletRepository;
         private readonly IConfiguration _configuration;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MappingProfile());
         });
         private readonly JwtSettings _jwtSettings;
-        public CustomerRegisterCommandHandler(IUserRepository userRepository, IOptions<JwtSettings> jwtSettings, IConfiguration configuration)
+        public CustomerRegisterCommandHandler(IUserRepository userRepository, IWalletRepository walletRepository, IOptions<JwtSettings> jwtSettings, IConfiguration configuration)
         {
             _userRepository = userRepository;
+            _walletRepository = walletRepository;
             _configuration = configuration;
             _jwtSettings = jwtSettings.Value;
         }
@@ -51,6 +54,13 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Authentica
                 entity.IsActive = true;
                 entity.RoleId = 3;
                 await _userRepository.Insert(entity);
+                var entityWallet = new Wallet
+                {
+                    Balance = 0.0M,
+                    Debt = 0.0M,
+                    UserId = entity.UserId
+                };
+                await _walletRepository.Insert(entityWallet);
                 List<Expression<Func<User, object>>> includes = new List<Expression<Func<User, object>>>
                 {
                     x => x.Role
