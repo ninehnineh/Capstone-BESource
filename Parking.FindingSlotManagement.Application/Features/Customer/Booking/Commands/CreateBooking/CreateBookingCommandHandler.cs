@@ -107,15 +107,57 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var paymentMethod = request.BookingDto.PaymentMethod;
             try
             {
-                // shecudle
-                if (paymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc))
+                var checkHasBookedYet = await _bookingRepository.GetAllItemWithCondition(x => x.UserId == request.BookingDto.UserId && !x.Status.Equals(BookingStatus.Done.ToString()) && !x.Status.Equals(BookingStatus.Cancel.ToString()));
+                List<Domain.Entities.Booking> lstGuest = new();
+                foreach (var item in checkHasBookedYet)
                 {
-                    return await Tratruoc(request, startTimeBooking, endTimeBooking, parkingSlotId, paymentMethod);
+                    if(item.GuestName != null && item.GuestPhone != null)
+                    {
+                        lstGuest.Add(item);
+                    }
                 }
-                else
+                if(lstGuest.Any())
                 {
-                    return await Trasau(request, startTimeBooking, endTimeBooking, parkingSlotId, paymentMethod);
+                    if (lstGuest.Count() >= 1)
+                    {
+                        return new ServiceResponse<int>
+                        {
+                            Message = "Bạn chỉ được đặt hộ cùng lúc 1 đơn.",
+                            StatusCode = 400,
+                            Success = false
+                        };
+                    }
                 }
+                var resCheckHasBookedYet = checkHasBookedYet.Where(x => x.GuestName == null && x.GuestPhone == null).ToList();
+                if (resCheckHasBookedYet.Count() > 0 && lstGuest.Count() > 0)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Bạn đang có 1 đơn đặt đang thực hiện, không thể đặt đơn.",
+                        StatusCode = 400,
+                        Success = false
+                    };
+                }
+                if (resCheckHasBookedYet.Count() == 0 || lstGuest.Count() == 0)
+                {
+                    // shecudle
+                    if (paymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc))
+                    {
+                        return await Tratruoc(request, startTimeBooking, endTimeBooking, parkingSlotId, paymentMethod);
+                    }
+                    else
+                    {
+                        return await Trasau(request, startTimeBooking, endTimeBooking, parkingSlotId, paymentMethod);
+                    }
+                }
+                
+                return new ServiceResponse<int>
+                {
+                    Message = "Thành công",
+                    StatusCode = 200,
+                    Success = true
+                };
+
 
             }
             catch (DbUpdateException ex)
@@ -292,6 +334,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 Data = entity.BookingId,
                 StatusCode = 201,
                 Success = true,
+                Message = "Thành công"
             };
         }
 
@@ -471,6 +514,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 Data = entity.BookingId,
                 StatusCode = 201,
                 Success = true,
+                Message = "Thành công"
             };
         }
 

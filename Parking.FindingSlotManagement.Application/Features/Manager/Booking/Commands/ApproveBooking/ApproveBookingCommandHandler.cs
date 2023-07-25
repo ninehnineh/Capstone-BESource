@@ -86,13 +86,13 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                     .GetSection("Accept").Value;
                 var bodyCustomer = _configuration.GetSection("MessageBody_Customer")
                     .GetSection("Accept").Value;
-                //var DeviceToken = booking.User.Devicetoken;
+                var DeviceToken = booking.User.Devicetoken;
 
                 var pushNotificationMobile = new PushNotificationMobileModel
                 {
                     Title = titleCustomer,
-                    //Message = bodyCustomer + "Vị trí đặt ở " + booking.ParkingSlot.Floor.FloorName + "-" + booking.ParkingSlot.Name,
-                    //TokenMobile = DeviceToken,
+                    Message = bodyCustomer,
+                    TokenMobile = DeviceToken,
                 };
 
                 await _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
