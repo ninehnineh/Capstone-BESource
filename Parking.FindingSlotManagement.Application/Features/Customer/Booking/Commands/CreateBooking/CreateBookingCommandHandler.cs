@@ -251,7 +251,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             }
 
             entity.TotalPrice = expectedPrice;
-            entity.DateBook = DateTime.Now;
             await _bookingRepository.Insert(entity);
 
             var linkQRImage = await UploadQRImagess(entity.BookingId);
@@ -282,7 +281,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     };
             var managerExist = await _parkingRepository.GetItemWithCondition(x => x.ParkingId == parking.ParkingId, includesParking);
             var ManagerOfParking = managerExist.BusinessProfile.User;
-            SetJob(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, ManagerOfParking);
+            var managerToGetDeviceToken = await _userRepository.GetItemWithCondition(x => x.UserId == ManagerOfParking.UserId);
+            SetJob(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, managerToGetDeviceToken);
 
             await PushNotiToManager(parkingSlot, floor, parking);
             await PushNoTiToCustomer(request, parkingSlot, floor);
@@ -413,7 +413,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 parkingPrice, timeLines);
 
             entity.TotalPrice = expectedPrice;
-            entity.DateBook = DateTime.UtcNow.AddHours(7);
 
             await _bookingRepository.Insert(entity);
 
@@ -437,12 +436,13 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
             await _timeSlotRepository.Save();
             await _bookingDetailsRepository.AddRange(bookingDetails);
-            var transaction = new Transaction
+            var transaction = new Domain.Entities.Transaction
             {
                 Price = expectedPrice,
                 Status = BookingPaymentStatus.Chua_thanh_toan.ToString(),
                 PaymentMethod = paymentMethod,
-                BookingId = entity.BookingId
+                BookingId = entity.BookingId,
+                CreatedDate = DateTime.UtcNow.AddHours(7),
             };
 
             if (request.BookingDto.PaymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc))
@@ -460,8 +460,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     };
             var managerExist = await _parkingRepository.GetItemWithCondition(x => x.ParkingId == parking.ParkingId, includesParking);
             var ManagerOfParking = managerExist.BusinessProfile.User;
-
-            SetJob(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, ManagerOfParking);
+            var managerToGetDeviceToken = await _userRepository.GetItemWithCondition(x => x.UserId == ManagerOfParking.UserId);
+            SetJob(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, managerToGetDeviceToken);
 
             await PushNotiToManager(parkingSlot, floor, parking);
             await PushNoTiToCustomer(request, parkingSlot, floor);
@@ -476,14 +476,14 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
         private void SetJob(int bookingId, DateTime? endTime, int parkingId, List<string> Token, User ManagerOfParking)
         {
-            var jobId = "";
+
 
             DateTime end = DateTime.Parse(endTime.ToString()).AddMinutes(1);
             // var timeToCa = DateTimeOffset.UtcNow.AddHours(7).AddMinutes(1); // 7 ngay + 1 phut chay tren server
             DateTimeOffset timeToCallMethod = new DateTimeOffset(end, new TimeSpan(7, 0, 0));
 
-            jobId = BackgroundJob.Schedule<IServiceManagement>(
-                x => x.CheckIfBookingIsLateOrNot(bookingId, parkingId, Token, ManagerOfParking, jobId),
+            var jobId = BackgroundJob.Schedule<IServiceManagement>(
+                x => x.CheckIfBookingIsLateOrNot(bookingId, parkingId, Token, ManagerOfParking),
                 timeToCallMethod);
 
             BackgroundJob.Schedule(
@@ -538,7 +538,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 Status = BookingPaymentStatus.Da_thanh_toan.ToString(),
                 PaymentMethod = paymentMethod,
                 WalletId = user.Wallet.WalletId,
-                BookingId = entity.BookingId
+                BookingId = entity.BookingId,
+                CreatedDate = DateTime.UtcNow.AddHours(7),
             };
             await _transactionRepository.Insert(transaction);
         }
@@ -565,7 +566,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
             var deviceToken = "";
             var staffAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
-            var lstStaff = staffAccount.Where(x => x.RoleId == 2);
+            var lstStaff = staffAccount.Where(x => x.RoleId == 2 && x.Devicetoken != null).ToList();
             List<Expression<Func<Domain.Entities.Parking, object>>> includesParking = new()
                     {
                         x => x.BusinessProfile.User

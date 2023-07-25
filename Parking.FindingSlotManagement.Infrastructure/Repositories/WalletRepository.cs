@@ -68,6 +68,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                             Description = "Nạp tiền vào ví."
                         };
                         var entityToAdd = _mapper.Map<Transaction>(transactionEntityCommand);
+                        entityToAdd.CreatedDate = DateTime.UtcNow.AddHours(7);
                         await _transactionRepository.CreateNewTransactionWithDeposit(entityToAdd);
                         return "Thành công";
                     }
@@ -79,6 +80,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                         Description = "Nạp tiền vào ví."
                     };
                     var entityToAdd2 = _mapper.Map<Transaction>(transactionEntityCommand2);
+                    entityToAdd2.CreatedDate = DateTime.UtcNow.AddHours(7);
                     await _transactionRepository.CreateNewTransactionWithDeposit(entityToAdd2);
                     return "Thành công";
                 }
@@ -112,6 +114,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                         Description = "Nạp tiền vào ví."
                     };
                     var entityToAdd = _mapper.Map<Transaction>(transactionEntityCommand);
+                    entityToAdd.CreatedDate = DateTime.UtcNow.AddHours(7);
                     await _transactionRepository.CreateNewTransactionWithDeposit(entityToAdd);
                     return "Thành công";
                 }
@@ -123,6 +126,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                     Description = "Nạp tiền vào ví."
                 };
                 var entityToAdd3 = _mapper.Map<Transaction>(transactionEntityCommand3);
+                entityToAdd3.CreatedDate = DateTime.UtcNow.AddHours(7);
                 await _transactionRepository.CreateNewTransactionWithDeposit(entityToAdd3);
                 return "Thành công";
             }
