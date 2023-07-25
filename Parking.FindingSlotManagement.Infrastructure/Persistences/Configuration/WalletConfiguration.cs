@@ -13,7 +13,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Persistences.Configuratio
     {
         public void Configure(EntityTypeBuilder<Wallet> builder)
         {
-
+            builder.HasData(
+                new Wallet { WalletId = 1, Balance = 0M, Debt = 0M});
         }
     }
 }
