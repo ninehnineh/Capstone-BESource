@@ -566,7 +566,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
             var deviceToken = "";
             var staffAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
-            var lstStaff = staffAccount.Where(x => x.RoleId == 2);
+            var lstStaff = staffAccount.Where(x => x.RoleId == 2 && x.Devicetoken != null).ToList();
             List<Expression<Func<Domain.Entities.Parking, object>>> includesParking = new()
                     {
                         x => x.BusinessProfile.User
