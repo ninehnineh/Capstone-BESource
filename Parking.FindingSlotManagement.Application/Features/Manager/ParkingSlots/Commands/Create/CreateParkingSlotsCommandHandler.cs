@@ -13,7 +13,8 @@ public class CreateParkingSlotsCommandHandler : IRequestHandler<CreateParkingSlo
     private readonly IParkingSlotRepository _parkingSlotRepository;
     private readonly ITimeSlotRepository _timeSlotRepository;
 
-    public CreateParkingSlotsCommandHandler(IMapper mapper, IParkingSlotRepository parkingSlotRepository, ITimeSlotRepository timeSlotRepository)
+    public CreateParkingSlotsCommandHandler(IMapper mapper, IParkingSlotRepository parkingSlotRepository,
+     ITimeSlotRepository timeSlotRepository)
     {
         _mapper = mapper;
         _parkingSlotRepository = parkingSlotRepository;
@@ -66,7 +67,7 @@ public class CreateParkingSlotsCommandHandler : IRequestHandler<CreateParkingSlo
                 }
             }
             var res = await _timeSlotRepository.AddRangeTimeSlot(ts);
-            if(!res.Equals("Thành công"))
+            if (!res.Equals("Thành công"))
             {
                 return new ServiceResponse<int>
                 {
@@ -75,8 +76,9 @@ public class CreateParkingSlotsCommandHandler : IRequestHandler<CreateParkingSlo
                     StatusCode = 400
                 };
             }
-            RecurringJob.AddOrUpdate<IServiceManagement>("DeleteTimeSlotIn1Week", x => x.DeleteTimeSlotIn1Week(), Cron.Weekly);
-            RecurringJob.AddOrUpdate<IServiceManagement>("AddTimeSlotInFuture", x => x.AddTimeSlotInFuture((int)request.FloorId), Cron.Weekly);
+            
+            var deleteJobId = BackgroundJob.Schedule<IServiceManagement>(x => x.DeleteTimeSlotIn1Week(), DateTime.UtcNow.AddDays(7));
+            BackgroundJob.ContinueJobWith<IServiceManagement>(deleteJobId, x => x.AddTimeSlotInFuture(a.ParkingSlotId));
 
             return new ServiceResponse<int>
             {

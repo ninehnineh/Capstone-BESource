@@ -38,42 +38,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             _emailService = emailService;
         }
 
-        public void AddTimeSlotInFuture(int floorId)
-        {
-            var lstParkingSlot = _context.ParkingSlots.Where(x => x.FloorId == floorId).ToList();
-            DateTime startDate = DateTime.UtcNow;
-            DateTime endDate = startDate.AddDays(7);
-
-            foreach (var a in lstParkingSlot)
-            {
-                List<TimeSlot> ts = new List<TimeSlot>();
-                for (DateTime date = startDate; date < endDate; date = date.AddDays(1))
-                {
-                    for (int i = 0; i < 24; i++)
-                    {
-                        DateTime startTime = date.Date + TimeSpan.FromHours(i);
-                        DateTime endTime = date.Date + TimeSpan.FromHours(i + 1);
-
-                        var entityTimeSlot = new TimeSlot
-                        {
-                            StartTime = startTime,
-                            EndTime = endTime,
-                            CreatedDate = DateTime.UtcNow.Date,
-                            Status = "Free",
-                            ParkingSlotId = a.ParkingSlotId
-                        };
-                        ts.Add(entityTimeSlot);
-                    }
-                }
-                _context.TimeSlots.AddRange(ts);
-                _context.SaveChanges();
-            }
-            Console.WriteLine($"Add TimeSlot In Future: Long running task {DateTime.UtcNow.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss")}");
-            RecurringJob.AddOrUpdate<IServiceManagement>(x => x.DeleteTimeSlotIn1Week(), Cron.Weekly);
-            RecurringJob.AddOrUpdate<IServiceManagement>(x => x.AddTimeSlotInFuture((int)floorId), Cron.Weekly);
-
-        }
-
         public void AutoCancelBookingWhenOverAllowTimeBooking(int bookingId)
         {
             var lateHoursAllowed = 1;
@@ -186,14 +150,56 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
         }
 
+        public void AddTimeSlotInFuture(int parkingSlotId)
+        {
+            var lstParkingSlot = _context.ParkingSlots.Where(x => x.ParkingSlotId == parkingSlotId).ToList();
+            DateTime startDate = DateTime.UtcNow;
+            DateTime endDate = startDate.AddDays(7);
+
+            foreach (var a in lstParkingSlot)
+            {
+                List<TimeSlot> ts = new List<TimeSlot>();
+                for (DateTime date = startDate; date < endDate; date = date.AddDays(1))
+                {
+                    for (int i = 0; i < 24; i++)
+                    {
+                        DateTime startTime = date.Date + TimeSpan.FromHours(i);
+                        DateTime endTime = date.Date + TimeSpan.FromHours(i + 1);
+
+                        var entityTimeSlot = new TimeSlot
+                        {
+                            StartTime = startTime,
+                            EndTime = endTime,
+                            CreatedDate = DateTime.UtcNow.Date,
+                            Status = "Free",
+                            ParkingSlotId = a.ParkingSlotId
+                        };
+                        ts.Add(entityTimeSlot);
+                    }
+                }
+                _context.TimeSlots.AddRange(ts);
+                _context.SaveChanges();
+            }
+            Console.WriteLine($"Add TimeSlot In Future: Long running task {DateTime.UtcNow.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss")}");
+
+            var deleteJobId = BackgroundJob.Schedule<IServiceManagement>(x => x.DeleteTimeSlotIn1Week(), DateTime.UtcNow.AddDays(7));
+            BackgroundJob.ContinueJobWith<IServiceManagement>(deleteJobId, x => x.AddTimeSlotInFuture(parkingSlotId));
+        }
+
         public void DeleteTimeSlotIn1Week()
         {
-            var oneWeekAgo = DateTime.UtcNow.AddDays(-7);
-            var dataToDelete = _context.TimeSlots.Where(x => x.CreatedDate < oneWeekAgo);
-
-            _context.TimeSlots.RemoveRange(dataToDelete);
-            _context.SaveChanges();
-            Console.WriteLine($"Delete TimeSlot In One Week: Long running task {DateTime.UtcNow.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss")}");
+            var oneWeekAgo = DateTime.Now.AddDays(-7);
+            var dataToDelete = _context.TimeSlots.Where(x => x.CreatedDate <= oneWeekAgo);
+            if (dataToDelete.Any())
+            {
+                _context.TimeSlots.RemoveRange(dataToDelete);
+                _context.SaveChanges();
+                Console.WriteLine($"Delete TimeSlot In One Week: Long running task {DateTime.UtcNow.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss")}");
+            }
+            else
+            {
+                Console.WriteLine($"có đéo gì đâu mà xóa");
+            }
         }
 
         public void GenerateMerchandise()
@@ -245,6 +251,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
 
                 SendMailToManager(fee, user);
                 SetNewJob(fee, bussinesId, user, newBill);
+
                 //RecurringJob.AddOrUpdate<IServiceManagement>(x => x.ChargeMoneyFor1MonthUsingSystem(fee, bussinesId, newBill.BillId, user), Cron.MinuteInterval(6));
             }
             catch (Exception ex)
@@ -259,21 +266,21 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             EmailModel emailModel = new EmailModel();
             emailModel.To = user.Email;
             emailModel.Subject = "Thông báo: Trừ tiền từ tài khoản ví của bạn";
-
-            string body = $"Dear {user.Name},\n\n";
-            body += "Chúng tôi xin thông báo rằng hệ thống của chúng tôi đã trừ một khoản tiền từ tài khoản ví của bạn.\n";
-            body += $"Số tiền đã trừ: {fee.Price} đồng\n";
-            body += $"Ngày trừ tiền: {DateTime.UtcNow.AddHours(7)}\n";
-            body += $"Gói sử dụng: {fee.Name}\n\n";
-            body += "Xin lưu ý rằng việc trừ tiền này đảm bảo bạn tiếp tục sử dụng các tính năng và dịch vụ của hệ thống chúng tôi.\n\n";
-            body += "Nếu bạn có bất kỳ câu hỏi hoặc cần hỗ trợ thêm, xin vui lòng liên hệ với chúng tôi qua địa chỉ email hoặc số điện thoại dưới đây. Chúng tôi luôn sẵn sàng hỗ trợ bạn.\n\n";
-            body += "Chân thành cảm ơn sự tin tưởng và ủng hộ của bạn đối với hệ thống của chúng tôi.\n\n";
-            body += "Trân trọng,\n";
-            body += "ParkZ\n";
-            body += "Địa chỉ công ty: Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 700000\n";
-            body += "Số điện thoại công ty: 0793808821\n";
-            body += "Địa chỉ email công ty: parkz.thichthicodeteam@gmail.com\r\n";
-            emailModel.Body = body;
+            System.Net.Mail.MailMessage message = new();
+            message.Body = $"Dear {user.Name}, " + Environment.NewLine;
+            message.Body += "Chúng tôi xin thông báo rằng hệ thống của chúng tôi đã trừ một khoản tiền từ tài khoản ví của bạn." + Environment.NewLine;
+            message.Body += $"Số tiền đã trừ: {fee.Price} đồng" + Environment.NewLine;
+            message.Body += $"Ngày trừ tiền: {DateTime.UtcNow.AddHours(7)}" + Environment.NewLine;
+            message.Body += $"Gói sử dụng: {fee.Name}" + Environment.NewLine;
+            message.Body += "Xin lưu ý rằng việc trừ tiền này đảm bảo bạn tiếp tục sử dụng các tính năng và dịch vụ của hệ thống chúng tôi." + Environment.NewLine;
+            message.Body += "Nếu bạn có bất kỳ câu hỏi hoặc cần hỗ trợ thêm, xin vui lòng liên hệ với chúng tôi qua địa chỉ email hoặc số điện thoại dưới đây. Chúng tôi luôn sẵn sàng hỗ trợ bạn." + Environment.NewLine;
+            message.Body += "Chân thành cảm ơn sự tin tưởng và ủng hộ của bạn đối với hệ thống của chúng tôi." + Environment.NewLine;
+            message.Body += "Trân trọng," + Environment.NewLine;
+            message.Body += "ParkZ" + Environment.NewLine;
+            message.Body += "Địa chỉ công ty: Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Thành phố Hồ Chí Minh 700000" + Environment.NewLine;
+            message.Body += "Số điện thoại công ty: 0793808821" + Environment.NewLine;
+            message.Body += "Địa chỉ email công ty: parkz.thichthicodeteam@gmail.com" + Environment.NewLine;
+            emailModel.Body = message.Body;
             _emailService.SendMail(emailModel);
             Console.WriteLine("done email");
         }
