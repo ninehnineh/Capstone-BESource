@@ -137,14 +137,14 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories.Authenticati
                 };
             }
 
-            if (manager.IsCensorship == false)
+            /*if (manager.IsCensorship == false)
             {
                 response.Success = false;
                 response.Message = "Tài khoản doanh nghiệp đang chờ xét duyệt. Vui lòng đợi email xác nhận";
                 response.StatusCode = 404;
 
                 return response;
-            }
+            }*/
 
             TokenManage token = new TokenManage(_jwtSettings, _configuration);
 

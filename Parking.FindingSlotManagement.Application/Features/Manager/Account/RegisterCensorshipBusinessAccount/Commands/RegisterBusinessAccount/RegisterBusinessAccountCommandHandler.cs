@@ -48,7 +48,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Account.Reg
                 userEntity.PasswordHash = passwordHash;
                 userEntity.PasswordSalt = passwordSalt;
                 userEntity.IsActive = true;
-                userEntity.IsCensorship = false;
+                userEntity.IsCensorship = true;
                 userEntity.RoleId = 1;
                 await _userRepository.Insert(userEntity);
                 var entityWallet = new Wallet

@@ -66,11 +66,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Cha
                         StatusCode = 404
                     };
                 }
+                var totalHoursEarly = Math.Ceiling((bookingExist.StartTime - checkInTime).TotalHours);
+                var x1 = (bookingExist.BookingDetails.FirstOrDefault().TimeSlotId - totalHoursEarly);
+                var x2 = bookingExist.BookingDetails.FirstOrDefault().TimeSlotId;
                 // Process: delete all booking detail with old timeSlot and add new bookingDetail with new timeSlot
                 await _bookingDetailsRepository.DeleteRange(bookingDetailOld.ToList());
+               
                 if (checkInTime < bookingExist.StartTime)
                 {
-                    var totalHoursEarly = Math.Ceiling((bookingExist.StartTime - checkInTime).TotalHours);
+                    
                     if (totalHoursEarly > 1)
                     {
                         return new ServiceResponse<string>
@@ -80,7 +84,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Cha
                             Success = false
                         };
                     }
-                    var getListPreviousSlot = await _timeSlotRepository.GetAllItemWithCondition(x => x.TimeSlotId >= (bookingExist.BookingDetails.FirstOrDefault().TimeSlotId - totalHoursEarly) && x.TimeSlotId < bookingExist.BookingDetails.FirstOrDefault().TimeSlotId);
+                    var currentDateTime = DateTime.UtcNow.AddHours(7);
+                    var checkInTime2 = new DateTime(currentDateTime.Year, currentDateTime.Month, currentDateTime.Day, currentDateTime.Hour, 0, 0);
+                    var getListPreviousSlot = await _timeSlotRepository.GetAllItemWithCondition(x => x.StartTime == checkInTime2 && x.ParkingSlotId == request.ParkingSlotId);
                     var checkBooked = false;
                     foreach (var item in getListPreviousSlot)
                     {

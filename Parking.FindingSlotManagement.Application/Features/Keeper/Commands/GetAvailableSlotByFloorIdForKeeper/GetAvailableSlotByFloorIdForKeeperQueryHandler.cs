@@ -45,7 +45,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Get
                         StatusCode = 404
                     };
                 }
-                if (request.FloorId == 0)
+                if (request.FloorId == null)
                 {
                     var _mapper = config.CreateMapper();
                     var floorExist = await _floorRepository.GetById(bookingExist.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.FloorId);
@@ -65,7 +65,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Get
                        x => x.Parkingslot.Floor
                     };
                     var currentLstBookedSlot = await _timeSlotRepository.GetAllItemWithCondition(x =>
-                                                                x.Parkingslot.FloorId == request.FloorId &&
+                                                                x.Parkingslot.FloorId == floorExist.FloorId &&
                                                                 x.StartTime >= checkInTime &&
                                                                 x.EndTime <= bookingExist.EndTime && x.Status == "Booked", includes);
                     HashSet<int> listParkingSlotIdExist = new();
@@ -76,7 +76,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Get
                             listParkingSlotIdExist.Add((int)item.ParkingSlotId);
                         }
                     }
-                    var lstParkingSlotHasBooked = await _parkingSlotRepository.GetAllItemWithCondition(x => listParkingSlotIdExist.Contains((int)x.ParkingSlotId) || x.FloorId == request.FloorId && x.IsAvailable == false);
+                    var lstParkingSlotHasBooked = await _parkingSlotRepository.GetAllItemWithCondition(x => listParkingSlotIdExist.Contains((int)x.ParkingSlotId) || x.FloorId == floorExist.FloorId && x.IsAvailable == false);
                     List<GetAvailableSlotByFloorIdResponse> lstTong = new List<GetAvailableSlotByFloorIdResponse>();
                     foreach (var item in lstParkingSlotHasBooked)
                     {
@@ -90,7 +90,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Get
                     }
                     //slot chua book
                     var lstParkingSlot = await _parkingSlotRepository
-                        .GetAllItemWithCondition(x => x.FloorId == request.FloorId);
+                        .GetAllItemWithCondition(x => x.FloorId == floorExist.FloorId);
                     var filterParkingSlot = lstParkingSlot
                         .Where(x => !listParkingSlotIdExist.Contains(x.ParkingSlotId)).ToList();
                     var filter2ParkingSlot = filterParkingSlot
