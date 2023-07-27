@@ -69,6 +69,22 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
                         StatusCode = 400
                     };
                 }
+                var lstApproveParkingManagement = await _approveParkingRepository.GetAllItemWithConditionByNoInclude(x => x.ParkingId == request.ParkingId);
+                if(lstApproveParkingManagement.Any())
+                {
+                    foreach (var item in lstApproveParkingManagement)
+                    {
+                        if(item.Status.Equals(ApproveParkingStatus.Tạo_mới.ToString()))
+                        {
+                            return new ServiceResponse<int>
+                            {
+                                Message = "Đang có yêu cầu tạo mới, không thể tạo thêm yêu cầu.",
+                                Success = false,
+                                StatusCode = 400
+                            };
+                        }
+                    }
+                }
                 var approveParkingEntity = _mapper.Map<Domain.Entities.ApproveParking>(request);
                 approveParkingEntity.Status = ApproveParkingStatus.Tạo_mới.ToString();
                 approveParkingEntity.CreatedDate = DateTime.UtcNow.AddHours(7);

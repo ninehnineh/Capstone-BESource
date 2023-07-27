@@ -15,14 +15,23 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
         private readonly IBookingRepository _bookingRepository;
         private readonly IConfiguration _configuration;
         private readonly IFireBaseMessageServices _fireBaseMessageServices;
+        private readonly ITimeSlotRepository _timeSlotRepository;
+        private readonly IBookingDetailsRepository _bookingDetailsRepository;
+        private readonly IConflictRequestRepository _conflictRequestRepository;
 
         public CheckInCommandHandler(IBookingRepository bookingRepository,
             IConfiguration configuration,
-            IFireBaseMessageServices fireBaseMessageServices)
+            IFireBaseMessageServices fireBaseMessageServices,
+            ITimeSlotRepository timeSlotRepository,
+            IBookingDetailsRepository bookingDetailsRepository,
+            IConflictRequestRepository conflictRequestRepository)
         {
             _bookingRepository = bookingRepository;
             _configuration = configuration;
             _fireBaseMessageServices = fireBaseMessageServices;
+            _timeSlotRepository = timeSlotRepository;
+            _bookingDetailsRepository = bookingDetailsRepository;
+            _conflictRequestRepository = conflictRequestRepository;
         }
         public async Task<ServiceResponse<string>> Handle(CheckInCommand request, CancellationToken cancellationToken)
         {
@@ -30,9 +39,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
             var checkInTime = DateTime.UtcNow.AddHours(7);
             try
             {
+                
                 var include = new List<Expression<Func<Domain.Entities.Booking, object>>>
                 {
                     x => x.User,
+                    x => x.BookingDetails
                 };
 
                 var booking = await _bookingRepository
@@ -47,40 +58,95 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                         Success = true
                     };
                 }
-
-                if (booking.StartTime > booking.EndTime)
-                    booking.EndTime += TimeSpan.FromHours(24);
-
-                //if (booking.EndTime.Value.Date == checkInTime.Date)
-                //    checkInTime += TimeSpan.FromHours(24);
-
-                //if (checkInTime >= booking.StartTime && checkInTime < booking.EndTime)
-                //{
-                booking.Status = BookingStatus.Check_In.ToString();
-                //if (checkInTime.Hour > 24)
-                //{
-                //    checkInTime -= TimeSpan.FromHours(24);
-                //}
-                booking.CheckinTime = checkInTime;
-                //}
-
-                await _bookingRepository.Save();
-
-                var titleCustomer = _configuration.GetSection("MessageTitle_Customer")
-                    .GetSection("Checkin").Value;
-                var bodyCustomer = _configuration.GetSection("MessageBody_Customer")
-                    .GetSection("Checkin").Value;
-                var userDiviceToken = booking.User!.Devicetoken;
-
-                var pushNotificationMobile = new PushNotificationMobileModel
+                var conflictRequest = await _conflictRequestRepository.GetItemWithCondition(x => x.BookingId == bookingId);
+                if(conflictRequest != null)
                 {
-                    Title = titleCustomer,
-                    Message = bodyCustomer,
-                    TokenMobile = userDiviceToken,
-                };
+                    return new ServiceResponse<string>
+                    {
+                        Message = "Đơn đặt xảy ra lỗi. Do slot đặt có đơn khác lấn giờ.",
+                        Success = false,
+                        StatusCode = 400
+                    };
+                }
+                else
+                {
+                    if (checkInTime < booking.StartTime)
+                    {
+                        var totalHoursEarly = Math.Ceiling((booking.StartTime - checkInTime).TotalHours);
+                        if (totalHoursEarly > 1)
+                        {
+                            return new ServiceResponse<string>
+                            {
+                                Message = "Số tiếng vào sớm chỉ có thể nhỏ hơn 1",
+                                StatusCode = 400,
+                                Success = false
+                            };
+                        }
+                        var getListPreviousSlot = await _timeSlotRepository.GetAllItemWithCondition(x => x.TimeSlotId >= (booking.BookingDetails.FirstOrDefault().TimeSlotId - totalHoursEarly) && x.TimeSlotId < booking.BookingDetails.FirstOrDefault().TimeSlotId);
+                        var checkBooked = false;
+                        foreach (var item in getListPreviousSlot)
+                        {
+                            if (item.Status.Equals(TimeSlotStatus.Booked.ToString()))
+                            {
+                                checkBooked = true;
+                            }
+                        }
+                        if (checkBooked)
+                        {
+                            return new ServiceResponse<string>
+                            {
+                                Message = "Không thể check-in vào sớm. Tại vì slot vẫn đang có người đặt.",
+                                StatusCode = 400,
+                                Success = false
+                            };
+                        }
+                        foreach (var item in getListPreviousSlot)
+                        {
+                            BookingDetails entity = new()
+                            {
+                                BookingId = booking.BookingId,
+                                TimeSlotId = item.TimeSlotId
+                            };
+                            await _bookingDetailsRepository.Insert(entity);
+                            var changeTimeSlotToBooked = await _timeSlotRepository.GetById(item.TimeSlotId);
+                            changeTimeSlotToBooked.Status = TimeSlotStatus.Booked.ToString();
+                            await _timeSlotRepository.Save();
+                        }
+                    }
+                    if (booking.StartTime > booking.EndTime)
+                        booking.EndTime += TimeSpan.FromHours(24);
 
-                await _fireBaseMessageServices
-                    .SendNotificationToMobileAsync(pushNotificationMobile);
+                    //if (booking.EndTime.Value.Date == checkInTime.Date)
+                    //    checkInTime += TimeSpan.FromHours(24);
+
+                    //if (checkInTime >= booking.StartTime && checkInTime < booking.EndTime)
+                    //{
+                    booking.Status = BookingStatus.Check_In.ToString();
+                    //if (checkInTime.Hour > 24)
+                    //{
+                    //    checkInTime -= TimeSpan.FromHours(24);
+                    //}
+                    booking.CheckinTime = checkInTime;
+                    //}
+
+                    await _bookingRepository.Save();
+
+                    var titleCustomer = _configuration.GetSection("MessageTitle_Customer")
+                        .GetSection("Checkin").Value;
+                    var bodyCustomer = _configuration.GetSection("MessageBody_Customer")
+                        .GetSection("Checkin").Value;
+                    var userDiviceToken = booking.User!.Devicetoken;
+
+                    var pushNotificationMobile = new PushNotificationMobileModel
+                    {
+                        Title = titleCustomer,
+                        Message = bodyCustomer,
+                        TokenMobile = userDiviceToken,
+                    };
+
+                    await _fireBaseMessageServices
+                        .SendNotificationToMobileAsync(pushNotificationMobile);
+                }
 
                 return new ServiceResponse<string>
                 {
