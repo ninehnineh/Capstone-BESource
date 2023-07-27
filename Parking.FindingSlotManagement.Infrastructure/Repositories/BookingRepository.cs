@@ -67,6 +67,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
         {
             var booking = await _dbContext.Bookings
                 .Include(x => x.Transactions)
+                .Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.BookingId == bookingId);
             
             if (booking == null) { return null!; }
