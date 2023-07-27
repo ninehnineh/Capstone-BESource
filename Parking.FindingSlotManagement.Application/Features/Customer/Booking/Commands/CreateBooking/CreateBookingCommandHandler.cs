@@ -141,7 +141,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 if (resCheckHasBookedYet.Count() == 0 || lstGuest.Count() == 0)
                 {
                     // shecudle
-                    if (paymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc))
+                    if (paymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc.ToString()))
                     {
                         return await Tratruoc(request, startTimeBooking, endTimeBooking, parkingSlotId, paymentMethod);
                     }
@@ -284,8 +284,13 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             }
             else
             {
+                List<Expression<Func<Domain.Entities.Parking, object>>> includesxx = new()
+                {
+                    x => x.BusinessProfile
+                };
+                var parkingExist = await _parkingRepository.GetItemWithCondition(x => x.ParkingId == parkingId, includesxx);
                 var managerWallet = await _userRepository
-                    .GetItemWithCondition(x => x.ParkingId == parkingId && x.RoleId == MANAGER, includesWallet, false);
+                    .GetItemWithCondition(x => x.UserId == parkingExist.BusinessProfile.UserId && x.RoleId == MANAGER, includesWallet, false);
 
                 managerWallet.Wallet!.Balance += expectedPrice;
                 user.Wallet.Balance -= expectedPrice;
@@ -488,7 +493,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 CreatedDate = DateTime.UtcNow.AddHours(7),
             };
 
-            if (request.BookingDto.PaymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc))
+            if (request.BookingDto.PaymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc.ToString()))
             {
                 transaction.WalletId = user.Wallet.WalletId;
             }

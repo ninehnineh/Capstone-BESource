@@ -31,5 +31,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         Task<IEnumerable<Booking>> FilterBookingForKeeperMethod(int parkingId, DateTime? date, string? status, int pageNo, int pageSize);
         Task<IEnumerable<Booking>> GetUpcommingBookingByUserIdMethod(int userId);
         Task<IEnumerable<Booking>> GetCustomerActivitiesByUserIdMethod(int userId);
+        Task<Booking> GetBookingToFindAvailableSlotMethod(int bookingId);
     }
 }

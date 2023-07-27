@@ -26,6 +26,8 @@ public class BookingDetailsDto
     public int BookingId { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; }
+    public DateTime? CheckinTime { get; set; }
+    public DateTime? CheckoutTime { get; set; }
     public string? Status { get; set; }
     public string? GuestName { get; set; }
     public string? GuestPhone { get; set; }
