@@ -93,6 +93,7 @@ using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.CreateB
 using Parking.FindingSlotManagement.Application.Features.Customer.Wallet.Queries.GetWalletByUserId;
 using Parking.FindingSlotManagement.Application.Features.Customer.Transaction.Queries.GetAllTransactionByUserId;
 using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Queries.GetApproveParkingWithIntial;
+using Parking.FindingSlotManagement.Application.Features.Admin.Bill.BillManagement.Queries.GetAllBills;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -351,6 +352,12 @@ namespace Parking.FindingSlotManagement.Application.Mapping
 
             #region Wallet Mapping
             CreateMap<Wallet, GetWalletByUserIdResponse>().ReverseMap();
+            #endregion
+
+            #region Bill Mapping
+            CreateMap<Bill, GetAllBillsResponse>()
+                .ForMember(x => x.BusinessName, act => act.MapFrom(obj => obj.businessProfile.Name))
+                .ReverseMap();
             #endregion
         }
     }

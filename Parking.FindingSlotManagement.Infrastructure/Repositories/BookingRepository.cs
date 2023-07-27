@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Firebase.Auth;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
@@ -508,6 +509,20 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                                                  .Where(x => x.UserId == userId && x.Status.Equals(BookingStatus.Done.ToString()) ||
                                                  x.UserId == userId && x.Status.Equals(BookingStatus.Cancel.ToString())).ToListAsync();
             if (!booking.Any())
+            {
+                return null;
+            }
+            return booking;
+        }
+
+        public async Task<Booking> GetBookingToFindAvailableSlotMethod(int bookingId)
+        {
+            var booking = await _dbContext.Bookings
+                                                 .Include(x => x.BookingDetails)
+                                                     .ThenInclude(x => x.TimeSlot)
+                                                     .ThenInclude(x => x.Parkingslot)
+                                                 .FirstOrDefaultAsync(x => x.BookingId == bookingId);
+            if (booking == null)
             {
                 return null;
             }
