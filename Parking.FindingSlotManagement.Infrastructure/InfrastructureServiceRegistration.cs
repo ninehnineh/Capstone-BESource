@@ -62,6 +62,7 @@ namespace Parking.FindingSlotManagement.Infrastructure
             services.AddScoped<IFeeRepository, FeeRepository>();
             services.AddScoped<IBookingDetailsRepository, BookingDetailsRepository>();
             services.AddScoped<IBillRepository, BillRepository>();
+            services.AddScoped<IConflictRequestRepository, ConflictRequestRepository>();
 
             FirebaseApp.Create(new AppOptions
             {
