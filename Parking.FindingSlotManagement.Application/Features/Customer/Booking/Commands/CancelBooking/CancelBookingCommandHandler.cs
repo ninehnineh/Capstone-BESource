@@ -22,7 +22,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             IParkingSlotRepository parkingSlotRepository,
             IBookingDetailsRepository bookingDetailsRepository,
             ITimeSlotRepository timeSlotRepository,
-            IHangfireRepository hangfireRepository
+            IHangfireRepository hangfireRepository,
             IWalletRepository walletRepository,
             IUserRepository userRepository)
         {
