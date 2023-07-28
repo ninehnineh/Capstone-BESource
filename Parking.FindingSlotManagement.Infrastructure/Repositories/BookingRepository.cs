@@ -8,6 +8,7 @@ using Parking.FindingSlotManagement.Domain.Enum;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
@@ -513,5 +514,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             }
             return booking;
         }
+
     }
 }
