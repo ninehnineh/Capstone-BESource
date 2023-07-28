@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Parking.FindingSlotManagement.Application;
+using Parking.FindingSlotManagement.Application.Features.Admin.Paypal.PaypalManagement.Queries.GetListPaypal;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.ApproveBooking;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.CheckOut;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.Done;
+using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetAllBookingByParkingId;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetBookingById;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetListBookingByManagerId;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
@@ -139,6 +141,31 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Manager
+        /// </summary>
+        [HttpGet("parkings/{parkingId}", Name = "GetAllBookingByParkingId")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<GetAllBookingByParkingIdResponse>>>> GetAllBookingByParkingId(int parkingId, [FromQuery] int pageNo, [FromQuery] int pageSize)
+        {
+            try
+            {
+                var query = new GetAllBookingByParkingIdQuery() { ParkingId = parkingId, PageNo = pageNo, PageSize = pageSize };
+                var res = await _mediator.Send(query);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
             }
         }
     }

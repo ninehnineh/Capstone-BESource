@@ -33,5 +33,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         Task<IEnumerable<Booking>> GetCustomerActivitiesByUserIdMethod(int userId);
         Task<Booking> GetBookingToFindAvailableSlotMethod(int bookingId);
         Task<IEnumerable<Booking>> GetAllBookingForAdminMethod(int pageNo, int pageSize);
+        Task<IEnumerable<Booking>> GetAllBookingByParkingIdVer2Method(int parkingId, int pageNo, int pageSize);
     }
 }
