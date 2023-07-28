@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Org.BouncyCastle.Ocsp;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
+using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Manager.Account.RegisterCensorshipBusinessAccount.Commands.RegisterBusinessAccount;
 using Parking.FindingSlotManagement.Application.Models;
 using Parking.FindingSlotManagement.Application.Models.PushNotification;
@@ -26,26 +27,26 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
         private readonly ILogger<ServiceManagement> _logger;
         private readonly IFireBaseMessageServices _fireBaseMessageServices;
         private readonly IEmailService _emailService;
+        private readonly IHangfireRepository hangfireRepository;
 
         public ServiceManagement(ParkZDbContext context,
             ILogger<ServiceManagement> logger,
             IFireBaseMessageServices fireBaseMessageServices,
-            IEmailService emailService)
+            IEmailService emailService,
+            IHangfireRepository hangfireRepository)
         {
             _context = context;
             _logger = logger;
             _fireBaseMessageServices = fireBaseMessageServices;
             _emailService = emailService;
+            this.hangfireRepository = hangfireRepository;
         }
 
 
-
-
-
-        public void AutoCancelBookingWhenOverAllowTimeBooking(int bookingId)
+        public async void AutoCancelBookingWhenOverAllowTimeBooking(int bookingId)
         {
             var lateHoursAllowed = 1;
-
+            var methodName = "AutoCancelBookingWhenOverAllowTimeBooking";
             try
             {
                 var bookedBooking = _context.Bookings
@@ -56,6 +57,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
 
                 var guestArrived = bookedBooking.CheckinTime.HasValue;
 
+                if (guestArrived)
+                {
+                    await hangfireRepository.DeleteJob(bookingId, methodName);
+                    Console.WriteLine($"Job deleted, because guest is arrived");
+                }
                 if (!guestArrived)
                 {
                     bookedBooking.Status = BookingStatus.Cancel.ToString();
@@ -100,8 +106,10 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
         }
 
-        public void AutoCancelBookingWhenOutOfEndTimeBooking(int bookingId)
+        public async void AutoCancelBookingWhenOutOfEndTimeBooking(int bookingId)
         {
+
+            var methodName = "AutoCancelBookingWhenOutOfEndTimeBooking";
             try
             {
                 var bookedBooking = _context.Bookings
@@ -110,10 +118,15 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                         .Include(x => x.Transactions)!.ThenInclude(x => x.Wallet)
                         .FirstOrDefault(x => x.BookingId == bookingId);
 
-                var guestArrived = bookedBooking.CheckinTime.HasValue;
+                var guestArrived = bookedBooking.CheckinTime.Value != null;
                 var isOutOfEndTimeBooking = DateTime.UtcNow.AddHours(7) >= bookedBooking.EndTime.Value;
 
-                if (!guestArrived && isOutOfEndTimeBooking)
+                if (guestArrived)
+                {
+                    await hangfireRepository.DeleteJob(bookingId, methodName);
+                    Console.WriteLine($"Job deleted, because guest is arrived");
+                }
+                else if (!guestArrived && isOutOfEndTimeBooking)
                 {
                     bookedBooking.Status = BookingStatus.Cancel.ToString();
                     bookedBooking.Transactions.First().Status = BookingPaymentStatus.Huy.ToString();
@@ -128,10 +141,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     //PushNotiToCustomerWhenCustomerNotArrive(bookedBooking);
                     _context.SaveChanges();
                 }
-                else
-                {
-                    Console.WriteLine($"Exception");
-                }
+                Console.WriteLine($"Exception");
             }
             catch (Exception ex)
             {
@@ -304,7 +314,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 x => x.ChargeMoneyFor1MonthUsingSystem(fee, bussinesId, newBill.BillId, user), timeToCancel);
         }
 
-        public void CheckIfBookingIsLateOrNot(int bookingId, int parkingId, List<string> token, User ManagerOfParking)
+        public async void CheckIfBookingIsLateOrNot(int bookingId, int parkingId, List<string> token, User ManagerOfParking)
         {
             Console.WriteLine("Background Job CheckIfBookingIsLateOrNot Called");
             var bookedBooking = _context.Bookings
@@ -315,13 +325,14 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             var bookedTimeSlot = bookedBooking.BookingDetails.Last().TimeSlotId;
 
             var nextTimeSlot = _context.TimeSlots.Find(bookedTimeSlot + 1);
-
+            var methodName = "CheckIfBookingIsLateOrNot";
 
             //Delete job
-/*            if (customerIsCheckOut)
+            if (customerIsCheckOut)
             {
-                BackgroundJob.Delete(jobId);
-            }*/
+                await hangfireRepository.DeleteJob(bookingId, methodName);
+                Console.WriteLine("job deleted, because customer is CheckOut");
+            }
             if (!customerIsCheckOut && nextTimeSlot.Status.Equals(TimeSlotStatus.Free.ToString()))
             {
                 var newJobId = "";
@@ -383,5 +394,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 }
             }
         }
+
     }
 }

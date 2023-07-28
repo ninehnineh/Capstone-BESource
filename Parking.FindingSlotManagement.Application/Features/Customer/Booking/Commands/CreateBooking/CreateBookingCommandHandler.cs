@@ -329,7 +329,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var managerExist = await _parkingRepository.GetItemWithCondition(x => x.ParkingId == parking.ParkingId, includesParking);
             var ManagerOfParking = managerExist.BusinessProfile.User;
             var managerToGetDeviceToken = await _userRepository.GetItemWithCondition(x => x.UserId == ManagerOfParking.UserId);
-            SetJob(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, managerToGetDeviceToken);
+            SetJobCheckIfBookingIsLateOrNot(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, managerToGetDeviceToken);
 
             await PushNotiToManager(parkingSlot, floor, parking);
             await PushNoTiToCustomer(request, parkingSlot, floor);
@@ -484,6 +484,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
             await _timeSlotRepository.Save();
             await _bookingDetailsRepository.AddRange(bookingDetails);
+            
             var transaction = new Domain.Entities.Transaction
             {
                 Price = expectedPrice,
@@ -503,13 +504,13 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var lstStaffToken = staffAccount.Where(x => x.RoleId == 2).Select(x => x.Devicetoken).ToList();
 
             List<Expression<Func<Domain.Entities.Parking, object>>> includesParking = new()
-                    {
-                        x => x.BusinessProfile.User
-                    };
+            {
+                x => x.BusinessProfile.User
+            };
             var managerExist = await _parkingRepository.GetItemWithCondition(x => x.ParkingId == parking.ParkingId, includesParking);
             var ManagerOfParking = managerExist.BusinessProfile.User;
             var managerToGetDeviceToken = await _userRepository.GetItemWithCondition(x => x.UserId == ManagerOfParking.UserId);
-            SetJob(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, managerToGetDeviceToken);
+            SetJobCheckIfBookingIsLateOrNot(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, managerToGetDeviceToken);
 
             await PushNotiToManager(parkingSlot, floor, parking);
             await PushNoTiToCustomer(request, parkingSlot, floor);
@@ -523,10 +524,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             };
         }
 
-        private void SetJob(int bookingId, DateTime? endTime, int parkingId, List<string> Token, User ManagerOfParking)
+        private void SetJobCheckIfBookingIsLateOrNot(int bookingId, DateTime? endTime, int parkingId, List<string> Token, User ManagerOfParking)
         {
-
-
             DateTime end = DateTime.Parse(endTime.ToString()).AddMinutes(1);
             // var timeToCa = DateTimeOffset.UtcNow.AddHours(7).AddMinutes(1); // 7 ngay + 1 phut chay tren server
             DateTimeOffset timeToCallMethod = new DateTimeOffset(end, new TimeSpan(7, 0, 0));
@@ -534,12 +533,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var jobId = BackgroundJob.Schedule<IServiceManagement>(
                 x => x.CheckIfBookingIsLateOrNot(bookingId, parkingId, Token, ManagerOfParking),
                 timeToCallMethod);
-
-            BackgroundJob.Schedule(
-            () => Console.WriteLine($"{timeToCallMethod} timeToCallMethodx mekiep hangfire"),
-            timeToCallMethod);
         }
-
         private async Task<string> UploadQRImagess(int bookingId)
         {
             QRCodeGenerator qrGenerator = new QRCodeGenerator();
