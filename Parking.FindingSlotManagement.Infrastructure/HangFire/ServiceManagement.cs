@@ -241,6 +241,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
         {
             try
             {
+                var adminWallet = _context.Wallets.FirstOrDefault(x => x.WalletId == 1);
                 var userWallet = _context.Wallets.FirstOrDefault(x => x.UserId == user.UserId);
                 var billExist = _context.Bills.FirstOrDefault(x => x.BillId == billId);
                 if (userWallet.Balance >= fee.Price)
@@ -256,6 +257,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     }
 
                 }
+                adminWallet.Balance += fee.Price;
                 billExist.WalletId = userWallet.WalletId;
                 billExist.Status = BillStatus.Đã_Thanh_Toán.ToString();
                 _context.SaveChanges();

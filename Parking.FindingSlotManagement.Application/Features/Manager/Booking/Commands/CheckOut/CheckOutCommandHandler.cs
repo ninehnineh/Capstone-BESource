@@ -95,6 +95,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                         return new ServiceResponse<string>
                         {
                             Message = "Số dư không đủ, vui lòng nạp thêm.",
+                            StatusCode = 400,
+                            Success = false
                         };
                     }
 

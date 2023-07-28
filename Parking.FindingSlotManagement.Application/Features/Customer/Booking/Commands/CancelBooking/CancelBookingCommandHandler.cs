@@ -15,16 +15,24 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         private readonly IBookingDetailsRepository _bookingDetailsRepository;
         private readonly ITimeSlotRepository _timeSlotRepository;
         private readonly IHangfireRepository hangfireRepository;
+        private readonly IWalletRepository _walletRepository;
+        private readonly IUserRepository _userRepository;
 
         public CancelBookingCommandHandler(IBookingRepository bookingRepository,
-            IParkingSlotRepository parkingSlotRepository, IHangfireRepository hangfireRepository,
-            IBookingDetailsRepository bookingDetailsRepository, ITimeSlotRepository timeSlotRepository)
+            IParkingSlotRepository parkingSlotRepository,
+            IBookingDetailsRepository bookingDetailsRepository,
+            ITimeSlotRepository timeSlotRepository,
+            IHangfireRepository hangfireRepository
+            IWalletRepository walletRepository,
+            IUserRepository userRepository)
         {
-            this.hangfireRepository = hangfireRepository;
             _bookingRepository = bookingRepository;
             _parkingSlotRepository = parkingSlotRepository;
             _bookingDetailsRepository = bookingDetailsRepository;
             _timeSlotRepository = timeSlotRepository;
+            this.hangfireRepository = hangfireRepository;
+            _walletRepository = walletRepository;
+            _userRepository = userRepository;
         }
         public async Task<ServiceResponse<string>> Handle(CancelBookingCommand request, CancellationToken cancellationToken)
         {
@@ -35,15 +43,30 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     .GetBookingIncludeParkingSlot(request.BookingId);
                 List<Expression<Func<BookingDetails, object>>> includes = new()
                 {
-                    x => x.TimeSlot
+                    x => x.TimeSlot,
+                    x => x.TimeSlot.Parkingslot,
+                    x => x.TimeSlot.Parkingslot.Floor.Parking.BusinessProfile
                 };
 
                 await hangfireRepository.DeleteJob(request.BookingId);
 
                 var bookingDetail = await _bookingDetailsRepository.GetAllItemWithCondition(x => x.BookingId == booking.BookingId, includes, null, false);
-
+                List<Expression<Func<User, object>>> includesxx = new()
+                {
+                    x => x.Wallet
+                };
+                var managerExist = await _userRepository.GetItemWithCondition(x => x.UserId == bookingDetail.FirstOrDefault().TimeSlot.Parkingslot.Floor.Parking.BusinessProfile.UserId, includesxx, false);
                 if (booking.Status == BookingStatus.Initial.ToString())
                 {
+                    foreach (var item in booking.Transactions)
+                    {
+                        if(item.Status.Equals(TransactionStatus.Da_thanh_toan.ToString()) && item.PaymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc.ToString()))
+                        {
+                            booking.User.Wallet.Balance += item.Price;
+                            managerExist.Wallet.Balance -= item.Price;
+                            await _walletRepository.Save();
+                        }
+                    }
                     booking.Status = BookingStatus.Cancel.ToString();
                     await _bookingRepository.Save();
                     foreach (var item in bookingDetail)
