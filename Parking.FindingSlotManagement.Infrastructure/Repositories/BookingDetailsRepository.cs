@@ -22,11 +22,19 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 
         public async Task AddRange(List<BookingDetails> bookingDetails)
         {
-            await _dbContext.AddRangeAsync(bookingDetails);
-            await _dbContext.SaveChangesAsync();
+            try
+            {
+                await _dbContext.AddRangeAsync(bookingDetails);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception("Add Range Booking Details" + ex.Message);
+            }
+
         }
 
-        public async Task DeleteRange(List<BookingDetails> bookingDetails)
+                public async Task DeleteRange(List<BookingDetails> bookingDetails)
         {
             _dbContext.RemoveRange(bookingDetails);
             await _dbContext.SaveChangesAsync();

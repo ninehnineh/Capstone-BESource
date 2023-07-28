@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using Hangfire;
+using Hangfire.Common;
+using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Domain.Enum;
@@ -12,17 +14,23 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         private readonly IParkingSlotRepository _parkingSlotRepository;
         private readonly IBookingDetailsRepository _bookingDetailsRepository;
         private readonly ITimeSlotRepository _timeSlotRepository;
+        private readonly IHangfireRepository hangfireRepository;
         private readonly IWalletRepository _walletRepository;
         private readonly IUserRepository _userRepository;
 
         public CancelBookingCommandHandler(IBookingRepository bookingRepository,
             IParkingSlotRepository parkingSlotRepository,
-            IBookingDetailsRepository bookingDetailsRepository, ITimeSlotRepository timeSlotRepository, IWalletRepository walletRepository, IUserRepository userRepository)
+            IBookingDetailsRepository bookingDetailsRepository,
+            ITimeSlotRepository timeSlotRepository,
+            IHangfireRepository hangfireRepository,
+            IWalletRepository walletRepository,
+            IUserRepository userRepository)
         {
             _bookingRepository = bookingRepository;
             _parkingSlotRepository = parkingSlotRepository;
             _bookingDetailsRepository = bookingDetailsRepository;
             _timeSlotRepository = timeSlotRepository;
+            this.hangfireRepository = hangfireRepository;
             _walletRepository = walletRepository;
             _userRepository = userRepository;
         }
@@ -30,6 +38,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         {
             try
             {
+                
                 var booking = await _bookingRepository
                     .GetBookingIncludeParkingSlot(request.BookingId);
                 List<Expression<Func<BookingDetails, object>>> includes = new()
@@ -38,6 +47,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     x => x.TimeSlot.Parkingslot,
                     x => x.TimeSlot.Parkingslot.Floor.Parking.BusinessProfile
                 };
+
+                await hangfireRepository.DeleteJob(request.BookingId);
+
                 var bookingDetail = await _bookingDetailsRepository.GetAllItemWithCondition(x => x.BookingId == booking.BookingId, includes, null, false);
                 List<Expression<Func<User, object>>> includesxx = new()
                 {
