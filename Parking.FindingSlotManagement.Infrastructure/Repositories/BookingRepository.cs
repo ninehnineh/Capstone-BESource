@@ -547,5 +547,31 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                             .Take((int)pageSize);
         }
 
+        public async Task<IEnumerable<Booking>> GetAllBookingByParkingIdVer2Method(int parkingId, int pageNo, int pageSize)
+        {
+            try
+            {
+                var booking = await _dbContext.Bookings
+                                                .Include(x => x.User)
+                                                .Include(x => x.VehicleInfor)
+                                                .Include(x => x.BookingDetails)
+                                                    .ThenInclude(x => x.TimeSlot)
+                                                    .ThenInclude(x => x.Parkingslot)
+                                                    .ThenInclude(x => x.Floor)
+                                                    .ThenInclude(x => x.Parking)
+                                                .Where(x => x.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.ParkingId == parkingId).OrderByDescending(x => x.BookingId).ToListAsync();
+                if (!booking.Any())
+                {
+                    return null;
+                }
+                return booking.Skip(((int)pageNo - 1) * (int)pageSize)
+                        .Take((int)pageSize);
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

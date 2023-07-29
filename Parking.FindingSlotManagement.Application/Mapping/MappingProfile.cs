@@ -96,6 +96,7 @@ using Parking.FindingSlotManagement.Application.Features.Staff.ApproveParking.Qu
 using Parking.FindingSlotManagement.Application.Features.Admin.Bill.BillManagement.Queries.GetAllBills;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetAllConflictRequestByKeeperId;
 using Parking.FindingSlotManagement.Application.Features.Admin.Booking.BookingManagement.Queries.GetAllBookingForAdmin;
+using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetAllBookingByParkingId;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -140,6 +141,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<User, GetCustomerByIdResponse>()
                 .ForMember(dto => dto.RoleName, act => act.MapFrom(obj => obj.Role.Name))
                 .ReverseMap();
+            CreateMap<User, UserForGetAllBookingByParkingIdResponse>().ReverseMap();
             #endregion
 
             #region Traffic Mapping
@@ -257,6 +259,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.Traffic.Name))
                 .ReverseMap();
             CreateMap<VehicleInfor, VehicleInformationForPasserby>().ReverseMap();
+            CreateMap<VehicleInfor, VehicleForGetAllBookingByParkingIdResponse>().ReverseMap();
             #endregion
 
             #region ParkingHasPrice Mapping
@@ -325,6 +328,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<Booking, BookingCheckoutDto>().ReverseMap();
             CreateMap<Booking, BookingSearchResult>().ReverseMap();
             CreateMap<Booking, BookingDtoForAdmin>().ReverseMap();
+            CreateMap<Booking, BookingForGetAllBookingByParkingIdResponse>().ReverseMap();
             #endregion
 
             #region Transaction Mapping
