@@ -70,7 +70,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
 
                 var parkingId = booking.BookingDetails.First().TimeSlot.Parkingslot.Floor.ParkingId;
 
-                var endTimeBooking = booking.EndTime;
+                var endTimeBooking = booking.EndTime.Value;
                 var startTimeBooking = booking.StartTime;
                 var checkinTime = booking.CheckinTime;
 
@@ -129,7 +129,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                         else
                         {
                             actualPriceLate += (decimal)penaltyPrice;
-                            var penaltyTime = checkOutTime.Hour - endTimeBooking.Value.Hour;
+                            var penaltyTime = checkOutTime.Hour - endTimeBooking.Hour;
                             var step = penaltyTime / (int)penaltyPriceStepTime;
                             actualPriceLate += (step * (decimal)penaltyPrice);
                         }
@@ -233,7 +233,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                         else
                         {
                             actualPriceLate += (decimal)penaltyPrice;
-                            var penaltyTime = checkOutTime.Hour - endTimeBooking.Value.Hour;
+                            var penaltyTime = checkOutTime.Hour - endTimeBooking.Hour;
                             var step = penaltyTime / (int)penaltyPriceStepTime;
                             actualPriceLate += (step * (decimal)penaltyPrice);
                         }
