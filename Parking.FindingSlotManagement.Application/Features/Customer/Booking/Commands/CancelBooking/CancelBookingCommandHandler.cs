@@ -56,7 +56,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     x => x.Wallet
                 };
                 var managerExist = await _userRepository.GetItemWithCondition(x => x.UserId == bookingDetail.FirstOrDefault().TimeSlot.Parkingslot.Floor.Parking.BusinessProfile.UserId, includesxx, false);
-                if (booking.Status == BookingStatus.Initial.ToString())
+                if (booking.Status == BookingStatus.Success.ToString())
                 {
                     foreach (var item in booking.Transactions)
                     {

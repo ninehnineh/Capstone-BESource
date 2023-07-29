@@ -3,19 +3,29 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using MongoDB.Driver.Core.Configuration;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 
 namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 {
     public class HangfireRepository : IHangfireRepository
     {
+        private readonly IConfiguration _configuration;
+        private string connectionString;
+
+        public HangfireRepository(IConfiguration configuration)
+        {
+            _configuration = configuration;
+            connectionString = _configuration.GetConnectionString("DefaultConnection");
+        }
         public async Task<string> DeleteJob(int bookingId, string? methodName)
         {
             try
             {
                 var result = "";
                 var query = "DELETE FROM HangFire.Job WHERE HangFire.Job.Arguments LIKE '%' + @arguments + '%' AND HangFire.Job.InvocationData LIKE '%' + @methodName + '%'";
-                using (var connection = new SqlConnection("server =chinh\\sqlexpress01; database = parkzv10;uid=sa;pwd=123123123;"))
+                using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(query, connection))
@@ -52,7 +62,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 var result = "";
                 var query = "DELETE FROM HangFire.Job WHERE HangFire.Job.Arguments LIKE '%' + @arguments + '%'";
 
-                using (var connection = new SqlConnection("server =chinh\\sqlexpress01; database = parkzv10;uid=sa;pwd=123123123;"))
+                using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
                     using (var command = new SqlCommand(query, connection))
