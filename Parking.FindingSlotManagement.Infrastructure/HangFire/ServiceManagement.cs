@@ -360,16 +360,18 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 Console.WriteLine("Background Job: co request can xu ly");
                 bookedBooking.Status = BookingStatus.OverTime.ToString();
 
-                var conflictBooking = _context.BookingDetails
+                var conflictBookingDetails = _context.BookingDetails
                 .FirstOrDefault(x => x.TimeSlotId == nextTimeSlot.TimeSlotId);
 
                 var newConflictRequest = new ConflictRequest
                 {
-                    BookingId = (int)conflictBooking.BookingId,
+                    BookingId = (int)conflictBookingDetails.BookingId,
                     Message = "Có request cần xử lý",
                     ParkingId = parkingId,
                     Status = "Process",
                 };
+
+                conflictBookingDetails.BookingId = bookingId;
 
                 _context.ConflictRequests.Add(newConflictRequest);
                 _context.SaveChanges();
