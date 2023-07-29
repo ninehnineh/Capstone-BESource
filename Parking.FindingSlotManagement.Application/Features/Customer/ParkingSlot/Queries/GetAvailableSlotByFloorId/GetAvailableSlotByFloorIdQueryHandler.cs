@@ -67,7 +67,31 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlo
                     var BigEntity = new GetAvailableSlotByFloorIdResponse
                     {
                         ParkingSlotDto = entity,
-                        IsBooked = true
+                        IsBooked = 1
+                    };
+                    lstTong.Add(BigEntity);
+                }
+                // get slot bi busy
+                var currentLstBusySlot = await _timeSlotRepository.GetAllItemWithCondition(x =>
+                                            x.Parkingslot.FloorId == request.FloorId &&
+                                            x.StartTime >= request.StartTimeBooking &&
+                                            x.EndTime <= request.EndTimeBooking && x.Status == "Busy", includes);
+                HashSet<int> listParkingSlotIdExistVer2 = new();
+                foreach (var item in currentLstBusySlot)
+                {
+                    if (!listParkingSlotIdExistVer2.Contains((int)item.ParkingSlotId))
+                    {
+                        listParkingSlotIdExistVer2.Add((int)item.ParkingSlotId);
+                    }
+                }
+                var lstParkingSlotHasBusy = await _parkingSlotRepository.GetAllItemWithCondition(x => listParkingSlotIdExistVer2.Contains((int)x.ParkingSlotId) || x.FloorId == request.FloorId && x.IsAvailable == false);
+                foreach (var item in lstParkingSlotHasBusy)
+                {
+                    var entity = _mapper.Map<ParkingSlotDto>(item);
+                    var BigEntity = new GetAvailableSlotByFloorIdResponse
+                    {
+                        ParkingSlotDto = entity,
+                        IsBooked = 2
                     };
                     lstTong.Add(BigEntity);
                 }
@@ -76,7 +100,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlo
                     .GetAllItemWithCondition(x => x.FloorId == request.FloorId);
                 var filterParkingSlot = lstParkingSlot
                     .Where(x => !listParkingSlotIdExist.Contains(x.ParkingSlotId)).ToList();
-                var filter2ParkingSlot = filterParkingSlot
+                var filterParkingSlot2 = filterParkingSlot
+                    .Where(x => !listParkingSlotIdExistVer2.Contains(x.ParkingSlotId)).ToList();
+                var filter2ParkingSlot = filterParkingSlot2
                     .Where(x => x.IsAvailable == true).ToList();
                 foreach (var item in filter2ParkingSlot)
                 {
@@ -84,7 +110,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlo
                     var BigEntity = new GetAvailableSlotByFloorIdResponse
                     {
                         ParkingSlotDto = entity,
-                        IsBooked = false
+                        IsBooked = 0
                     };
                     lstTong.Add(BigEntity);
                 }
