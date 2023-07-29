@@ -62,12 +62,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                 booking.Status = BookingStatus.Success.ToString();
                 await _bookingRepository.Save();
 
-
                 var isPostPaid = booking.Transactions.First().Status.Equals(BookingPaymentStatus.Chua_thanh_toan.ToString()) &&
                                     booking.Transactions.First().PaymentMethod.Equals(PaymentMethod.tra_sau.ToString());
 
                 var isPrePaid = booking.Transactions.First().Status.Equals(BookingPaymentStatus.Da_thanh_toan.ToString()) &&
-                                    booking.Transactions.First().PaymentMethod.Equals(PaymentMethod.thanh_toan_online.ToString());
+                                    booking.Transactions.First().PaymentMethod.Equals(PaymentMethod.tra_truoc.ToString());
 
                 if (isPostPaid)
                 {
