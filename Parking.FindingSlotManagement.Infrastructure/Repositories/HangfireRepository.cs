@@ -23,8 +23,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                         command.Parameters.AddWithValue("@arguments", bookingId.ToString());
                         command.Parameters.AddWithValue("@methodName", methodName);
 
-                        command.Parameters.AddWithValue("@arguments", bookingId.ToString());
-
                         int rowsAffected = command.ExecuteNonQuery();
 
                         if (rowsAffected > 0)
