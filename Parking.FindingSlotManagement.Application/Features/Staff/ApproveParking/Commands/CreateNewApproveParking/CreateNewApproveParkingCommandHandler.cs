@@ -70,7 +70,42 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
                     };
                 }
                 var lstApproveParkingManagement = await _approveParkingRepository.GetAllItemWithConditionByNoInclude(x => x.ParkingId == request.ParkingId);
-                if(lstApproveParkingManagement.Any())
+                if (lstApproveParkingManagement == null)
+                {
+                    var approveParkingEntity = _mapper.Map<Domain.Entities.ApproveParking>(request);
+                    approveParkingEntity.Status = ApproveParkingStatus.Tạo_mới.ToString();
+                    approveParkingEntity.CreatedDate = DateTime.UtcNow.AddHours(7);
+                    approveParkingEntity.NoteForAdmin = null;
+                    await _approveParkingRepository.Insert(approveParkingEntity);
+                    if (!request.Images.Any())
+                    {
+                        return new ServiceResponse<int>
+                        {
+                            Message = "Hãy nhập ảnh thực địa về bãi xe.",
+                            Success = false,
+                            StatusCode = 400
+                        };
+                    }
+                    List<Domain.Entities.FieldWorkParkingImg> lstFWPI = new();
+                    foreach (var item in request.Images)
+                    {
+                        Domain.Entities.FieldWorkParkingImg fwpi = new Domain.Entities.FieldWorkParkingImg
+                        {
+                            Url = item,
+                            ApproveParkingId = approveParkingEntity.ApproveParkingId
+                        };
+                        lstFWPI.Add(fwpi);
+                    }
+                    await _fieldWorkParkingImgRepository.AddRangeFieldWorkParkingImg(lstFWPI);
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Thành công",
+                        Success = true,
+                        StatusCode = 201,
+                        Data = approveParkingEntity.ApproveParkingId
+                    };
+                }
+                if (lstApproveParkingManagement.Any())
                 {
                     foreach (var item in lstApproveParkingManagement)
                     {
@@ -85,37 +120,13 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
                         }
                     }
                 }
-                var approveParkingEntity = _mapper.Map<Domain.Entities.ApproveParking>(request);
-                approveParkingEntity.Status = ApproveParkingStatus.Tạo_mới.ToString();
-                approveParkingEntity.CreatedDate = DateTime.UtcNow.AddHours(7);
-                approveParkingEntity.NoteForAdmin = null;
-                await _approveParkingRepository.Insert(approveParkingEntity);
-                if(!request.Images.Any())
-                {
-                    return new ServiceResponse<int>
-                    {
-                        Message = "Hãy nhập ảnh thực địa về bãi xe.",
-                        Success = false,
-                        StatusCode = 400
-                    };
-                }
-                List<Domain.Entities.FieldWorkParkingImg> lstFWPI = new();
-                foreach (var item in request.Images)
-                {
-                    Domain.Entities.FieldWorkParkingImg fwpi = new Domain.Entities.FieldWorkParkingImg
-                    {
-                        Url = item,
-                        ApproveParkingId = approveParkingEntity.ApproveParkingId
-                    };
-                    lstFWPI.Add(fwpi);
-                }
-                await _fieldWorkParkingImgRepository.AddRangeFieldWorkParkingImg(lstFWPI);
+                
+                
                 return new ServiceResponse<int>
                 {
-                    Message = "Thành công",
-                    Success = true,
-                    StatusCode = 201,
-                    Data = approveParkingEntity.ApproveParkingId
+                    Message = "Đã xảy ra lỗi",
+                    Success = false,
+                    StatusCode = 400,
                 };
 
             }
