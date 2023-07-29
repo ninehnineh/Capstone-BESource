@@ -34,5 +34,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         Task<Booking> GetBookingToFindAvailableSlotMethod(int bookingId);
         Task<IEnumerable<Booking>> GetAllBookingForAdminMethod(int pageNo, int pageSize);
         Task<IEnumerable<Booking>> GetAllBookingByParkingIdVer2Method(int parkingId, int pageNo, int pageSize);
+        Task<IEnumerable<Booking>> GetAllBookingWithDuplicateVehicle(int userId, string licensePlate);
     }
 }
