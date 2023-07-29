@@ -9,6 +9,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlo
     public class GetAvailableSlotByFloorIdResponse
     {
         public ParkingSlotDto ParkingSlotDto { get; set; }
-        public bool IsBooked { get; set; }
+        public int IsBooked { get; set; }
     }
 }
