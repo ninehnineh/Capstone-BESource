@@ -317,6 +317,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
         public async void CheckIfBookingIsLateOrNot(int bookingId, int parkingId, List<string> token, User ManagerOfParking)
         {
             Console.WriteLine("Background Job CheckIfBookingIsLateOrNot Called");
+
+            var newJobId = "";
             var bookedBooking = _context.Bookings
                                         .Include(x => x.BookingDetails!).ThenInclude(x => x.TimeSlot)
                                         .FirstOrDefault(x => x.BookingId == bookingId);
@@ -335,7 +337,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             }
             if (!customerIsCheckOut && nextTimeSlot.Status.Equals(TimeSlotStatus.Free.ToString()))
             {
-                var newJobId = "";
+                bookedBooking.Status = BookingStatus.OverTime.ToString();
+
                 nextTimeSlot.Status = TimeSlotStatus.Booked.ToString();
                 var newBookingDetail = new BookingDetails
                 {
@@ -345,7 +348,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
 
                 _context.BookingDetails.Add(newBookingDetail);
                 _context.SaveChanges();
-                
+
                 DateTime end = DateTime.Parse(nextTimeSlot.EndTime.ToString()).AddMinutes(1);
                 DateTimeOffset timeToCallMethod = new DateTimeOffset(end, new TimeSpan(7, 0, 0));
                 newJobId = BackgroundJob.Schedule<IServiceManagement>(
@@ -355,18 +358,29 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             else if (!customerIsCheckOut && nextTimeSlot.Status.Equals(TimeSlotStatus.Booked.ToString()))
             {
                 Console.WriteLine("Background Job: co request can xu ly");
-                var conflictBooking = _context.BookingDetails.FirstOrDefault(x => x.TimeSlotId == nextTimeSlot.TimeSlotId);
+                bookedBooking.Status = BookingStatus.OverTime.ToString();
+
+                var conflictBookingDetails = _context.BookingDetails
+                .FirstOrDefault(x => x.TimeSlotId == nextTimeSlot.TimeSlotId);
 
                 var newConflictRequest = new ConflictRequest
                 {
-                    BookingId = (int)conflictBooking.BookingId,
+                    BookingId = (int)conflictBookingDetails.BookingId,
                     Message = "Có request cần xử lý",
                     ParkingId = parkingId,
                     Status = "Process",
                 };
 
+                conflictBookingDetails.BookingId = bookingId;
+
                 _context.ConflictRequests.Add(newConflictRequest);
                 _context.SaveChanges();
+
+                DateTime end = DateTime.Parse(nextTimeSlot.EndTime.ToString()).AddMinutes(1);
+                DateTimeOffset timeToCallMethod = new DateTimeOffset(end, new TimeSpan(7, 0, 0));
+                newJobId = BackgroundJob.Schedule<IServiceManagement>(
+                x => x.CheckIfBookingIsLateOrNot(bookingId, parkingId, token, ManagerOfParking),
+                timeToCallMethod);
 
                 if (token.Any())
                 {
@@ -374,8 +388,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     {
                         var pushNotificationModel = new PushNotificationWebModel
                         {
-                            // Title = titleManager,
-                            // Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                            Title = "Đơn đặt xung đột, cần xử lý",
+                            Message = "Vui lòng kiểm tra thông báo,......",
                             TokenWeb = item,
                         };
                         _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
@@ -383,17 +397,16 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 }
                 else
                 {
-                    var manager =  _context.Users.Find(ManagerOfParking.UserId!);
+                    var manager = _context.Users.Find(ManagerOfParking.UserId!);
                     var pushNotificationModel = new PushNotificationWebModel
                     {
-                        // Title = titleManager,
-                        // Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                        Title = "Đơn đặt xung đột, cần xử lý",
+                        Message = "Vui lòng kiểm tra thông báo,......",
                         TokenWeb = manager.Devicetoken,
                     };
                     _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
                 }
             }
         }
-
     }
 }
