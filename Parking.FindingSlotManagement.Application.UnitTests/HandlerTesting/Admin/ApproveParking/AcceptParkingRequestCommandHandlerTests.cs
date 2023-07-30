@@ -1,6 +1,9 @@
-﻿/*using Moq;
+﻿using Moq;
+using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Commands.AcceptParkingRequest;
+using Parking.FindingSlotManagement.Application.Models;
+using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Domain.Enum;
 using Shouldly;
 using System;
@@ -16,159 +19,136 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
     {
         private readonly Mock<IApproveParkingRepository> _approveParkingRepositoryMock;
         private readonly Mock<IParkingRepository> _parkingRepositoryMock;
+        private readonly Mock<IUserRepository> _userRepositoryMock;
+        private readonly Mock<IBusinessProfileRepository> _businessProfileRepositoryMock;
+        private readonly Mock<IEmailService> _emailServiceMock;
         private readonly AcceptParkingRequestCommandHandler _handler;
         public AcceptParkingRequestCommandHandlerTests()
         {
             _approveParkingRepositoryMock = new Mock<IApproveParkingRepository>();
             _parkingRepositoryMock = new Mock<IParkingRepository>();
-            _handler = new AcceptParkingRequestCommandHandler(_approveParkingRepositoryMock.Object, _parkingRepositoryMock.Object);
+            _userRepositoryMock = new Mock<IUserRepository>();
+            _businessProfileRepositoryMock = new Mock<IBusinessProfileRepository>();
+            _emailServiceMock = new Mock<IEmailService>();
+            _handler = new AcceptParkingRequestCommandHandler(_approveParkingRepositoryMock.Object, _userRepositoryMock.Object, _businessProfileRepositoryMock.Object, _parkingRepositoryMock.Object, _emailServiceMock.Object);
         }
         [Fact]
-        public async Task Handle_WhenParkingExists_ShouldReturnSuccessResponse()
+        public async Task Handle_WhenApproveParkingIsNull_ReturnsNotFoundResponse()
         {
             // Arrange
-            var parkingId = 1;
-            var parkingExist = new Domain.Entities.Parking { ParkingId = parkingId };
-            var approveParking = new Domain.Entities.ApproveParking { ParkingId = parkingId, Status = ApproveParkingStatus.Chờ_duyệt.ToString() };
-
-            _parkingRepositoryMock.Setup(r => r.GetById(parkingId)).ReturnsAsync(parkingExist);
-
-            _approveParkingRepositoryMock.Setup(r => r.GetItemWithCondition(It.IsAny<Expression<Func<Domain.Entities.ApproveParking, bool>>>(), null, false))
-                .ReturnsAsync(approveParking);
-
-            var command = new AcceptParkingRequestCommand { ParkingId = parkingId };
+            var request = new AcceptParkingRequestCommand { ApproveParkingId = 1 };
+            _approveParkingRepositoryMock.Setup(x => x.GetItemWithCondition(It.IsAny<Expression<Func<Domain.Entities.ApproveParking, bool>>>(), null, false)).ReturnsAsync((Domain.Entities.ApproveParking)null);
 
             // Act
-            var response = await _handler.Handle(command, CancellationToken.None);
-
-            // Assert
-            response.ShouldNotBeNull();
-            response.Success.ShouldBeTrue();
-            response.Message.ShouldBe("Thành công");
-            response.StatusCode.ShouldBe(204);
-
-            _parkingRepositoryMock.Verify(r => r.Save(), Times.Once);
-            _approveParkingRepositoryMock.Verify(r => r.Save(), Times.Once);
-        }
-        [Fact]
-        public async Task Handle_WhenParkingDoesNotExist_ShouldReturnNotFoundResponse()
-        {
-            // Arrange
-            var parkingId = 1;
-            Domain.Entities.Parking parkingExist = null;
-
-            _parkingRepositoryMock.Setup(r => r.GetById(parkingId)).ReturnsAsync(parkingExist);
-
-            var command = new AcceptParkingRequestCommand { ParkingId = parkingId };
-
-            // Act
-            var response = await _handler.Handle(command, CancellationToken.None);
-
-            // Assert
-            response.ShouldNotBeNull();
-            response.Success.ShouldBeTrue();
-            response.Message.ShouldBe("Không tìm thấy bãi giữ xe.");
-            response.StatusCode.ShouldBe(200);
-        }
-        [Fact]
-        public async Task Handle_WhenParkingIsAlreadyApproved_ShouldReturnBadRequestResponse()
-        {
-            // Arrange
-            var parkingId = 1;
-            var parkingExist = new Domain.Entities.Parking { ParkingId = parkingId, IsActive = true };
-
-            _parkingRepositoryMock.Setup(r => r.GetById(parkingId)).ReturnsAsync(parkingExist);
-
-            var command = new AcceptParkingRequestCommand { ParkingId = parkingId };
-
-            // Act
-            var response = await _handler.Handle(command, CancellationToken.None);
+            var response = await _handler.Handle(request, CancellationToken.None);
 
             // Assert
             response.ShouldNotBeNull();
             response.Success.ShouldBeFalse();
-            response.Message.ShouldBe("Bãi đã được duyệt, không thể thực hiện thao tác.");
-            response.StatusCode.ShouldBe(400);
-        }
-        [Fact]
-        public async Task Handle_WhenApprovalRequestDoesNotExist_ShouldReturnNotFoundResponse()
-        {
-            // Arrange
-            var parkingId = 1;
-            var parkingExist = new Domain.Entities.Parking { ParkingId = parkingId };
-            Domain.Entities.ApproveParking approveParking = null;
-
-            _parkingRepositoryMock.Setup(r => r.GetById(parkingId)).ReturnsAsync(parkingExist);
-
-            _approveParkingRepositoryMock.Setup(r => r.GetItemWithCondition(It.IsAny<Expression<Func<Domain.Entities.ApproveParking, bool>>>(), null, false))
-                .ReturnsAsync(approveParking);
-
-            var command = new AcceptParkingRequestCommand { ParkingId = parkingId };
-
-            // Act
-            var response = await _handler.Handle(command, CancellationToken.None);
-
-            // Assert
-            response.ShouldNotBeNull();
-            response.Success.ShouldBeTrue();
+            response.StatusCode.ShouldBe(404);
             response.Message.ShouldBe("Không tìm thấy yêu cầu xác thực của bãi.");
-            response.StatusCode.ShouldBe(200);
         }
         [Fact]
-        public async Task Handle_WhenApprovalRequestIsAlreadyProcessed_ShouldReturnBadRequestResponse()
+        public async Task Handle_WhenApproveParkingIsAlreadyProcessed_ReturnsBadRequestResponse()
         {
             // Arrange
-            var parkingId = 1;
-            var parkingExist = new Domain.Entities.Parking { ParkingId = parkingId };
-            var approveParking = new Domain.Entities.ApproveParking { ParkingId = parkingId, Status = ApproveParkingStatus.Đã_duyệt.ToString() };
-
-            _parkingRepositoryMock.Setup(r => r.GetById(parkingId)).ReturnsAsync(parkingExist);
-
-            _approveParkingRepositoryMock.Setup(r => r.GetItemWithCondition(It.IsAny<Expression<Func<Domain.Entities.ApproveParking, bool>>>(), null, false))
-                .ReturnsAsync(approveParking);
-
-            var command = new AcceptParkingRequestCommand { ParkingId = parkingId };
+            var request = new AcceptParkingRequestCommand { ApproveParkingId = 1 };
+            var approveParking = new Domain.Entities.ApproveParking
+            {
+                ApproveParkingId = 1,
+                Status = Domain.Enum.ApproveParkingStatus.Đã_duyệt.ToString()
+            };
+            _approveParkingRepositoryMock.Setup(x => x.GetItemWithCondition(It.IsAny<Expression<Func<Domain.Entities.ApproveParking, bool>>>(), null, false)).ReturnsAsync(approveParking);
 
             // Act
-            var response = await _handler.Handle(command, CancellationToken.None);
+            var response = await _handler.Handle(request, CancellationToken.None);
 
             // Assert
             response.ShouldNotBeNull();
             response.Success.ShouldBeFalse();
-            response.Message.ShouldBe("Bãi đã được xử lý duyệt/từ chối, không thể thực hiện thao tác.");
             response.StatusCode.ShouldBe(400);
+            response.Message.ShouldBe("Bãi đã được xử lý duyệt/từ chối, không thể thực hiện thao tác.");
         }
         [Fact]
-        public async Task Handle_WhenAllConditionsAreMet_ShouldReturnSuccessResponseAndSaveChanges()
+        public async Task Handle_WhenParkingApprovalIsSuccessful_ReturnsSuccessResponse()
         {
             // Arrange
-            var parkingId = 1;
-            var parkingExist = new Domain.Entities.Parking { ParkingId = parkingId };
-            var approveParking = new Domain.Entities.ApproveParking { ParkingId = parkingId, Status = ApproveParkingStatus.Chờ_duyệt.ToString() };
+            var request = new AcceptParkingRequestCommand { ApproveParkingId = 1 };
+            var approveParking = new Domain.Entities.ApproveParking
+            {
+                ApproveParkingId = 1,
+                Status = Domain.Enum.ApproveParkingStatus.Chờ_duyệt.ToString(),
+                ParkingId = 1
+            };
+            var parkingExist = new Domain.Entities.Parking { ParkingId = 1, IsActive = false, BusinessId = 1 };
+            var businessExist = new Domain.Entities.BusinessProfile { BusinessProfileId = 1, UserId = 1 };
+            var userExist = new Domain.Entities.User { UserId = 1, Email = "test@example.com", Name = "John Doe" };
 
-            _parkingRepositoryMock.Setup(r => r.GetById(parkingId)).ReturnsAsync(parkingExist);
-            _parkingRepositoryMock.Setup(r => r.Save()).Returns(Task.CompletedTask);
-
-            _approveParkingRepositoryMock.Setup(r => r.GetItemWithCondition(It.IsAny<Expression<Func<Domain.Entities.ApproveParking, bool>>>(), null, false))
-                .ReturnsAsync(approveParking);
-            _approveParkingRepositoryMock.Setup(r => r.Save()).Returns(Task.CompletedTask);
-
-            var command = new AcceptParkingRequestCommand { ParkingId = parkingId };
+            _approveParkingRepositoryMock.Setup(x => x.GetItemWithCondition(It.IsAny<Expression<Func<Domain.Entities.ApproveParking, bool>>>(), null, false)).ReturnsAsync(approveParking);
+            _parkingRepositoryMock.Setup(x => x.GetById(1)).ReturnsAsync(parkingExist);
+            _businessProfileRepositoryMock.Setup(x => x.GetById(1)).ReturnsAsync(businessExist);
+            _userRepositoryMock.Setup(x => x.GetById(1)).ReturnsAsync(userExist);
 
             // Act
-            var response = await _handler.Handle(command, CancellationToken.None);
+            var response = await _handler.Handle(request, CancellationToken.None);
 
             // Assert
             response.ShouldNotBeNull();
             response.Success.ShouldBeTrue();
-            response.Message.ShouldBe("Thành công");
             response.StatusCode.ShouldBe(204);
+            response.Message.ShouldBe("Thành công");
+        }
+        [Fact]
+        public async Task Handle_WhenApproveParkingHasNotFoundBusiness_ReturnsBadRequestResponse()
+        {
+            var request = new AcceptParkingRequestCommand { ApproveParkingId = 1 };
+            var approveParking = new Domain.Entities.ApproveParking
+            {
+                ApproveParkingId = 1,
+                Status = Domain.Enum.ApproveParkingStatus.Chờ_duyệt.ToString(),
+                ParkingId = 1
+            };
+            var parkingExist = new Domain.Entities.Parking { ParkingId = 1, IsActive = false, BusinessId = 1 };
+            
 
-            _parkingRepositoryMock.Verify(r => r.Save(), Times.Once);
-            _approveParkingRepositoryMock.Verify(r => r.Save(), Times.Once);
+            _approveParkingRepositoryMock.Setup(x => x.GetItemWithCondition(It.IsAny<Expression<Func<Domain.Entities.ApproveParking, bool>>>(), null, false)).ReturnsAsync(approveParking);
+            _parkingRepositoryMock.Setup(x => x.GetById(1)).ReturnsAsync(parkingExist);
+            _businessProfileRepositoryMock.Setup(x => x.GetById(1)).ReturnsAsync((Domain.Entities.BusinessProfile)null);
 
-            approveParking.Status.ShouldBe(ApproveParkingStatus.Đã_duyệt.ToString());
-        } 
+            // Act
+            var response = await _handler.Handle(request, CancellationToken.None);
+
+            // Assert
+            response.ShouldNotBeNull();
+            response.Success.ShouldBeFalse();
+            response.StatusCode.ShouldBe(404);
+            response.Message.ShouldBe("Không tìm thấy doanh nghiệp.");
+        }
+        [Fact]
+        public async Task Handle_WhenApproveParkingHasNotFoundUser_ReturnsBadRequestResponse()
+        {
+            var request = new AcceptParkingRequestCommand { ApproveParkingId = 1 };
+            var approveParking = new Domain.Entities.ApproveParking
+            {
+                ApproveParkingId = 1,
+                Status = Domain.Enum.ApproveParkingStatus.Chờ_duyệt.ToString(),
+                ParkingId = 1
+            };
+            var parkingExist = new Domain.Entities.Parking { ParkingId = 1, IsActive = false, BusinessId = 1 };
+            var businessExist = new Domain.Entities.BusinessProfile { BusinessProfileId = 1, UserId = 1 };
+
+            _approveParkingRepositoryMock.Setup(x => x.GetItemWithCondition(It.IsAny<Expression<Func<Domain.Entities.ApproveParking, bool>>>(), null, false)).ReturnsAsync(approveParking);
+            _parkingRepositoryMock.Setup(x => x.GetById(1)).ReturnsAsync(parkingExist);
+            _businessProfileRepositoryMock.Setup(x => x.GetById(1)).ReturnsAsync(businessExist);
+            _userRepositoryMock.Setup(x => x.GetById(1)).ReturnsAsync((User)null);
+            // Act
+            var response = await _handler.Handle(request, CancellationToken.None);
+
+            // Assert
+            response.ShouldNotBeNull();
+            response.Success.ShouldBeFalse();
+            response.StatusCode.ShouldBe(404);
+            response.Message.ShouldBe("Không tìm thấy tài khoản.");
+        }
     }
 }
-*/
