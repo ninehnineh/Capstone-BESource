@@ -324,18 +324,20 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                                         .FirstOrDefault(x => x.BookingId == bookingId);
 
             var customerIsCheckOut = bookedBooking.CheckoutTime != null;
+            var customerIsCheckIn = bookedBooking.CheckinTime.HasValue;
+
             var bookedTimeSlot = bookedBooking.BookingDetails.Last().TimeSlotId;
 
             var nextTimeSlot = _context.TimeSlots.Find(bookedTimeSlot + 1);
             var methodName = "CheckIfBookingIsLateOrNot";
 
             //Delete job
-            if (customerIsCheckOut)
+            if (customerIsCheckOut && customerIsCheckIn)
             {
                 await hangfireRepository.DeleteJob(bookingId, methodName);
                 Console.WriteLine("job deleted, because customer is CheckOut");
             }
-            if (!customerIsCheckOut && nextTimeSlot.Status.Equals(TimeSlotStatus.Free.ToString()))
+            if (!customerIsCheckOut && nextTimeSlot.Status.Equals(TimeSlotStatus.Free.ToString()) && customerIsCheckIn)
             {
                 bookedBooking.Status = BookingStatus.OverTime.ToString();
 
@@ -355,7 +357,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 x => x.CheckIfBookingIsLateOrNot(bookingId, parkingId, token, ManagerOfParking),
                 timeToCallMethod);
             }
-            else if (!customerIsCheckOut && nextTimeSlot.Status.Equals(TimeSlotStatus.Booked.ToString()))
+            else if (!customerIsCheckOut && nextTimeSlot.Status.Equals(TimeSlotStatus.Booked.ToString()) && customerIsCheckIn)
             {
                 Console.WriteLine("Background Job: co request can xu ly");
                 bookedBooking.Status = BookingStatus.OverTime.ToString();
@@ -371,9 +373,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     Status = "Process",
                 };
 
-                conflictBookingDetails.BookingId = bookingId;
-
                 _context.ConflictRequests.Add(newConflictRequest);
+                conflictBookingDetails.BookingId = bookingId;
                 _context.SaveChanges();
 
                 DateTime end = DateTime.Parse(nextTimeSlot.EndTime.ToString()).AddMinutes(1);
