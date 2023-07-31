@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Parking.FindingSlotManagement.Application;
+using Parking.FindingSlotManagement.Application.Features.Admin.Paypal.PaypalManagement.Queries.GetPaypalByManagerId;
 using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Commands.CreateNewVnPay;
 using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Commands.DeleteVnPay;
 using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Commands.UpdateVnPay;
+using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Queries.GetVnPayById;
 using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Queries.GetVnPayByUserId;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using System.Net;
@@ -127,7 +129,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Manager, Admin
         /// </summary>
-        [HttpGet("{userId}", Name = "GetVnpayInforByManagerId")]
+        [HttpGet("user/{userId}", Name = "GetVnpayInforByManagerId")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -136,6 +138,33 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
             try
             {
                 var query = new GetVnPayByUserIdQuery() { UserId = userId };
+                var res = await _mediator.Send(query);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Manager, Admin
+        /// </summary>
+        /// 
+        [AllowAnonymous]
+        [HttpGet("{vnPayId}", Name = "GetVnPayById")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<GetVnPayByIdResponse>>> GetVnPayById(int vnPayId)
+        {
+            try
+            {
+                var query = new GetVnPayByIdQuery() { VnPayId = vnPayId };
                 var res = await _mediator.Send(query);
                 if (res.Message != "Thành công")
                 {

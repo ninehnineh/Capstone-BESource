@@ -53,9 +53,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                 {
                     return new ServiceResponse<string>
                     {
-                        Message = "Chỗ đặt không tồn tại.",
-                        StatusCode = 200,
-                        Success = true
+                        Message = "Đơn đặt không tồn tại.",
+                        StatusCode = 404,
+                        Success = false
                     };
                 }
                 var conflictRequest = await _conflictRequestRepository.GetItemWithCondition(x => x.BookingId == bookingId);

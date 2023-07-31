@@ -97,6 +97,7 @@ using Parking.FindingSlotManagement.Application.Features.Admin.Bill.BillManageme
 using Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetAllConflictRequestByKeeperId;
 using Parking.FindingSlotManagement.Application.Features.Admin.Booking.BookingManagement.Queries.GetAllBookingForAdmin;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetAllBookingByParkingId;
+using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Queries.GetVnPayById;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -166,6 +167,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<VnPay, GetVnPayByUserIdResponse>()
                 .ForMember(dto => dto.UserName, act => act.MapFrom(obj => obj.User.Name))
                 .ReverseMap();
+            CreateMap<VnPay, GetVnPayByIdResponse>().ReverseMap();
             #endregion
 
             #region PayPal Mapping

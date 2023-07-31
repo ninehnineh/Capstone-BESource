@@ -44,21 +44,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                     x => x.User
                 };
                 var approveParkingInfo = await _approveParkingRepository.GetAllItemWithCondition(x => x.ParkingId == request.ParkingId, includes);
-                /*List<string> imgs = new();
-                var lstImgFromParking = await _fieldWorkParkingImgRepository.GetAllItemWithConditionByNoInclude(x => x.ApproveParkingId == approveParkingInfo.ApproveParkingId);
-                if(!lstImgFromParking.Any())
-                {
-                    return new ServiceResponse<GetFieldInforByParkingIdResponse>
-                    {
-                        Message = "Chưa có hình ảnh thực địa.",
-                        Success = false,
-                        StatusCode = 400
-                    };
-                }
-                foreach (var item in lstImgFromParking)
-                {
-                    imgs.Add(item.Url);
-                }*/
                 if(!approveParkingInfo.Any())
                 {
                     return new ServiceResponse<IEnumerable<GetFieldInforByParkingIdResponse>>
@@ -78,7 +63,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                         StaffId = item.StaffId,
                         StaffName = item.User.Name,
                         Status = item.Status
-                       /* Images = _mapper.Map< List<ImagesOfRequestApprove>> (item.FieldWorkParkingImgs)*/
                     };
                     resReturn.Add(response);
                 }

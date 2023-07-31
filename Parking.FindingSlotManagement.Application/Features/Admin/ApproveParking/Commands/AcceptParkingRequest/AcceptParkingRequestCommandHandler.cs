@@ -38,8 +38,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                     return new ServiceResponse<string>
                     {
                         Message = "Không tìm thấy yêu cầu xác thực của bãi.",
-                        Success = true,
-                        StatusCode = 200
+                        Success = false,
+                        StatusCode = 404
                     };
                 }
                 if(!approveParking.Status.Equals(Domain.Enum.ApproveParkingStatus.Chờ_duyệt.ToString()))
@@ -63,8 +63,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                     return new ServiceResponse<string>
                     {
                         Message = "Không tìm thấy doanh nghiệp.",
-                        Success = true,
-                        StatusCode = 200
+                        Success = false,
+                        StatusCode = 404
                     };
                 }
                 var userExist = await _userRepository.GetById(getBusinessExist.UserId);
@@ -73,8 +73,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                     return new ServiceResponse<string>
                     {
                         Message = "Không tìm thấy tài khoản.",
-                        Success = true,
-                        StatusCode = 200
+                        Success = false,
+                        StatusCode = 404
                     };
                 }
                 EmailModel emailModel = new EmailModel();

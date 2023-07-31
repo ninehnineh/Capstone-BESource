@@ -107,7 +107,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var paymentMethod = request.BookingDto.PaymentMethod;
             try
             {
-                var checkHasBookedYet = await _bookingRepository.GetAllItemWithCondition(x => x.UserId == request.BookingDto.UserId && !x.Status.Equals(BookingStatus.Done.ToString()) && !x.Status.Equals(BookingStatus.Cancel.ToString()));
+                /*var checkHasBookedYet = await _bookingRepository.GetAllItemWithCondition(x => x.UserId == request.BookingDto.UserId && !x.Status.Equals(BookingStatus.Done.ToString()) && !x.Status.Equals(BookingStatus.Cancel.ToString()));
                 List<Domain.Entities.Booking> lstGuest = new();
                 foreach (var item in checkHasBookedYet)
                 {
@@ -129,7 +129,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     }
                 }
                 var resCheckHasBookedYet = checkHasBookedYet.Where(x => x.GuestName == null && x.GuestPhone == null).ToList();
-                if (resCheckHasBookedYet.Count() > 0 && lstGuest.Count() > 0)
+                if (resCheckHasBookedYet.Count() > 0 && lstGuest.Count() >= 0)
                 {
                     return new ServiceResponse<int>
                     {
@@ -139,7 +139,41 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     };
                 }
                 if (resCheckHasBookedYet.Count() == 0 || lstGuest.Count() == 0)
+                {*/
+                var checkHasBookedYet = await _bookingRepository.GetAllItemWithCondition(x => x.UserId == request.BookingDto.UserId && !x.Status.Equals(BookingStatus.Done.ToString()) && !x.Status.Equals(BookingStatus.Cancel.ToString()));
+                if(checkHasBookedYet.Count() > 5)
                 {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Bạn chỉ được đặt cùng lúc 5 đơn.",
+                        Success = false,
+                        StatusCode = 400
+                    };
+                }
+                else
+                {
+                    var vehicleExist = await _vehicleInfoRepository.GetById(request.BookingDto.VehicleInforId);
+                    if (vehicleExist == null)
+                    {
+                        return new ServiceResponse<int>
+                        {
+                            Message = "Không tìm thấy thông tin phương tiện.",
+                            Success = false,
+                            StatusCode = 404
+                        };
+                    }
+                    var checkDuplicateLicsene = await _bookingRepository.GetAllBookingWithDuplicateVehicle(request.BookingDto.UserId, vehicleExist.LicensePlate);
+
+                    if (checkDuplicateLicsene != null)
+                    {
+                        return new ServiceResponse<int>
+                        {
+                            Message = "Biển số xe bị trùng với một đơn đã được đặt.",
+                            Success = false,
+                            StatusCode = 400
+                        };
+                    }
+
                     // shecudle
                     if (paymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc.ToString()))
                     {
@@ -150,13 +184,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         return await Trasau(request, startTimeBooking, endTimeBooking, parkingSlotId, paymentMethod);
                     }
                 }
-                
-                return new ServiceResponse<int>
-                {
-                    Message = "Thành công",
-                    StatusCode = 200,
-                    Success = true
-                };
+
 
 
             }
@@ -248,7 +276,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             }
 
             var entity = _mapper.Map<Domain.Entities.Booking>(request.BookingDto);
-            entity.Status = BookingStatus.Initial.ToString();
+            entity.Status = BookingStatus.Success.ToString();
             var floor = await _floorRepository.GetById(parkingSlot.FloorId!);
             var parkingId = floor.ParkingId;
             var parking = await _parkingRepository.GetById(parkingId!);
@@ -279,6 +307,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             {
                 return new ServiceResponse<int>
                 {
+                    Success = false,
+                    StatusCode = 400,
                     Message = "Số dư ví không đủ, vui lòng nạp thêm hoặc chọn phương thức thanh toán khác.",
                 };
             }
@@ -333,7 +363,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
             await PushNotiToManager(parkingSlot, floor, parking);
             await PushNoTiToCustomer(request, parkingSlot, floor);
-
+            var timeToCancel = entity.EndTime.Value - DateTime.UtcNow.AddHours(7);
+            BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOutOfEndTimeBooking(entity.BookingId), timeToCancel);
             return new ServiceResponse<int>
             {
                 Data = entity.BookingId,
@@ -411,7 +442,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             }
 
             var entity = _mapper.Map<Domain.Entities.Booking>(request.BookingDto);
-            entity.Status = BookingStatus.Initial.ToString();
+            entity.Status = BookingStatus.Success.ToString();
             var floor = await _floorRepository.GetById(parkingSlot.FloorId!);
             var parkingId = floor.ParkingId;
 
@@ -514,7 +545,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
             await PushNotiToManager(parkingSlot, floor, parking);
             await PushNoTiToCustomer(request, parkingSlot, floor);
-
+            var timeToCancel = entity.StartTime.AddHours(1) - DateTime.UtcNow.AddHours(7);
+            BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
             return new ServiceResponse<int>
             {
                 Data = entity.BookingId,

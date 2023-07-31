@@ -35,8 +35,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.GetA
                     return new ServiceResponse<GetCustomerByIdResponse>
                     {
                         Message = "Không tìm thấy thông tin tài khoản.",
-                        Success = true,
-                        StatusCode = 200
+                        Success = false,
+                        StatusCode = 404
                     };
                 }
                 var entity = _mapper.Map<GetCustomerByIdResponse>(user);

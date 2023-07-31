@@ -75,9 +75,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                         Success = false
                     };
                 }
-
                 // Đã thanh toán trước, vào bãi, ra bãi đúng giờ, chỉ có một transaction
-                if (moneyCustomerMustPayAfterCheckOut == 0 &&
+                else if (moneyCustomerMustPayAfterCheckOut == 0 &&
                     string.IsNullOrEmpty(paymentMethod))
                 {
 
