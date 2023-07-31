@@ -45,7 +45,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Qu
                     Data = lstDto,
                     Success = true,
                     StatusCode = 200,
-                    Message = "Không tìm thấy",
+                    Message = "Thành công",
                     Count = lstDto.Count()
                 };
             }
