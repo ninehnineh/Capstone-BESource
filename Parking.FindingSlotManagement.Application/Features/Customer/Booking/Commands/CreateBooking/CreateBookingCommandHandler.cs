@@ -307,6 +307,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             {
                 return new ServiceResponse<int>
                 {
+                    Success = false,
+                    StatusCode = 400,
                     Message = "Số dư ví không đủ, vui lòng nạp thêm hoặc chọn phương thức thanh toán khác.",
                 };
             }
