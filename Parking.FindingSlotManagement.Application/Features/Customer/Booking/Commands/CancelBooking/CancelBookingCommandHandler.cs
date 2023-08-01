@@ -17,6 +17,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
         private readonly IHangfireRepository hangfireRepository;
         private readonly IWalletRepository _walletRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ITransactionRepository _transactionRepository;
 
         public CancelBookingCommandHandler(IBookingRepository bookingRepository,
             IParkingSlotRepository parkingSlotRepository,
@@ -24,7 +25,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             ITimeSlotRepository timeSlotRepository,
             IHangfireRepository hangfireRepository,
             IWalletRepository walletRepository,
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            ITransactionRepository transactionRepository)
         {
             _bookingRepository = bookingRepository;
             _parkingSlotRepository = parkingSlotRepository;
@@ -33,6 +35,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             this.hangfireRepository = hangfireRepository;
             _walletRepository = walletRepository;
             _userRepository = userRepository;
+            _transactionRepository = transactionRepository;
         }
         public async Task<ServiceResponse<string>> Handle(CancelBookingCommand request, CancellationToken cancellationToken)
         {
@@ -58,13 +61,24 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 var managerExist = await _userRepository.GetItemWithCondition(x => x.UserId == bookingDetail.FirstOrDefault().TimeSlot.Parkingslot.Floor.Parking.BusinessProfile.UserId, includesxx, false);
                 if (booking.Status == BookingStatus.Success.ToString())
                 {
-                    foreach (var item in booking.Transactions)
+                    foreach (var item in booking.Transactions.ToList())
                     {
                         if(item.Status.Equals(TransactionStatus.Da_thanh_toan.ToString()) && item.PaymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc.ToString()))
                         {
                             booking.User.Wallet.Balance += item.Price;
                             managerExist.Wallet.Balance -= item.Price;
                             await _walletRepository.Save();
+                            Domain.Entities.Transaction billTrans = new Domain.Entities.Transaction()
+                            {
+                                BookingId = request.BookingId,
+                                CreatedDate = DateTime.UtcNow.AddHours(7),
+                                Description = "Hoàn tiền",
+                                Price = item.Price,
+                                WalletId = booking.User.Wallet.WalletId,
+                                PaymentMethod = Domain.Enum.PaymentMethod.thanh_toan_online.ToString(),
+                                Status = Domain.Enum.BookingPaymentStatus.Da_thanh_toan.ToString()
+                            };
+                            await _transactionRepository.Insert(billTrans);
                         }
                     }
                     booking.Status = BookingStatus.Cancel.ToString();
