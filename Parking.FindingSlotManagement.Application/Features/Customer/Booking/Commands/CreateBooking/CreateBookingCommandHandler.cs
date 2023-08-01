@@ -361,9 +361,64 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var managerToGetDeviceToken = await _userRepository.GetItemWithCondition(x => x.UserId == ManagerOfParking.UserId);
             SetJobCheckIfBookingIsLateOrNot(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, managerToGetDeviceToken);
 
-            await PushNotiToManager(parkingSlot, floor, parking);
-            await PushNoTiToCustomer(request, parkingSlot, floor);
-            var timeToCancel = entity.EndTime.Value - DateTime.UtcNow.AddHours(7);
+            var notiManager = await PushNotiToManager(parkingSlot, floor, parking);
+            if (notiManager == "error")
+            {
+                var notiCustomer = await PushNoTiToCustomer(request, parkingSlot, floor);
+                if (notiCustomer == "error")
+                {
+                    var timeToCancel = entity.EndTime.Value - DateTime.UtcNow.AddHours(7);
+                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
+                    return new ServiceResponse<int>
+                    {
+                        Data = entity.BookingId,
+                        StatusCode = 201,
+                        Success = true,
+                        Message = "Thành công"
+                    };
+                }
+                else
+                {
+                    var timeToCancel = entity.EndTime.Value - DateTime.UtcNow.AddHours(7);
+                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
+                    return new ServiceResponse<int>
+                    {
+                        Data = entity.BookingId,
+                        StatusCode = 201,
+                        Success = true,
+                        Message = "Thành công"
+                    };
+                }
+            }
+            else
+            {
+                var notiCustomer = await PushNoTiToCustomer(request, parkingSlot, floor);
+                if (notiCustomer == "error")
+                {
+                    var timeToCancel = entity.EndTime.Value - DateTime.UtcNow.AddHours(7);
+                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
+                    return new ServiceResponse<int>
+                    {
+                        Data = entity.BookingId,
+                        StatusCode = 201,
+                        Success = true,
+                        Message = "Thành công"
+                    };
+                }
+                else
+                {
+                    var timeToCancel = entity.EndTime.Value - DateTime.UtcNow.AddHours(7);
+                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
+                    return new ServiceResponse<int>
+                    {
+                        Data = entity.BookingId,
+                        StatusCode = 201,
+                        Success = true,
+                        Message = "Thành công"
+                    };
+                }
+            }
+            /*var timeToCancel = entity.EndTime.Value - DateTime.UtcNow.AddHours(7);
             BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOutOfEndTimeBooking(entity.BookingId), timeToCancel);
             return new ServiceResponse<int>
             {
@@ -371,7 +426,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 StatusCode = 201,
                 Success = true,
                 Message = "Thành công"
-            };
+            };*/
         }
 
         private async Task<ServiceResponse<int>> Trasau(CreateBookingCommand request, DateTime startTimeBooking, DateTime endTimeBooking, int parkingSlotId, string? paymentMethod)
@@ -523,6 +578,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 PaymentMethod = paymentMethod,
                 BookingId = entity.BookingId,
                 CreatedDate = DateTime.UtcNow.AddHours(7),
+                Description = "Đặt đơn"
             };
 
             if (request.BookingDto.PaymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc.ToString()))
@@ -543,9 +599,65 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var managerToGetDeviceToken = await _userRepository.GetItemWithCondition(x => x.UserId == ManagerOfParking.UserId);
             SetJobCheckIfBookingIsLateOrNot(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, managerToGetDeviceToken);
 
-            await PushNotiToManager(parkingSlot, floor, parking);
-            await PushNoTiToCustomer(request, parkingSlot, floor);
-            var timeToCancel = entity.StartTime.AddHours(1) - DateTime.UtcNow.AddHours(7);
+            var notiManager = await PushNotiToManager(parkingSlot, floor, parking);
+            if(notiManager == "error")
+            {
+                var notiCustomer = await PushNoTiToCustomer(request, parkingSlot, floor);
+                if (notiCustomer == "error")
+                {
+                    var timeToCancel = entity.StartTime.AddHours(1) - DateTime.UtcNow.AddHours(7);
+                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
+                    return new ServiceResponse<int>
+                    {
+                        Data = entity.BookingId,
+                        StatusCode = 201,
+                        Success = true,
+                        Message = "Thành công"
+                    };
+                }
+                else
+                {
+                    var timeToCancel = entity.StartTime.AddHours(1) - DateTime.UtcNow.AddHours(7);
+                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
+                    return new ServiceResponse<int>
+                    {
+                        Data = entity.BookingId,
+                        StatusCode = 201,
+                        Success = true,
+                        Message = "Thành công"
+                    };
+                }
+            }
+            else
+            {
+                var notiCustomer = await PushNoTiToCustomer(request, parkingSlot, floor);
+                if(notiCustomer == "error")
+                {
+                    var timeToCancel = entity.StartTime.AddHours(1) - DateTime.UtcNow.AddHours(7);
+                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
+                    return new ServiceResponse<int>
+                    {
+                        Data = entity.BookingId,
+                        StatusCode = 201,
+                        Success = true,
+                        Message = "Thành công"
+                    };
+                }
+                else
+                {
+                    var timeToCancel = entity.StartTime.AddHours(1) - DateTime.UtcNow.AddHours(7);
+                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
+                    return new ServiceResponse<int>
+                    {
+                        Data = entity.BookingId,
+                        StatusCode = 201,
+                        Success = true,
+                        Message = "Thành công"
+                    };
+                }
+            }
+            /*var notiCustomer = await PushNoTiToCustomer(request, parkingSlot, floor);*/
+            /*var timeToCancel = entity.StartTime.AddHours(1) - DateTime.UtcNow.AddHours(7);
             BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
             return new ServiceResponse<int>
             {
@@ -553,7 +665,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 StatusCode = 201,
                 Success = true,
                 Message = "Thành công"
-            };
+            };*/
         }
 
         private void SetJobCheckIfBookingIsLateOrNot(int bookingId, DateTime? endTime, int parkingId, List<string> Token, User ManagerOfParking)
@@ -615,65 +727,86 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 WalletId = user.Wallet.WalletId,
                 BookingId = entity.BookingId,
                 CreatedDate = DateTime.UtcNow.AddHours(7),
+                Description = "Đặt đơn"
             };
             await _transactionRepository.Insert(transaction);
         }
 
-        private async Task PushNoTiToCustomer(CreateBookingCommand request, Domain.Entities.ParkingSlot parkingSlot, Floor floor)
+        private async Task<string> PushNoTiToCustomer(CreateBookingCommand request, Domain.Entities.ParkingSlot parkingSlot, Floor floor)
         {
-            var titleCustomer = _configuration.GetSection("MessageTitle_Customer").GetSection("Success").Value;
-            var bodyCustomer = _configuration.GetSection("MessageBody_Customer").GetSection("Success").Value;
-
-            var pushNotificationMobile = new PushNotificationMobileModel
+            try
             {
-                Title = titleCustomer,
-                Message = bodyCustomer + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                TokenMobile = request.DeviceToKenMobile,
-            };
+                var titleCustomer = _configuration.GetSection("MessageTitle_Customer").GetSection("Success").Value;
+                var bodyCustomer = _configuration.GetSection("MessageBody_Customer").GetSection("Success").Value;
 
-            await _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
+                var pushNotificationMobile = new PushNotificationMobileModel
+                {
+                    Title = titleCustomer,
+                    Message = bodyCustomer + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                    TokenMobile = request.DeviceToKenMobile,
+                };
+
+                await _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
+                return "success";
+            }
+            catch (Exception ex)
+            {
+
+                return "error";
+            }
+            
         }
 
-        private async Task PushNotiToManager(Domain.Entities.ParkingSlot parkingSlot, Floor floor, Domain.Entities.Parking parking)
+        private async Task<string> PushNotiToManager(Domain.Entities.ParkingSlot parkingSlot, Floor floor, Domain.Entities.Parking parking)
         {
-            var titleManager = _configuration.GetSection("MessageTitle_Manager").GetSection("Success").Value;
-            var bodyManager = _configuration.GetSection("MessageBody_Manager").GetSection("Success").Value;
+            try
+            {
+                var titleManager = _configuration.GetSection("MessageTitle_Manager").GetSection("Success").Value;
+                var bodyManager = _configuration.GetSection("MessageBody_Manager").GetSection("Success").Value;
 
-            var deviceToken = "";
-            var staffAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
-            var lstStaff = staffAccount.Where(x => x.RoleId == 2 && x.Devicetoken != null).ToList();
-            List<Expression<Func<Domain.Entities.Parking, object>>> includesParking = new()
+                var deviceToken = "";
+                var staffAccount = await _userRepository.GetAllItemWithCondition(x => x.ParkingId == parking.ParkingId);
+                var lstStaff = staffAccount.Where(x => x.RoleId == 2 && x.Devicetoken != null).ToList();
+                List<Expression<Func<Domain.Entities.Parking, object>>> includesParking = new()
                     {
                         x => x.BusinessProfile.User
                     };
-            var managerExist = await _parkingRepository.GetItemWithCondition(x => x.ParkingId == parking.ParkingId, includesParking);
-            var ManagerOfParking = managerExist.BusinessProfile.User;
+                var managerExist = await _parkingRepository.GetItemWithCondition(x => x.ParkingId == parking.ParkingId, includesParking);
+                var ManagerOfParking = managerExist.BusinessProfile.User;
 
-            if (lstStaff.Any())
-            {
-                foreach (var item in lstStaff)
+                if (lstStaff.Any())
                 {
-                    deviceToken = item.Devicetoken.ToString();
+                    foreach (var item in lstStaff)
+                    {
+                        deviceToken = item.Devicetoken.ToString();
+                        var pushNotificationModel = new PushNotificationWebModel
+                        {
+                            Title = titleManager,
+                            Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
+                            TokenWeb = deviceToken,
+                        };
+                        await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
+                    }
+                }
+                else
+                {
+                    var manager = await _userRepository.GetById(ManagerOfParking.UserId!);
                     var pushNotificationModel = new PushNotificationWebModel
                     {
                         Title = titleManager,
                         Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                        TokenWeb = deviceToken,
+                        TokenWeb = manager.Devicetoken,
                     };
                     await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
                 }
+                return "success";
             }
-            else
+            catch (Exception ex)
             {
-                var manager = await _userRepository.GetById(ManagerOfParking.UserId!);
-                var pushNotificationModel = new PushNotificationWebModel
-                {
-                    Title = titleManager,
-                    Message = bodyManager + "Vị trí " + floor.FloorName + "-" + parkingSlot.Name,
-                    TokenWeb = manager.Devicetoken,
-                };
-                await _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
+
+                return "error";
             }
+            
         }
 
         private async Task<decimal> CaculateExpectedPrice(CreateBookingCommand request, int? parkingId, int? trafficid)
