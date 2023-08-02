@@ -22,6 +22,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Cus
         private readonly Mock<IHangfireRepository> _hangfireRepositoryMock;
         private readonly Mock<IWalletRepository> _walletRepositoryMock;
         private readonly Mock<IUserRepository> _userRepositoryMock;
+        private readonly Mock<ITransactionRepository> _transactionRepositoryMock;
         private readonly CancelBookingCommandHandler _handler;
         public CancelBookingCommandHandlerTest()
         {
@@ -32,7 +33,8 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Cus
             _hangfireRepositoryMock = new Mock<IHangfireRepository>();
             _walletRepositoryMock = new Mock<IWalletRepository> ();
             _userRepositoryMock = new Mock<IUserRepository> ();
-            _handler = new CancelBookingCommandHandler(_bookingRepositoryMock.Object, _parkingSlotRepositoryMock.Object, _bookingDetailsRepositoryMock.Object, _timeSlotRepositoryMock.Object, _hangfireRepositoryMock.Object, _walletRepositoryMock.Object, _userRepositoryMock.Object);
+            _transactionRepositoryMock = new Mock<ITransactionRepository>();
+            _handler = new CancelBookingCommandHandler(_bookingRepositoryMock.Object, _parkingSlotRepositoryMock.Object, _bookingDetailsRepositoryMock.Object, _timeSlotRepositoryMock.Object, _hangfireRepositoryMock.Object, _walletRepositoryMock.Object, _userRepositoryMock.Object, _transactionRepositoryMock.Object);
         }
         [Fact]
         public async Task Handle_BookingStatusSuccess_CancelsBooking_Tra_sau()
