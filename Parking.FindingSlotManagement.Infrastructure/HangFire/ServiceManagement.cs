@@ -242,6 +242,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             {
                 Console.WriteLine($"có gì đâu mà update");
             }
+            var timeToDelete = DateTime.UtcNow.AddHours(7).Date.AddDays(1);
+
+            var deleteJobId = BackgroundJob.Schedule<IServiceManagement>(x => x.UpdateTimeSlotIn1Week(parkingSlotId), timeToDelete);
         }
 
         public void GenerateMerchandise()

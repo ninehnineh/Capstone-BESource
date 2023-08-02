@@ -80,7 +80,7 @@ public class CreateParkingSlotsCommandHandler : IRequestHandler<CreateParkingSlo
             var timeToDelete = DateTime.UtcNow.AddHours(7).Date.AddDays(1);
 
             var deleteJobId = BackgroundJob.Schedule<IServiceManagement>(x => x.UpdateTimeSlotIn1Week(a.ParkingSlotId), timeToDelete);
-            BackgroundJob.ContinueJobWith<IServiceManagement>(deleteJobId, x => x.AddTimeSlotInFuture(a.ParkingSlotId));
+            /*BackgroundJob.ContinueJobWith<IServiceManagement>(deleteJobId, x => x.AddTimeSlotInFuture(a.ParkingSlotId));*/
 
             Console.WriteLine($"One week ago to delete time slot: {timeToDelete}" );
 
