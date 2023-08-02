@@ -143,6 +143,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.RoleName, act => act.MapFrom(obj => obj.Role.Name))
                 .ReverseMap();
             CreateMap<User, UserForGetAllBookingByParkingIdResponse>().ReverseMap();
+            CreateMap<User, UserForGetAllBookingForAdminResponse>().ReverseMap();
             #endregion
 
             #region Traffic Mapping
