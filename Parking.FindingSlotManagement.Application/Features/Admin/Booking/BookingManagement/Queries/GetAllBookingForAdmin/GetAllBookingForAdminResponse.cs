@@ -12,6 +12,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Booking.Booki
         public ParkingDtoForAdmin ParkingDtoForAdmin { get; set; }
         public FloorDtoForAdmin FloorDtoForAdmin { get; set; }
         public SlotDtoForAdmin SlotDtoForAdmin { get; set; }
+        public UserForGetAllBookingForAdminResponse UserForGetAllBookingForAdminResponse { get; set; }
     }
     public class BookingDtoForAdmin
     {
@@ -35,5 +36,12 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Booking.Booki
     {
         public int ParkingSlotId { get; set; }
         public string? Name { get; set; }
+    }
+    public class UserForGetAllBookingForAdminResponse
+    {
+        public int UserId { get; set; }
+        public string? Name { get; set; }
+        public string? Phone { get; set; }
+        public string? Avatar { get; set; }
     }
 }

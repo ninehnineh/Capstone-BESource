@@ -534,6 +534,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
         public async Task<IEnumerable<Booking>> GetAllBookingForAdminMethod(int pageNo, int pageSize)
         {
             var booking = await _dbContext.Bookings
+                                     .Include(x => x.User)
                                      .Include(x => x.BookingDetails)
                                          .ThenInclude(x => x.TimeSlot)
                                          .ThenInclude(x => x.Parkingslot)

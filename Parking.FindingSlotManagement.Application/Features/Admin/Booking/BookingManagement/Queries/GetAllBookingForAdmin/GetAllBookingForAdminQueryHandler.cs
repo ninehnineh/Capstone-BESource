@@ -49,7 +49,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Booking.Booki
                         BookingDtoForAdmin = _mapper.Map<BookingDtoForAdmin>(item),
                         ParkingDtoForAdmin = _mapper.Map<ParkingDtoForAdmin>(item.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.Parking),
                         FloorDtoForAdmin = _mapper.Map<FloorDtoForAdmin>(item.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor),
-                        SlotDtoForAdmin = _mapper.Map<SlotDtoForAdmin>(item.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot)
+                        SlotDtoForAdmin = _mapper.Map<SlotDtoForAdmin>(item.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot),
+                        UserForGetAllBookingForAdminResponse = _mapper.Map<UserForGetAllBookingForAdminResponse>(item.User)
                     };
                     resReturn.Add(x);
                 }
