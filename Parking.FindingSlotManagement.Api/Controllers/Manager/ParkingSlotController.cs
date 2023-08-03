@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Commands.Create;
+using Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots.Commands.DisableParkingSlot;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Commands.UpdateParkingSlots;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Queries.GetListParkingSlotByFloorId;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
@@ -13,7 +14,7 @@ using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 {
-    
+
     [Route("api/parkingSlot")]
     [ApiController]
     public class ParkingSlotController : ControllerBase
@@ -61,7 +62,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <param name="command"></param>
         /// <returns></returns>
         /// 
-        [Authorize(Roles = "Manager")]
+        //[Authorize(Roles = "Manager")]
         [HttpPost("create")]
         public async Task<ActionResult<ServiceResponse<int>>> Create([FromBody] CreateParkingSlotsCommand command)
         {

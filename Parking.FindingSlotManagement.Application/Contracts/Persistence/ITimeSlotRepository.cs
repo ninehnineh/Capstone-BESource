@@ -1,3 +1,4 @@
+using Parking.FindingSlotManagement.Application.Models.ParkingSlot;
 using Parking.FindingSlotManagement.Application.Models.TimeSlot;
 using Parking.FindingSlotManagement.Domain.Entities;
 using System;
@@ -14,5 +15,9 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
             DateTime endTimeBooking, int bookingSlotId);
             
         Task<string> AddRangeTimeSlot(List<TimeSlot> lstTs);
+
+        Task DisableTimeSlot(int parkingSlotId);
+        Task<List<DisableSlotResult>> GetBookedTimeSlotIncludeBookingDetails(int parkingSlotId);
+
     }
 }

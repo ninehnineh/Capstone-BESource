@@ -4,7 +4,6 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using MongoDB.Driver.Core.Configuration;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 
 namespace Parking.FindingSlotManagement.Infrastructure.Repositories

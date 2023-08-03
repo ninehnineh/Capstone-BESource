@@ -10,6 +10,8 @@ using Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Qu
 using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.GetAvailableSlotByFloorIdForKeeper;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.ChangeSlotWhenComeEarly;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetAvailableSlotByFloorIdVer2;
+using Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots.Commands.DisableParkingSlot;
+using Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots.Commands.DisableParkingSlotByDate;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Keep
 {
@@ -121,6 +123,42 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Keep
                 return StatusCode((int)res.StatusCode, res);
             }
             catch (Exception ex)
+            {
+              throw new Exception(ex.Message);
+            }
+        }
+
+        [HttpPost("disable")]
+        public async Task<ActionResult<ServiceResponse<string>>> Disable([FromBody] DisableParkingSlotCommand command)
+        {
+            try
+            {
+                var res = await _mediator.Send(command);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error at Disable: " + ex.Message);
+            }
+        }
+
+        [HttpPost("disable-parking-slot-by-date")]
+        public async Task<ActionResult<ServiceResponse<string>>> DisableByDate([FromBody] DisableParkingSlotByDateCommand command)
+        {
+            try
+            {
+                var res = await _mediator.Send(command);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return NoContent();
+            }
+            catch (System.Exception ex)
             {
                 throw new Exception(ex.Message);
             }
