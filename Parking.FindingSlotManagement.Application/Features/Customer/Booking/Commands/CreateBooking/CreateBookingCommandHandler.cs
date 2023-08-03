@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commands.CreateBookingWhenAlreadyPaid;
@@ -605,7 +604,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 var notiCustomer = await PushNoTiToCustomer(request, parkingSlot, floor);
                 if (notiCustomer == "error")
                 {
-                    var timeToCancel = entity.StartTime.AddHours(1) - DateTime.UtcNow.AddHours(7);
+
+                    var bookedHours = entity.EndTime.Value - entity.StartTime;
+                    var persent = bookedHours * 0.5;
+                    var timeToCancel = entity.StartTime.Add(persent) - DateTime.UtcNow.AddHours(7);
+                    Console.WriteLine(timeToCancel);
                     BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
                     return new ServiceResponse<int>
                     {
@@ -617,7 +620,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 }
                 else
                 {
-                    var timeToCancel = entity.StartTime.AddHours(1) - DateTime.UtcNow.AddHours(7);
+                    var bookedHours = entity.EndTime.Value - entity.StartTime;
+                    var persent = bookedHours * 0.5;
+                    var timeToCancel = entity.StartTime.Add(persent) - DateTime.UtcNow.AddHours(7);
                     BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
                     return new ServiceResponse<int>
                     {
@@ -633,7 +638,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 var notiCustomer = await PushNoTiToCustomer(request, parkingSlot, floor);
                 if(notiCustomer == "error")
                 {
-                    var timeToCancel = entity.StartTime.AddHours(1) - DateTime.UtcNow.AddHours(7);
+                    var bookedHours = entity.EndTime.Value - entity.StartTime;
+                    var persent = bookedHours * 0.5;
+                    var timeToCancel = entity.StartTime.Add(persent) - DateTime.UtcNow.AddHours(7);
                     BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
                     return new ServiceResponse<int>
                     {
@@ -645,7 +652,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 }
                 else
                 {
-                    var timeToCancel = entity.StartTime.AddHours(1) - DateTime.UtcNow.AddHours(7);
+                    var bookedHours = entity.EndTime.Value - entity.StartTime;
+                    var persent = bookedHours * 0.5;
+                    var timeToCancel = entity.StartTime.Add(persent) - DateTime.UtcNow.AddHours(7);
                     BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
                     return new ServiceResponse<int>
                     {

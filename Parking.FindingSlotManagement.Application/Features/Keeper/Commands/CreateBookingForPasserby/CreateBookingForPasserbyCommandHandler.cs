@@ -1,14 +1,12 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using MongoDB.Driver.Linq;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Commons;
 using Parking.FindingSlotManagement.Application.Models.Booking;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Domain.Enum;
 using QRCoder;
-using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
