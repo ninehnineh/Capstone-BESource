@@ -143,6 +143,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.RoleName, act => act.MapFrom(obj => obj.Role.Name))
                 .ReverseMap();
             CreateMap<User, UserForGetAllBookingByParkingIdResponse>().ReverseMap();
+            CreateMap<User, UserForGetAllBookingForAdminResponse>().ReverseMap();
             #endregion
 
             #region Traffic Mapping
@@ -306,6 +307,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<Booking, GetListBookingByManagerIdResponse>()
                 .ForMember(dto => dto.CustomerName, act => act.MapFrom(obj => obj.User.Name))
                 .ForMember(dto => dto.Phone, act => act.MapFrom(obj => obj.User.Phone))
+                .ForMember(dto => dto.CustomerAvatar, act => act.MapFrom(obj => obj.User.Avatar))
                 .ForMember(dto => dto.Position, act => act.MapFrom(obj => obj.BookingDetails.First().TimeSlot.Parkingslot.Name))
                 .ForMember(dto => dto.LicensePlate, act => act.MapFrom(obj => obj.VehicleInfor.LicensePlate))
                 .ForMember(dto => dto.ParkingName, act => act.MapFrom(obj => obj.BookingDetails.First().TimeSlot.Parkingslot.Floor.Parking.Name))

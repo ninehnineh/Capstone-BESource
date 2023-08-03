@@ -10,6 +10,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Que
     {
         public int BookingId { get; set; }
         public string CustomerName { get; set; }
+        public string CustomerAvatar { get; set; }
         public string? Phone { get; set; }
         public string Position { get; set; }
         public DateTime StartTime { get; set; }

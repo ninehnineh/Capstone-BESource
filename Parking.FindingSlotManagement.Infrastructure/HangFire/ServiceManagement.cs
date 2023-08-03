@@ -18,6 +18,7 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Parking.FindingSlotManagement.Infrastructure.HangFire
 {
@@ -168,7 +169,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
         {
             var lstParkingSlot = _context.ParkingSlots.Where(x => x.ParkingSlotId == parkingSlotId).ToList();
             DateTime startDate = DateTime.UtcNow;
-            DateTime endDate = startDate.AddDays(7);
+            DateTime endDate = startDate.AddDays(1);
 
             foreach (var a in lstParkingSlot)
             {
@@ -196,29 +197,56 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             }
             Console.WriteLine($"Add TimeSlot In Future: Long running task {DateTime.UtcNow.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss")}");
 
-            var timeToDelete = DateTime.UtcNow.AddDays(7);
+            var timeToDelete = DateTime.UtcNow.AddHours(7).Date.AddDays(7);
 
-            var deleteJobId = BackgroundJob.Schedule<IServiceManagement>(x => x.DeleteTimeSlotIn1Week(), timeToDelete);
+            var deleteJobId = BackgroundJob.Schedule<IServiceManagement>(x => x.UpdateTimeSlotIn1Week(parkingSlotId), timeToDelete);
             BackgroundJob.ContinueJobWith<IServiceManagement>(deleteJobId, x => x.AddTimeSlotInFuture(parkingSlotId));
-            Console.WriteLine($"One week ago to delete time slot: {timeToDelete}");
+            Console.WriteLine($"One week ago to update time slot: {timeToDelete}");
 
         }
 
-        public void DeleteTimeSlotIn1Week()
+        public void UpdateTimeSlotIn1Week(int parkingSlotId)
         {
-            var oneWeekAgo = DateTime.UtcNow.AddHours(7).AddDays(-7);
-            Console.WriteLine($"One week ago to delete time slot: {oneWeekAgo}");
-            var dataToDelete = _context.TimeSlots.Where(x => x.CreatedDate <= oneWeekAgo);
-            if (dataToDelete.Any())
+            var listOldParkingSlot = _context.TimeSlots.Where(x => x.ParkingSlotId == parkingSlotId).ToList();
+
+            if (listOldParkingSlot.Any())
             {
-                _context.TimeSlots.RemoveRange(dataToDelete);
+                DateTime startDate2 = DateTime.UtcNow.AddHours(7).Date;
+                DateTime endDate2 = startDate2.AddDays(1);
+                List<TimeSlot> test2 = new List<TimeSlot>();
+                for (DateTime date = startDate2; date < endDate2; date = date.AddDays(1))
+                {
+                    for (int i = 0; i < 24; i++)
+                    {
+                        DateTime startTime = date.Date + TimeSpan.FromHours(i);
+                        DateTime endTime = date.Date + TimeSpan.FromHours(i + 1);
+                        TimeSlot x = new TimeSlot()
+                        {
+                            StartTime = startTime,
+                            EndTime = endTime
+                        };
+                        test2.Add(x);
+                    }
+                }
+                for (int i = 0; i < listOldParkingSlot.Count && i < test2.Count; i++)
+                {
+                    listOldParkingSlot[i].StartTime = test2[i].StartTime;
+                    listOldParkingSlot[i].EndTime = test2[i].EndTime;
+                    listOldParkingSlot[i].CreatedDate = DateTime.UtcNow.AddHours(7).Date;
+                }
+                _context.TimeSlots.UpdateRange(listOldParkingSlot);
                 _context.SaveChanges();
-                Console.WriteLine($"Delete TimeSlot In One Week: Long running task {DateTime.UtcNow.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss")}");
+                Console.WriteLine($"Update TimeSlot In One Week: Long running task {DateTime.UtcNow.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss")}");
+                var timeToDelete = DateTime.Parse($"{DateTime.UtcNow.AddHours(7).Date.AddDays(1)}");
+
+                var deleteJobId = BackgroundJob.Schedule<IServiceManagement>(x => x.UpdateTimeSlotIn1Week(parkingSlotId), timeToDelete);
+                Console.WriteLine($"One week ago to update time slot: {timeToDelete}");
             }
             else
             {
-                Console.WriteLine($"có đéo gì đâu mà xóa");
+                Console.WriteLine($"có gì đâu mà update");
             }
+
         }
 
         public void GenerateMerchandise()

@@ -10,7 +10,7 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Infrastructure
     public interface IServiceManagement
     {
         void SendEmail(int entity);
-        void DeleteTimeSlotIn1Week();
+        void UpdateTimeSlotIn1Week(int parkingSlotId);
         void GenerateMerchandise();
         void SyncData();
         void AddTimeSlotInFuture(int floorId);
