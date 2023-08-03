@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Models.ParkingSlot;
 using Parking.FindingSlotManagement.Application.Models.TimeSlot;
 using Parking.FindingSlotManagement.Domain.Entities;
+using Parking.FindingSlotManagement.Domain.Enum;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using System;
 using System.Collections.Generic;
@@ -30,14 +32,14 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                     .Where(x => x.ParkingSlotId == parkingSlotId &&
                         x.StartTime >= startTimeBooking && x.EndTime <= endTimeBooking)
                     .ToListAsync();
-                
+
                 return bookingTimeSlots;
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
-      }
+        }
 
         public async Task<string> AddRangeTimeSlot(List<TimeSlot> lstTs)
         {
@@ -53,5 +55,51 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task DisableTimeSlot(int parkingSlotId)
+        {
+            try
+            {
+                var timeSlots = await _dbContext.TimeSlots.Where(x => x.ParkingSlotId == parkingSlotId).ToListAsync();
+                timeSlots.ForEach(x => x.Status = TimeSlotStatus.Busy.ToString());
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at disable time slot repository dbcontext: {ex.Message}");
+            }
+        }
+
+        public async Task<List<DisableSlotResult>> GetBookedTimeSlotIncludeBookingDetails(int parkingSlotId)
+        {
+            try
+            {
+                var list = new HashSet<DisableSlotResult>();
+                var bookedTimeSlot = await _dbContext.TimeSlots
+                    .Include(x => x.BookingDetails)!.ThenInclude(x => x.Booking!).ThenInclude(y => y.User!).ThenInclude(z => z.Wallet)
+                    .Where(x => x.Status == TimeSlotStatus.Booked.ToString() &&
+                                x.ParkingSlotId == parkingSlotId)
+                    .ToListAsync();
+
+                foreach (var timeSlot in bookedTimeSlot)
+                {
+                    // list.UnionWith(timeSlot.BookingDetails!.Select(x => x.BookingId!.Value && x.Booking.User.Wallet));
+                    list.UnionWith(timeSlot.BookingDetails!.Select(x => new DisableSlotResult{BookingId = x.BookingId!.Value, Wallet = x.Booking!.User!.Wallet!, User = x.Booking.User}));
+                }
+                
+                return list.ToList();
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at GetBookedTimeSlot: Message {ex.Message}");
+            }
+        }
     }
+    
+    // public class BookedUserWallet 
+    // {
+    //     public int WalletId { get; set; }
+    //     public int Balance { get; set; }
+    // }
 }

@@ -98,6 +98,7 @@ using Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetAllCo
 using Parking.FindingSlotManagement.Application.Features.Admin.Booking.BookingManagement.Queries.GetAllBookingForAdmin;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetAllBookingByParkingId;
 using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Queries.GetVnPayById;
+using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.DisableParkingSlotByDate.Model;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -206,6 +207,8 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<Domain.Entities.Parking, GetListParkingNewWNoApproveResponse>().ReverseMap();
             CreateMap < Domain.Entities.Parking, ParkingSearchResult>().ReverseMap();
             CreateMap<Domain.Entities.Parking, ParkingDtoForAdmin>().ReverseMap();
+            CreateMap<Domain.Entities.Parking, DisableParkingSlotParking>().ReverseMap();
+            
             #endregion
 
             #region StaffParking Mapping
@@ -218,6 +221,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<Floor, GetListFloorByParkingIdResponse>().ReverseMap();
             CreateMap<Floor, FloorWithBookingDetailDto>().ReverseMap();
             CreateMap<Floor, FloorDtoForAdmin>().ReverseMap();
+            CreateMap<Floor, DisableParkingSlotFloor>().ReverseMap();
             #endregion
 
             #region TimeLine Mapping

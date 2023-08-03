@@ -71,7 +71,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
 
                     foreach (var bookingDetail in bookedBooking.BookingDetails)
                     {
-                        _logger.LogInformation($"Count: {bookedBooking.BookingDetails.Count}");
                         bookingDetail.TimeSlot.Status = TimeSlotStatus.Free.ToString();
                     }
 
