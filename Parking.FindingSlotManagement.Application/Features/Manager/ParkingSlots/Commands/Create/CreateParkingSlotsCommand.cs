@@ -16,4 +16,5 @@ public class CreateParkingSlotsCommand : IRequest<ServiceResponse<int>>
     public int? TrafficId { get; set; }
     public int? FloorId { get; set; }
     public int? ParkingId { get; set; }
+    public bool? IsBackup { get; set; }
 }

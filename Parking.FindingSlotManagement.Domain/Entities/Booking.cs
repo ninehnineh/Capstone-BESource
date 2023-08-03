@@ -22,6 +22,7 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public decimal? TotalPrice { get; set; }
         public string? QRImage { get; set; }
         public decimal UnPaidMoney { get; set; }
+        public bool? IsRating { get; set; }
 
 
         public int? UserId { get; set; }

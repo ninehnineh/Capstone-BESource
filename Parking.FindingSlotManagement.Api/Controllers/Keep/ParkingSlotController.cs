@@ -9,6 +9,7 @@ using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.ChangeS
 using Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Queries.GetAvailableSlotByFloorId;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.GetAvailableSlotByFloorIdForKeeper;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.ChangeSlotWhenComeEarly;
+using Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetAvailableSlotByFloorIdVer2;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Keep
 {
@@ -88,6 +89,27 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Keep
         [HttpGet("floors/floor/parking-slots")]
         public async Task<ActionResult<ServiceResponse<IEnumerable<GetAvailableSlotByFloorIdResponse>>>> GetAvailableParkingSlots
             ([FromQuery] GetAvailableSlotByFloorIdForKeeperQuery query)
+        {
+            try
+            {
+                var res = await _mediator.Send(query);
+                if (res.Message == "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Keeper
+        /// </summary>
+        [HttpGet("floors/floor/parking-slots/ver2/passerby")]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<GetAvailableSlotByFloorIdResponse>>>> GetAvailableParkingSlotsForPasswerBy
+            ([FromQuery] GetAvailableSlotByFloorIdVer2Query query)
         {
             try
             {

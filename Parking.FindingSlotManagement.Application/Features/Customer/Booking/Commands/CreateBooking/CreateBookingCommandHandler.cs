@@ -328,6 +328,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             }
 
             entity.TotalPrice = expectedPrice;
+            entity.IsRating = false;
             await _bookingRepository.Insert(entity);
 
             var linkQRImage = await UploadQRImagess(entity.BookingId);
@@ -547,7 +548,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 parkingPrice, timeLines);
 
             entity.TotalPrice = expectedPrice;
-
+            entity.IsRating = false;
             await _bookingRepository.Insert(entity);
 
             var linkQRImage = await UploadQRImagess(entity.BookingId);
