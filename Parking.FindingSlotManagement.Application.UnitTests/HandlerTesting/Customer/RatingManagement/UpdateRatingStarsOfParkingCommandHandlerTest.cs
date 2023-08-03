@@ -14,13 +14,15 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Cus
     public class UpdateRatingStarsOfParkingCommandHandlerTest
     {
         private readonly Mock<IParkingRepository> _parkingRepositoryMock;
+        private readonly Mock<IBookingRepository> _bookingRepositoryMock;
         private readonly UpdateRatingStarsOfParkingCommandHandler _handler;
         private readonly UpdateRatingStarsOfParkingCommandValidation _validator;
         public UpdateRatingStarsOfParkingCommandHandlerTest()
         {
             _parkingRepositoryMock = new Mock<IParkingRepository>();
             _validator = new UpdateRatingStarsOfParkingCommandValidation();
-            _handler = new UpdateRatingStarsOfParkingCommandHandler(_parkingRepositoryMock.Object);
+            _bookingRepositoryMock = new Mock<IBookingRepository>();
+            _handler = new UpdateRatingStarsOfParkingCommandHandler(_parkingRepositoryMock.Object, _bookingRepositoryMock.Object);
         }
         [Fact]
         public async Task UpdateRatingStarsOfParkingCommandHandler_Should_Update_Parking_Successfully()
