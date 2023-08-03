@@ -11,16 +11,28 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.RatingPark
     public class UpdateRatingStarsOfParkingCommandHandler : IRequestHandler<UpdateRatingStarsOfParkingCommand, ServiceResponse<string>>
     {
         private readonly IParkingRepository _parkingRepository;
+        private readonly IBookingRepository _bookingRepository;
 
-        public UpdateRatingStarsOfParkingCommandHandler(IParkingRepository parkingRepository)
+        public UpdateRatingStarsOfParkingCommandHandler(IParkingRepository parkingRepository, IBookingRepository bookingRepository)
         {
             _parkingRepository = parkingRepository;
+            _bookingRepository = bookingRepository;
         }
 
         public async Task<ServiceResponse<string>> Handle(UpdateRatingStarsOfParkingCommand request, CancellationToken cancellationToken)
         {
             try
             {
+                var checkBookingExist = await _bookingRepository.GetById(request.BookingId);
+                if(checkBookingExist == null)
+                {
+                    return new ServiceResponse<string>
+                    {
+                        Message = "Không tìm thấy đơn đặt.",
+                        Success = false,
+                        StatusCode = 404
+                    };
+                }
                 var checkParkingExist = await _parkingRepository.GetById(request.ParkingId);
                 if(checkParkingExist == null)
                 {
@@ -49,6 +61,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.RatingPark
                 var ope = checkParkingExist.TotalStars / checkParkingExist.StarsCount;
                 checkParkingExist.Stars = (float)Math.Round((float)ope, 1, MidpointRounding.AwayFromZero);
                 await _parkingRepository.Save();
+                checkBookingExist.IsRating = true;
+                await _bookingRepository.Save();
                 return new ServiceResponse<string>
                 {
                     Message = "Thành công",

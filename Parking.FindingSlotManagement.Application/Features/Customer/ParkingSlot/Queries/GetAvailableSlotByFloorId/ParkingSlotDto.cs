@@ -14,5 +14,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlo
         public int RowIndex { get; set; }
         public int ColumnIndex { get; set; }
         public int FloorId { get; set; }
+        public bool? IsBackup { get; set; }
     }
 }

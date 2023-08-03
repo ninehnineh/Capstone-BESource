@@ -9,6 +9,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.RatingPark
 {
     public class UpdateRatingStarsOfParkingCommand : IRequest<ServiceResponse<string>>
     {
+        public int BookingId { get; set; }
         public int ParkingId { get; set; }
         public int Stars { get; set; }
     }
