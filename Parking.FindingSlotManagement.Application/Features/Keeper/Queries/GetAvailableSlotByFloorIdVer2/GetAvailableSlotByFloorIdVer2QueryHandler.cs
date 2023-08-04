@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
+using NuGet.Protocol.Plugins;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Queries.GetAvailableSlotByFloorId;
 using Parking.FindingSlotManagement.Application.Mapping;
 using System;
 using System.Collections.Generic;
@@ -9,9 +11,9 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Queries.GetAvailableSlotByFloorId
+namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetAvailableSlotByFloorIdVer2
 {
-    public class GetAvailableSlotByFloorIdQueryHandler : IRequestHandler<GetAvailableSlotByFloorIdQuery, ServiceResponse<IEnumerable<GetAvailableSlotByFloorIdResponse>>>
+    public class GetAvailableSlotByFloorIdVer2QueryHandler : IRequestHandler<GetAvailableSlotByFloorIdVer2Query, ServiceResponse<IEnumerable<GetAvailableSlotByFloorIdResponse>>>
     {
         private readonly IFloorRepository _floorRepository;
         private readonly IParkingSlotRepository _parkingSlotRepository;
@@ -20,13 +22,14 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlo
         {
             cfg.AddProfile(new MappingProfile());
         });
-        public GetAvailableSlotByFloorIdQueryHandler(IFloorRepository floorRepository, IParkingSlotRepository parkingSlotRepository, ITimeSlotRepository timeSlotRepository)
+        public GetAvailableSlotByFloorIdVer2QueryHandler(IFloorRepository floorRepository, IParkingSlotRepository parkingSlotRepository, ITimeSlotRepository timeSlotRepository)
         {
             _floorRepository = floorRepository;
             _parkingSlotRepository = parkingSlotRepository;
             _timeSlotRepository = timeSlotRepository;
         }
-        public async Task<ServiceResponse<IEnumerable<GetAvailableSlotByFloorIdResponse>>> Handle(GetAvailableSlotByFloorIdQuery request, CancellationToken cancellationToken)
+
+        public async Task<ServiceResponse<IEnumerable<GetAvailableSlotByFloorIdResponse>>> Handle(GetAvailableSlotByFloorIdVer2Query request, CancellationToken cancellationToken)
         {
             try
             {
@@ -47,9 +50,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlo
                    x => x.Parkingslot,
                    x => x.Parkingslot.Floor
                 };
-                var currentLstBookedSlot = await _timeSlotRepository.GetAllItemWithCondition(x => 
-                                                            x.Parkingslot.FloorId == request.FloorId && 
-                                                            x.StartTime >= request.StartTimeBooking && 
+                var currentLstBookedSlot = await _timeSlotRepository.GetAllItemWithCondition(x =>
+                                                            x.Parkingslot.FloorId == request.FloorId &&
+                                                            x.StartTime >= request.StartTimeBooking &&
                                                             x.EndTime <= request.EndTimeBooking && x.Status == "Booked", includes);
                 HashSet<int> listParkingSlotIdExist = new();
                 foreach (var item in currentLstBookedSlot)
@@ -59,7 +62,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlo
                         listParkingSlotIdExist.Add((int)item.ParkingSlotId);
                     }
                 }
-                var lstParkingSlotHasBooked = await _parkingSlotRepository.GetAllItemWithCondition(x => listParkingSlotIdExist.Contains((int)x.ParkingSlotId) || x.FloorId == request.FloorId && x.IsAvailable == false && x.IsBackup == false);
+                var lstParkingSlotHasBooked = await _parkingSlotRepository.GetAllItemWithCondition(x => listParkingSlotIdExist.Contains((int)x.ParkingSlotId) || x.FloorId == request.FloorId && x.IsAvailable == false);
                 List<GetAvailableSlotByFloorIdResponse> lstTong = new List<GetAvailableSlotByFloorIdResponse>();
                 foreach (var item in lstParkingSlotHasBooked)
                 {
@@ -84,7 +87,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlo
                         listParkingSlotIdExistVer2.Add((int)item.ParkingSlotId);
                     }
                 }
-                var lstParkingSlotHasBusy = await _parkingSlotRepository.GetAllItemWithCondition(x => listParkingSlotIdExistVer2.Contains((int)x.ParkingSlotId) || x.FloorId == request.FloorId && x.IsAvailable == false && x.IsBackup == false);
+                var lstParkingSlotHasBusy = await _parkingSlotRepository.GetAllItemWithCondition(x => listParkingSlotIdExistVer2.Contains((int)x.ParkingSlotId) || x.FloorId == request.FloorId && x.IsAvailable == false);
                 foreach (var item in lstParkingSlotHasBusy)
                 {
                     var entity = _mapper.Map<ParkingSlotDto>(item);
@@ -97,7 +100,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlo
                 }
                 //slot chua book
                 var lstParkingSlot = await _parkingSlotRepository
-                    .GetAllItemWithCondition(x => x.FloorId == request.FloorId && x.IsBackup == false);
+                    .GetAllItemWithCondition(x => x.FloorId == request.FloorId);
                 var filterParkingSlot = lstParkingSlot
                     .Where(x => !listParkingSlotIdExist.Contains(x.ParkingSlotId)).ToList();
                 var filterParkingSlot2 = filterParkingSlot

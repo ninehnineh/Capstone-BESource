@@ -26,6 +26,7 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public DateTime? IdCardDate { get; set; }
         public string? IdCardIssuedBy { get; set; }
         public string? Address { get; set; }
+        public int? BanCount { get; set; }
 
         public virtual User? Manager { get; set; }
         public virtual Role? Role { get; set; }

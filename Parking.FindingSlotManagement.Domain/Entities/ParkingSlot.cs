@@ -15,6 +15,7 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public int? ColumnIndex { get; set; }
         public int? TrafficId { get; set; }
         public int? FloorId { get; set; }
+        public bool? IsBackup { get; set; }
 
         public virtual ICollection<TimeSlot> TimeSlots { get; set; }
         public virtual Floor? Floor { get; set; }
