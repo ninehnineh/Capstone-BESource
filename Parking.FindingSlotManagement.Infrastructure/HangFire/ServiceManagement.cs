@@ -236,7 +236,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 _context.TimeSlots.UpdateRange(listOldParkingSlot);
                 _context.SaveChanges();
                 Console.WriteLine($"Update TimeSlot In One Week: Long running task {DateTime.UtcNow.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss")}");
-                var timeToDelete = DateTime.Parse($"{DateTime.UtcNow.AddHours(7).Date.AddDays(1)}");
+                var timeToDelete = DateTime.UtcNow.AddHours(7).AddDays(1).Date - DateTime.UtcNow.AddHours(7);
 
                 var deleteJobId = BackgroundJob.Schedule<IServiceManagement>(x => x.UpdateTimeSlotIn1Week(parkingSlotId), timeToDelete);
                 Console.WriteLine($"One week ago to update time slot: {timeToDelete}");
