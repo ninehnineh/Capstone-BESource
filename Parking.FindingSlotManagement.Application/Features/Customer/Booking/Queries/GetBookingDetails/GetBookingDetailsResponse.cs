@@ -33,6 +33,7 @@ public class BookingDetailsDto
     public string? GuestPhone { get; set; }
     public decimal? TotalPrice { get; set; }
     public string? QRImage { get; set; }
+    public bool? IsRating { get; set; }
 }
 public class VehicleInforDtoos
 {
