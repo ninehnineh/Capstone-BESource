@@ -39,7 +39,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Authentica
             try
             {
                 var checkUserExist = await _userRepository.GetItemWithCondition(x => x.Phone.Equals(request.Phone));
-                if(checkUserExist != null && checkUserExist.RoleId == 3)
+                if (checkUserExist != null && checkUserExist.RoleId == 3)
                 {
                     return new ServiceResponse<string>
                     {
@@ -53,6 +53,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Authentica
                 var entity = _mapper.Map<User>(request);
                 entity.IsActive = true;
                 entity.RoleId = 3;
+                entity.BanCount = 0;
                 await _userRepository.Insert(entity);
                 var entityWallet = new Domain.Entities.Wallet
                 {
