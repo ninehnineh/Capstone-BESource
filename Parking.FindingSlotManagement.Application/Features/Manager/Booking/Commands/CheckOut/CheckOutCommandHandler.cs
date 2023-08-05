@@ -55,7 +55,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                         Success = false
                     };
                 }
-
+                if (booking.Status.Equals(BookingStatus.Success.ToString()) || booking.Status.Equals(BookingStatus.Cancel.ToString()))
+                {
+                    return new ServiceResponse<string>
+                    {
+                        Message = "Đơn chưa check-in hoặc đã bị hủy nên không thể xử lý.",
+                        StatusCode = 400,
+                        Success = false
+                    };
+                }
                 var includesss = new List<Expression<Func<Domain.Entities.Parking, object>>>
                 {
                     x => x.BusinessProfile.User.Wallet
@@ -160,8 +168,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                     };
                 }
                 var userDiviceToken = booking.User!.Devicetoken;
-                
-                
+
+
 
                 var pushNotificationMobile = new PushNotificationMobileModel
                 {
