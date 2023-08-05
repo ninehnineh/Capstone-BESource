@@ -16,6 +16,7 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public decimal? Longitude { get; set; }
         public string? Description { get; set; }
         public bool? IsActive { get; set; }
+        public bool? IsAvailable { get; set; }
         public int? MotoSpot { get; set; }
         public int? CarSpot { get; set; }
         public bool? IsFull { get; set; }
