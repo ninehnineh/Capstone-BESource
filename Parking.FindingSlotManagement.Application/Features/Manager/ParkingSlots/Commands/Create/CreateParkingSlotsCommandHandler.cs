@@ -46,7 +46,7 @@ public class CreateParkingSlotsCommandHandler : IRequestHandler<CreateParkingSlo
             var a = _mapper.Map<ParkingSlot>(request);
             await _parkingSlotRepository.Insert(a);
             DateTime startDate = DateTime.UtcNow;
-            DateTime endDate = startDate.AddDays(1);
+            DateTime endDate = startDate.AddDays(7);
             List<TimeSlot> ts = new List<TimeSlot>();
             for (DateTime date = startDate; date < endDate; date = date.AddDays(1))
             {
@@ -77,7 +77,7 @@ public class CreateParkingSlotsCommandHandler : IRequestHandler<CreateParkingSlo
                 };
             }
 
-            var timeToDelete = DateTime.Parse($"{DateTime.UtcNow.AddHours(7).Date.AddDays(1)}");
+            var timeToDelete = DateTime.UtcNow.AddHours(7).AddDays(7).Date - DateTime.UtcNow.AddHours(7);
 
             var deleteJobId = BackgroundJob.Schedule<IServiceManagement>(x => x.UpdateTimeSlotIn1Week(a.ParkingSlotId), timeToDelete);
             /*BackgroundJob.ContinueJobWith<IServiceManagement>(deleteJobId, x => x.AddTimeSlotInFuture(a.ParkingSlotId));*/

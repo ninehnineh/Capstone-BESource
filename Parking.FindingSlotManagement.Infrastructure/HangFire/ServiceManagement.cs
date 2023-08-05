@@ -211,7 +211,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             if (listOldParkingSlot.Any())
             {
                 DateTime startDate2 = DateTime.UtcNow.AddHours(7).Date;
-                DateTime endDate2 = startDate2.AddDays(1);
+                DateTime endDate2 = startDate2.AddDays(7);
                 List<TimeSlot> test2 = new List<TimeSlot>();
                 for (DateTime date = startDate2; date < endDate2; date = date.AddDays(1))
                 {
@@ -236,7 +236,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 _context.TimeSlots.UpdateRange(listOldParkingSlot);
                 _context.SaveChanges();
                 Console.WriteLine($"Update TimeSlot In One Week: Long running task {DateTime.UtcNow.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss")}");
-                var timeToDelete = DateTime.Parse($"{DateTime.UtcNow.AddHours(7).Date.AddDays(1)}");
+                var timeToDelete = DateTime.UtcNow.AddHours(7).AddDays(7).Date - DateTime.UtcNow.AddHours(7);
 
                 var deleteJobId = BackgroundJob.Schedule<IServiceManagement>(x => x.UpdateTimeSlotIn1Week(parkingSlotId), timeToDelete);
                 Console.WriteLine($"One week ago to update time slot: {timeToDelete}");
