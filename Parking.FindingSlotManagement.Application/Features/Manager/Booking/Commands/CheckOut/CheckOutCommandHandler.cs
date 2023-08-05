@@ -55,7 +55,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                         Success = false
                     };
                 }
-                if (booking.Status.Equals(BookingStatus.Success.ToString()) || booking.Status.Equals(BookingStatus.Cancel.ToString()))
+                if (!booking.Status.Equals(BookingStatus.Check_Out.ToString()))
                 {
                     return new ServiceResponse<string>
                     {

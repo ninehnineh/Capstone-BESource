@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.BookingInformation;
 using Parking.FindingSlotManagement.Application.Models.PushNotification;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Domain.Enum;
@@ -55,6 +56,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                     {
                         Message = "Đơn đặt không tồn tại.",
                         StatusCode = 404,
+                        Success = false
+                    };
+                }
+                if(!booking.Status.Equals(BookingStatus.Success.ToString()))
+                {
+                    return new ServiceResponse<string>
+                    {
+                        Message = "Đơn đang ở trạng thái khác hoặc đã bị hủy nên không thể xử lý.",
+                        StatusCode = 400,
                         Success = false
                     };
                 }

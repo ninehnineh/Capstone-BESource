@@ -99,6 +99,7 @@ using Parking.FindingSlotManagement.Application.Features.Admin.Booking.BookingMa
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetAllBookingByParkingId;
 using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Queries.GetVnPayById;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.DisableParkingSlotByDate.Model;
+using Parking.FindingSlotManagement.Application.Features.Customer.Account.AccountManagement.Queries.GetBanCountByUserId;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -145,6 +146,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ReverseMap();
             CreateMap<User, UserForGetAllBookingByParkingIdResponse>().ReverseMap();
             CreateMap<User, UserForGetAllBookingForAdminResponse>().ReverseMap();
+            CreateMap<User, GetBanCountByUserIdResponse>().ReverseMap();
             #endregion
 
             #region Traffic Mapping
@@ -378,7 +380,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ReverseMap();
             #endregion
 
-            #region
+            #region ConflictRequest Mapping
             CreateMap<ConflictRequest, GetAllConflictRequestByKeeperIdResponse>().ReverseMap();
             #endregion
         }

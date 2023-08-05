@@ -12,5 +12,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlot
         public string? Name { get; set; }
         public int? RowIndex { get; set; }
         public int? ColumnIndex { get; set; }
+        public bool? IsBackup { get; set; }
     }
 }
