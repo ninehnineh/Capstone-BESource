@@ -53,6 +53,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                 }
                 var parkingExist = await _parkingRepository.GetById(approveParking.ParkingId);
                 parkingExist.IsActive = true;
+                parkingExist.IsAvailable = true;
                 await _parkingRepository.Save();
                 approveParking.NoteForAdmin = request.NoteForAdmin;
                 approveParking.Status = Domain.Enum.ApproveParkingStatus.Đã_duyệt.ToString();
