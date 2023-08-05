@@ -44,6 +44,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 
                 var booking = await _bookingRepository
                     .GetBookingIncludeParkingSlot(request.BookingId);
+                if (!booking.Status.Equals(BookingStatus.Success.ToString()))
+                {
+                    return new ServiceResponse<string>
+                    {
+                        Message = "Đơn đang ở trạng thái khác hoặc đã bị hủy nên không thể xử lý.",
+                        StatusCode = 400,
+                        Success = false
+                    };
+                }
                 List<Expression<Func<BookingDetails, object>>> includes = new()
                 {
                     x => x.TimeSlot,

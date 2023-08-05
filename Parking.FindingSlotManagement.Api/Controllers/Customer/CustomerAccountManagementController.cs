@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Features.Customer.Account.AccountManagement.Commands.UpdateCustomerProfileById;
+using Parking.FindingSlotManagement.Application.Features.Customer.Account.AccountManagement.Queries.GetBanCountByUserId;
 using Parking.FindingSlotManagement.Application.Features.Customer.Account.AccountManagement.Queries.GetCustomerProfileById;
 using System.Net;
 
@@ -32,6 +33,29 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
             try
             {
                 var query = new GetCustomerProfileByIdQuery() { UserId = userId };
+                var res = await _mediator.Send(query);
+
+                return StatusCode((int)res.StatusCode, res);
+
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// API For Customer
+        /// </summary>
+        [HttpGet("account/ban-count/{userId}", Name = "GetBanCountByUserId")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ServiceResponse<GetBanCountByUserIdResponse>>> GetBanCountByUserId(int userId)
+        {
+            try
+            {
+                var query = new GetBanCountByUserIdQuery() { UserId = userId };
                 var res = await _mediator.Send(query);
 
                 return StatusCode((int)res.StatusCode, res);
