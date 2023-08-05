@@ -23,16 +23,19 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories.Authenticati
     {
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IParkingRepository _parkingRepository;
         private readonly ParkZDbContext _dbContext;
         private readonly JwtSettings _jwtSettings;
 
         public BusinessManagerAuthenticationRepository(IConfiguration configuration,
             IOptions<JwtSettings> jwtSettings,
             IHttpContextAccessor httpContextAccessor,
+            IParkingRepository parkingRepository,
             ParkZDbContext DbContext)
         {
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
+            _parkingRepository = parkingRepository;
             _dbContext = DbContext;
             _jwtSettings = jwtSettings.Value;
         }
@@ -150,6 +153,29 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories.Authenticati
 
             if (manager.IsActive == true && manager.IsCensorship == true && manager.Role!.Name!.Equals("Manager") || manager.IsActive == true && manager.IsCensorship == true && manager.Role!.Name!.Equals("Keeper"))
             {
+                if(manager.Role!.Name!.Equals("Keeper"))
+                {
+                    var parkingExist = await _parkingRepository.GetById(manager.ParkingId);
+                    if (parkingExist == null)
+                    {
+                        return new ServiceResponse<AuthResponse>
+                        {
+                            Message = "Không tìm thấy bãi.",
+                            Success = false,
+                            StatusCode = 404
+                        };
+                    }
+                    if(parkingExist.IsAvailable == false)
+                    {
+                        return new ServiceResponse<AuthResponse>
+                        {
+                            Message = "Bãi đang bị quản lý khóa.",
+                            Success = false,
+                            StatusCode = 400
+                        };
+                    }
+                }
+
                 response.Success = true;
                 response.Message = $"Chào mừng {manager.Name}";
                 response.StatusCode = 200;

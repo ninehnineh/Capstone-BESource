@@ -47,7 +47,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Parking.Qu
                     x => x.ParkingHasPrices,
                     x => x.ParkingSpotImages,
                 };
-                var lstParking = await _parkingRepository.GetAllItemWithPagination(x => x.IsActive == true && x.Stars != null && x.Latitude != null && x.Longitude != null && x.ParkingHasPrices.Count() > 0, includes, null, true, request.PageNo, request.PageSize);
+                var lstParking = await _parkingRepository.GetAllItemWithPagination(x => x.IsActive == true && x.IsAvailable == true && x.Stars != null && x.Latitude != null && x.Longitude != null && x.ParkingHasPrices.Count() > 0, includes, null, true, request.PageNo, request.PageSize);
                 if(lstParking.Count() <= 0)
                 {
                     return new ServiceResponse<IEnumerable<GetListParkingDesByRatingResponse>>()

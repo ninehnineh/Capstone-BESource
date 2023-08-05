@@ -64,6 +64,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                 parkingEntity.BusinessId = checkBusinessExist.BusinessProfileId;
                 parkingEntity.IsActive = false;
                 parkingEntity.IsFull = false;
+                parkingEntity.IsAvailable = false;
                 await _parkingRepository.Insert(parkingEntity);
                 parkingEntity.Code = "BX" + parkingEntity.ParkingId;
                 parkingEntity.Stars = (float)0.0;
