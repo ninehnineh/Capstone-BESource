@@ -31,7 +31,8 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Cus
             var request = new UpdateRatingStarsOfParkingCommand
             {
                 ParkingId = 1,
-                Stars = 5
+                Stars = 5,
+                BookingId = 1
             };
             var cancellationToken = new CancellationToken();
             var OldStarsOfParking = new Domain.Entities.Parking
@@ -41,6 +42,11 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Cus
                 TotalStars = null,
                 StarsCount = null
             };
+            var expectedBooking = new Domain.Entities.Booking
+            {
+                BookingId = 1,
+            };
+            _bookingRepositoryMock.Setup(x => x.GetById(request.BookingId)).ReturnsAsync(expectedBooking);
             _parkingRepositoryMock.Setup(x => x.GetById(request.ParkingId))
                 .ReturnsAsync(OldStarsOfParking);
 
@@ -54,8 +60,9 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Cus
             response.StatusCode.ShouldBe(204);
             response.Count.ShouldBe(0);
             OldStarsOfParking.Stars.ShouldBe(request.Stars);
+            expectedBooking.IsRating.ShouldBe(true);
             _parkingRepositoryMock.Verify(x => x.Save(), Times.Once);
-            
+            _bookingRepositoryMock.Verify(x => x.Save(), Times.Once);
         }
         [Fact]
         public async Task UpdateRatingStarsOfParkingCommandHandler_Should_Return_Not_Found_If_Parking_Does_Not_Exist()
@@ -64,9 +71,15 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Cus
             var request = new UpdateRatingStarsOfParkingCommand
             {
                 ParkingId = 100000,
-                Stars = 5
+                Stars = 5,
+                BookingId = 1
             };
             var cancellationToken = new CancellationToken();
+            var expectedBooking = new Domain.Entities.Booking
+            {
+                BookingId = 1,
+            };
+            _bookingRepositoryMock.Setup(x => x.GetById(request.BookingId)).ReturnsAsync(expectedBooking);
             _parkingRepositoryMock.Setup(x => x.GetById(request.ParkingId))
                 .ReturnsAsync((Domain.Entities.Parking)null);
 
@@ -78,6 +91,33 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Cus
             response.Success.ShouldBeTrue();
             response.Message.ShouldBe("Không tìm thấy bãi giữ xe.");
             response.StatusCode.ShouldBe(200);
+            response.Count.ShouldBe(0);
+            _parkingRepositoryMock.Verify(x => x.Save(), Times.Never);
+        }
+        [Fact]
+        public async Task UpdateRatingStarsOfParkingCommandHandler_Should_Return_Not_Found_If_Booking_Does_Not_Exist()
+        {
+            // Arrange
+            var request = new UpdateRatingStarsOfParkingCommand
+            {
+                ParkingId = 100000,
+                Stars = 5,
+                BookingId = 1
+            };
+            var cancellationToken = new CancellationToken();
+
+            _bookingRepositoryMock.Setup(x => x.GetById(request.BookingId)).ReturnsAsync((Domain.Entities.Booking)null);
+            _parkingRepositoryMock.Setup(x => x.GetById(request.ParkingId))
+                .ReturnsAsync((Domain.Entities.Parking)null);
+
+            // Act
+            var response = await _handler.Handle(request, cancellationToken);
+
+            // Assert
+            response.ShouldNotBeNull();
+            response.Success.ShouldBeFalse();
+            response.Message.ShouldBe("Không tìm thấy đơn đặt.");
+            response.StatusCode.ShouldBe(404);
             response.Count.ShouldBe(0);
             _parkingRepositoryMock.Verify(x => x.Save(), Times.Never);
         }

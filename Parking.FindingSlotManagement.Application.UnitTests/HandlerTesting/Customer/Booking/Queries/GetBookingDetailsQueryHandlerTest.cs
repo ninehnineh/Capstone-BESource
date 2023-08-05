@@ -35,11 +35,11 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Cus
             var booking = new Domain.Entities.Booking
             {
                 BookingId = bookingId,
-                BookingDetails = new List<BookingDetails>() { new BookingDetails { BookingId = 1, TimeSlotId = 1, BookingDetailsId = 1, TimeSlot = new TimeSlot() { TimeSlotId = 1, ParkingSlotId = 1, Status = TimeSlotStatus.Booked.ToString(), Parkingslot = new ParkingSlot { ParkingSlotId = 1, Floor = new Floor { FloorId = 1, Parking = new Domain.Entities.Parking { ParkingId = 1 } } } } } },
+                BookingDetails = new List<BookingDetails>() { new BookingDetails { BookingId = 1, TimeSlotId = 1, BookingDetailsId = 1, TimeSlot = new TimeSlot() { TimeSlotId = 1, ParkingSlotId = 1, Status = TimeSlotStatus.Booked.ToString(), Parkingslot = new Domain.Entities.ParkingSlot { ParkingSlotId = 1, Floor = new Floor { FloorId = 1, Parking = new Domain.Entities.Parking { ParkingId = 1 } } } } } },
                 VehicleInfor = new Domain.Entities.VehicleInfor { VehicleInforId = 1 },
                 User = new User { UserId = 1 }
             };
-            var bookingDetails = new BookingDetails { TimeSlot = new TimeSlot { Parkingslot = new ParkingSlot { Floor = new Floor { Parking = new Domain.Entities.Parking() } } } };
+            var bookingDetails = new BookingDetails { TimeSlot = new TimeSlot { Parkingslot = new Domain.Entities.ParkingSlot { Floor = new Floor { Parking = new Domain.Entities.Parking() } } } };
 
             var expectedResponse = new GetBookingDetailsResponse
             {
@@ -74,11 +74,11 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Cus
             var booking = new Domain.Entities.Booking
             {
                 BookingId = bookingId,
-                BookingDetails = new List<BookingDetails>() { new BookingDetails { BookingId = 1, TimeSlotId = 1, BookingDetailsId = 1, TimeSlot = new TimeSlot() { TimeSlotId = 1, ParkingSlotId = 1, Status = TimeSlotStatus.Booked.ToString(), Parkingslot = new ParkingSlot { ParkingSlotId = 1, Floor = new Floor { FloorId = 1, Parking = new Domain.Entities.Parking { ParkingId = 1 } } } } } },
+                BookingDetails = new List<BookingDetails>() { new BookingDetails { BookingId = 1, TimeSlotId = 1, BookingDetailsId = 1, TimeSlot = new TimeSlot() { TimeSlotId = 1, ParkingSlotId = 1, Status = TimeSlotStatus.Booked.ToString(), Parkingslot = new Domain.Entities.ParkingSlot { ParkingSlotId = 1, Floor = new Floor { FloorId = 1, Parking = new Domain.Entities.Parking { ParkingId = 1 } } } } } },
                 VehicleInfor = new Domain.Entities.VehicleInfor { VehicleInforId = 1 },
                 User = new User { UserId = 1 }
             };
-            var bookingDetails = new BookingDetails { TimeSlot = new TimeSlot { Parkingslot = new ParkingSlot { Floor = new Floor { Parking = new Domain.Entities.Parking() } } } };
+            var bookingDetails = new BookingDetails { TimeSlot = new TimeSlot { Parkingslot = new Domain.Entities.ParkingSlot { Floor = new Floor { Parking = new Domain.Entities.Parking() } } } };
 
 
             _bookingRepositoryMock.Setup(x => x.GetBookingDetailsByBookingIdMethod(bookingId)).ReturnsAsync((Domain.Entities.Booking)null);
