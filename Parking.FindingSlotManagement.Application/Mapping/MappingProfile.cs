@@ -60,7 +60,6 @@ using Parking.FindingSlotManagement.Application.Features.Customer.Parking.Querie
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetBookingDetails;
 using Parking.FindingSlotManagement.Application.Models.Floor;
 using Parking.FindingSlotManagement.Application.Models.User;
-using Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Queries.GetParkingSlots;
 using Parking.FindingSlotManagement.Application.Models.Traffic;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetListBookingByManagerId;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetBookingById;
@@ -291,9 +290,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #region Parkingslots Mapping
             CreateMap<ParkingSlot, CreateParkingSlotsCommand>().ReverseMap();
             CreateMap<ParkingSlot, GetAvailableSlotsResponse>().ReverseMap();
-            CreateMap<ParkingSlot, GetParkingSlotsResponse>().ReverseMap();
             CreateMap<ParkingSlot, GetListParkingSlotByFloorIdResponse>().ReverseMap();
-            CreateMap<ParkingSlot, ParkingSlotsDto>().ReverseMap();
             CreateMap<ParkingSlot, ParkingSlotDto>().ReverseMap();
             CreateMap<ParkingSlot, ParkingSlotWithBookingDetailDto>().ReverseMap();
             CreateMap<ParkingSlot, ParkingSlotSearchResult>()
