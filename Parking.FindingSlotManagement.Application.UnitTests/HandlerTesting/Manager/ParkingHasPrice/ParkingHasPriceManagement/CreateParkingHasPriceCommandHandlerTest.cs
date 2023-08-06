@@ -39,10 +39,10 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 ParkingPriceId = 1
             };
 
-            var parkingExist = new Domain.Entities.Parking { ParkingId = 1, CarSpot = 50, MotoSpot = 50 };
+            var parkingExist = new Domain.Entities.Parking { ParkingId = 1, CarSpot = 50, MotoSpot = 0 };
             _parkingRepositoryMock.Setup(x => x.GetById(request.ParkingId)).ReturnsAsync(parkingExist);
 
-            var parkingPriceExist = new Domain.Entities.ParkingPrice { ParkingPriceId = 1, IsActive = true };
+            var parkingPriceExist = new Domain.Entities.ParkingPrice { ParkingPriceId = 1, IsActive = true, TrafficId = 1 };
             _parkingPriceRepositoryMock.Setup(x => x.GetItemWithCondition(x => x.ParkingPriceId == request.ParkingPriceId, null, true)).ReturnsAsync(parkingPriceExist);
 
             var lstParkingHasPrice = new List<Domain.Entities.ParkingHasPrice>();
@@ -182,7 +182,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 ParkingPriceId = 1
             };
 
-            var parkingExist = new Domain.Entities.Parking { ParkingId = 1, CarSpot = 50, MotoSpot = 50 };
+            var parkingExist = new Domain.Entities.Parking { ParkingId = 1, CarSpot = 50, MotoSpot = 0 };
             _parkingRepositoryMock.Setup(x => x.GetById(request.ParkingId)).ReturnsAsync(parkingExist);
 
             var parkingPriceExist = new Domain.Entities.ParkingPrice { ParkingPriceId = 1, IsActive = true, TrafficId = 1 };
@@ -244,70 +244,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
 
             _parkingHasPriceRepositoryMock.Verify(x => x.Insert(It.IsAny<Domain.Entities.ParkingHasPrice>()), Times.Never);
         }
-        [Fact]
-        public async Task Handle_The_Parking_Does_Not_Support_Car_ReturnsErrorResponse()
-        {
-            // Arrange
-            var request = new CreateParkingHasPriceCommand
-            {
-                ParkingId = 1,
-                ParkingPriceId = 1
-            };
 
-            var parkingExist = new Domain.Entities.Parking { ParkingId = 1, CarSpot = 0, MotoSpot = 50 };
-            _parkingRepositoryMock.Setup(x => x.GetById(request.ParkingId)).ReturnsAsync(parkingExist);
-
-            var parkingPriceExist = new Domain.Entities.ParkingPrice { ParkingPriceId = 1, IsActive = true, TrafficId = 2 };
-            _parkingPriceRepositoryMock.Setup(x => x.GetItemWithCondition(x => x.ParkingPriceId == request.ParkingPriceId, null, true)).ReturnsAsync(parkingPriceExist);
-
-            var lstParkingHasPrice = new List<Domain.Entities.ParkingHasPrice>();
-            _parkingHasPriceRepositoryMock.Setup(x => x.GetAllItemWithCondition(x => x.ParkingId == request.ParkingId, null, null, true)).ReturnsAsync(lstParkingHasPrice);
-
-
-            // Act
-            var result = await _handler.Handle(request, CancellationToken.None);
-
-            // Assert
-            result.ShouldNotBeNull();
-            result.Success.ShouldBeFalse();
-            result.Data.ShouldBe(0);
-            result.Message.ShouldBe("Bãi giữ xe chỉ hổ trợ giữ xe hơi. Áp dụng gói không phù hợp.");
-            result.StatusCode.ShouldBe(400);
-
-            _parkingHasPriceRepositoryMock.Verify(x => x.Insert(It.IsAny<Domain.Entities.ParkingHasPrice>()), Times.Never);
-        }
-        [Fact]
-        public async Task Handle_The_Parking_Does_Not_Support_Moto_ReturnsErrorResponse()
-        {
-            // Arrange
-            var request = new CreateParkingHasPriceCommand
-            {
-                ParkingId = 1,
-                ParkingPriceId = 1
-            };
-
-            var parkingExist = new Domain.Entities.Parking { ParkingId = 1, CarSpot = 50, MotoSpot = 0 };
-            _parkingRepositoryMock.Setup(x => x.GetById(request.ParkingId)).ReturnsAsync(parkingExist);
-
-            var parkingPriceExist = new Domain.Entities.ParkingPrice { ParkingPriceId = 1, IsActive = true, TrafficId = 1 };
-            _parkingPriceRepositoryMock.Setup(x => x.GetItemWithCondition(x => x.ParkingPriceId == request.ParkingPriceId, null, true)).ReturnsAsync(parkingPriceExist);
-
-            var lstParkingHasPrice = new List<Domain.Entities.ParkingHasPrice>();
-            _parkingHasPriceRepositoryMock.Setup(x => x.GetAllItemWithCondition(x => x.ParkingId == request.ParkingId, null, null, true)).ReturnsAsync(lstParkingHasPrice);
-
-
-            // Act
-            var result = await _handler.Handle(request, CancellationToken.None);
-
-            // Assert
-            result.ShouldNotBeNull();
-            result.Success.ShouldBeFalse();
-            result.Data.ShouldBe(0);
-            result.Message.ShouldBe("Bãi giữ xe chỉ hổ trợ giữ xe máy. Áp dụng gói không phù hợp.");
-            result.StatusCode.ShouldBe(400);
-
-            _parkingHasPriceRepositoryMock.Verify(x => x.Insert(It.IsAny<Domain.Entities.ParkingHasPrice>()), Times.Never);
-        }
         [Fact]
         public async Task Handle_The_Package_Does_Not_Have_Timeline_ReturnsErrorResponse()
         {

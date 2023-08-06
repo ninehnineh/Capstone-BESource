@@ -1,332 +1,138 @@
-﻿//using AutoMapper;
-//using Moq;
-//using Org.BouncyCastle.Asn1.Ocsp;
-//using Parking.FindingSlotManagement.Application.Contracts.Persistence;
-//using Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice.Queries.GetListParkingHasPriceWithPagination;
-//using Parking.FindingSlotManagement.Domain.Entities;
-//using Shouldly;
-//using System;
-//using System.Collections.Generic;
-//using System.Drawing.Printing;
-//using System.Linq;
-//using System.Linq.Expressions;
-//using System.Text;
-//using System.Threading.Tasks;
+﻿using AutoMapper;
+using Moq;
+using Org.BouncyCastle.Asn1.Ocsp;
+using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasPrice.Queries.GetListParkingHasPriceWithPagination;
+using Parking.FindingSlotManagement.Domain.Entities;
+using Shouldly;
+using System;
+using System.Collections.Generic;
+using System.Drawing.Printing;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
+using System.Threading.Tasks;
 
-//namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Manager.ParkingHasPrice.ParkingHasPriceManagement;
+namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Manager.ParkingHasPrice.ParkingHasPriceManagement;
 
-//public class GetListParkingHasPriceWithPaginationQueryHandlerTests
-//{
-//    private readonly Mock<IMapper> _mapperMock;
-//    private readonly Mock<IParkingHasPriceRepository> _parkingHasPriceRepositoryMock;
+public class GetListParkingHasPriceWithPaginationQueryHandlerTests
+{
+    private readonly Mock<IMapper> _mapperMock;
+    private readonly Mock<IParkingHasPriceRepository> _parkingHasPriceRepositoryMock;
+    private readonly GetListParkingHasPriceWithPaginationQueryHandler _handler;
 
-//    public GetListParkingHasPriceWithPaginationQueryHandlerTests()
-//    {
-//        _mapperMock = new Mock<IMapper>();
-//        _parkingHasPriceRepositoryMock = new Mock<IParkingHasPriceRepository>();
-//    }
+    public GetListParkingHasPriceWithPaginationQueryHandlerTests()
+    {
+        _mapperMock = new Mock<IMapper>();
+        _parkingHasPriceRepositoryMock = new Mock<IParkingHasPriceRepository>();
+        _handler = new GetListParkingHasPriceWithPaginationQueryHandler(_parkingHasPriceRepositoryMock.Object, _mapperMock.Object);
+    }
+    [Fact]
+    public async Task Handle_ValidParkingHasPriceList_ShouldReturnResponseWithItems()
+    {
+        // Arrange
+        int parkingId = 1; // Replace with a valid parking ID
 
-//    [Fact]
-//    public async Task Handle_Returns_Success_Response_With_Count_Zero_When_ListParkingHasPrice_Is_Empty()
-//    {
-//        // Arrange
-//        GetListParkingHasPriceWithPaginationQuery request = MediatorRequest();
+        var mockParkingHasPriceRepository = new Mock<IParkingHasPriceRepository>();
+        var mockMapper = new Mock<IMapper>();
 
-//        var listParkingHasPrice = new List<Domain.Entities.ParkingHasPrice>();
+        var parkingHasPriceList = new List<Domain.Entities.ParkingHasPrice>
+        {
+            new Domain.Entities.ParkingHasPrice { ParkingHasPriceId = 1, ParkingId = 1 },
+            new Domain.Entities.ParkingHasPrice { ParkingHasPriceId = 2, ParkingId = 1  },
+            new Domain.Entities.ParkingHasPrice { ParkingHasPriceId = 3, ParkingId = 1  }
+        };
 
-//        _parkingHasPriceRepositoryMock.Setup(x => x.GetAllItemWithPagination(
-//            It.IsAny<Expression<Func<Domain.Entities.ParkingHasPrice, bool>>>(),
-//            It.IsAny<List<Expression<Func<Domain.Entities.ParkingHasPrice, object>>>>(),
-//            It.IsAny<Expression<Func<Domain.Entities.ParkingHasPrice, int>>>(),
-//            It.IsAny<bool>(),
-//            It.IsAny<int>(),
-//            It.IsAny<int>()
-//        )).ReturnsAsync(listParkingHasPrice);
+        mockParkingHasPriceRepository.Setup(repo => repo.GetAllItemWithPagination(
+            It.IsAny<Expression<Func<Domain.Entities.ParkingHasPrice, bool>>>(),
+            It.IsAny<List<Expression<Func<Domain.Entities.ParkingHasPrice, object>>>>(),
+            It.IsAny<Expression<Func<Domain.Entities.ParkingHasPrice, int>>>(),
+            It.IsAny<bool>(),
+            It.IsAny<int>(),
+            It.IsAny<int>()
+        )).ReturnsAsync(parkingHasPriceList);
 
-//        var expectedResponse = new ServiceResponse<IEnumerable<GetListParkingHasPriceWithPaginationResponse>>
-//        {
-//            Success = true,
-//            StatusCode = 200,
-//            Message = "Không tim thấy",
-//            Count = 0
-//        };
+        var handler = new GetListParkingHasPriceWithPaginationQueryHandler(
+            mockParkingHasPriceRepository.Object,
+            mockMapper.Object
+        );
+        var query = new GetListParkingHasPriceWithPaginationQuery
+        {
+            ParkingId = parkingId,
+            PageNo = 1,
+            PageSize = 10
+        };
 
-//        var service = new GetListParkingHasPriceWithPaginationQueryHandler(_parkingHasPriceRepositoryMock.Object , _mapperMock.Object);
+        // Act
+        var result = await handler.Handle(query, CancellationToken.None);
 
-//        // Act
-//        var result = await service.Handle(request, CancellationToken.None);
+        // Assert
+        result.ShouldNotBeNull();
+        result.Success.ShouldBeTrue();
+        result.StatusCode.ShouldBe(200);
+        result.Data.ShouldNotBeNull();
+        result.Count.ShouldBe(parkingHasPriceList.Count);
+        result.Message.ShouldBe("Thành công");
+    }
+    [Fact]
+    public async Task Handle_EmptyParkingHasPriceList_ShouldReturnEmptyResponse()
+    {
+        // Arrange
+        int parkingId = 1; // Replace with a valid parking ID
 
-//        // Assert
-//        result.Success.ShouldBeTrue();
-//        result.StatusCode.ShouldBe(200);
-//        result.Message.ShouldBe("Không tim thấy");
-//        result.Count.ShouldBe(0);
-//    }
 
-//    [Fact]
-//    public async Task Handle_ReturnsSuccessResponseWithData_When_ListParkingHasPriceIsNotEmpty_And_HasOneRecord()
-//    {
-//        // Arrange
-//        GetListParkingHasPriceWithPaginationQuery request = MediatorRequest();
+        _parkingHasPriceRepositoryMock.Setup(repo => repo.GetAllItemWithPagination(
+            It.IsAny<Expression<Func<Domain.Entities.ParkingHasPrice, bool>>>(),
+            It.IsAny<List<Expression<Func<Domain.Entities.ParkingHasPrice, object>>>>(),
+            It.IsAny<Expression<Func<Domain.Entities.ParkingHasPrice, int>>>(),
+            It.IsAny<bool>(),
+            It.IsAny<int>(),
+            It.IsAny<int>()
+        )).ReturnsAsync(new List<Domain.Entities.ParkingHasPrice>());
 
-//        List<Domain.Entities.ParkingHasPrice> listParkingHasPrice = ListParkingHasPriceWithOneRecord();
+        var query = new GetListParkingHasPriceWithPaginationQuery
+        {
+            ParkingId = parkingId,
+            PageNo = 1,
+            PageSize = 10
+        };
 
-//        GetRecondFromExitedListWithCondition(listParkingHasPrice);
+        // Act
+        var result = await _handler.Handle(query, CancellationToken.None);
 
-//        var expectedResponse = new ServiceResponse<IEnumerable<GetListParkingHasPriceWithPaginationResponse>>
-//        {
-//            Data = new List<GetListParkingHasPriceWithPaginationResponse>
-//            {
-//                new GetListParkingHasPriceWithPaginationResponse
-//                {
-//                    ParkingHasPriceId = 1,
-//                    ParkingName = "Parking 1",
-//                    ParkingPrice = new Domain.Entities.TimeLine
-//                    {
-//                        PackagePriceId = 1,
-//                        Price = 10000,
-//                    }
-//                }
-//            },
-//            Success = true,
-//            StatusCode = 200,
-//            Message = "Thành công",
-//            Count = 1
-//        };
+        // Assert
+        result.ShouldNotBeNull();
+        result.Success.ShouldBeTrue();
+        result.StatusCode.ShouldBe(200);
+        result.Count.ShouldBe(0);
+        result.Message.ShouldBe("Không tim thấy");
+    }
+    [Fact]
+    public async Task Handle_ExceptionThrown_ShouldThrowException()
+    {
+        // Arrange
+        int parkingId = 1; // Replace with a valid parking ID
 
-//        _mapperMock.Setup(x => x.Map<IEnumerable<GetListParkingHasPriceWithPaginationResponse>>(listParkingHasPrice))
-//            .Returns(expectedResponse.Data);
 
-//        var service = new GetListParkingHasPriceWithPaginationQueryHandler(_parkingHasPriceRepositoryMock.Object, _mapperMock.Object);
+        _parkingHasPriceRepositoryMock.Setup(repo => repo.GetAllItemWithPagination(
+            It.IsAny<Expression<Func<Domain.Entities.ParkingHasPrice, bool>>>(),
+            It.IsAny<List<Expression<Func<Domain.Entities.ParkingHasPrice, object>>>>(),
+            It.IsAny<Expression<Func<Domain.Entities.ParkingHasPrice, int>>>(),
+            It.IsAny<bool>(),
+            It.IsAny<int>(),
+            It.IsAny<int>()
+        )).Throws(new Exception("Simulated exception"));
 
-//        // Act
-//        var result = await service.Handle(request, CancellationToken.None);
+        var query = new GetListParkingHasPriceWithPaginationQuery
+        {
+            ParkingId = parkingId,
+            PageNo = 1,
+            PageSize = 10
+        };
 
-//        // Assert
-//        result.Success.ShouldBeTrue();
-//        result.StatusCode.ShouldBe(200);
-//        result.Message.ShouldBe("Thành công");
-//        result.Count.ShouldBe(1);
-//    }
-    
-//    [Fact]
-//    public async Task Handle_ReturnsSuccessResponseWithData_When_ListParkingHasPriceIsNotEmpty_And_HasMultipleRecord()
-//    {
-//        // Arrange
-//        GetListParkingHasPriceWithPaginationQuery request = MediatorRequest();
-
-//        List<Domain.Entities.ParkingHasPrice> listParkingHasPrice = ListParkingHasPriceWithTwoRecord();
-
-//        GetRecondFromExitedListWithCondition(listParkingHasPrice);
-
-//        var expectedResponse = new ServiceResponse<IEnumerable<GetListParkingHasPriceWithPaginationResponse>>
-//        {
-//            Data = new List<GetListParkingHasPriceWithPaginationResponse>
-//            {
-//                new GetListParkingHasPriceWithPaginationResponse
-//                {
-//                    ParkingHasPriceId = 1,
-//                    ParkingName = "Parking 1",
-//                    ParkingPrice = new Domain.Entities.TimeLine
-//                    {
-//                        PackagePriceId = 1,
-//                        Price = 10000,
-//                    }
-//                },
-//                new GetListParkingHasPriceWithPaginationResponse
-//                {
-//                    ParkingHasPriceId = 2,
-//                    ParkingName = "Parking 2",
-//                    ParkingPrice = new Domain.Entities.TimeLine
-//                    {
-//                        PackagePriceId = 2,
-//                        Price = 10000,
-//                    }
-//                }
-//            },
-//            Success = true,
-//            StatusCode = 200,
-//            Message = "Thành công",
-//            Count = 1
-//        };
-
-//        _mapperMock.Setup(x => x.Map<IEnumerable<GetListParkingHasPriceWithPaginationResponse>>(listParkingHasPrice))
-//            .Returns(expectedResponse.Data);
-
-//        var service = new GetListParkingHasPriceWithPaginationQueryHandler(_parkingHasPriceRepositoryMock.Object, _mapperMock.Object);
-
-//        // Act
-//        var result = await service.Handle(request, CancellationToken.None);
-
-//        // Assert
-//        result.Success.ShouldBeTrue();
-//        result.StatusCode.ShouldBe(200);
-//        result.Message.ShouldBe("Thành công");
-//        result.Count.ShouldBe(2);
-//    }
-
-//    //[Fact]
-//    //public async Task Handle_Returns_SuccessResponseWithData_When_ListParkingHasPriceIsNotEmpty_And_HasMultipleRecord_AndPaging()
-//    //{
-//    //    // Arrange
-//    //    var request = new GetListParkingHasPriceWithPaginationQuery
-//    //    {
-//    //        ManagerId = 1,
-//    //        PageNo = 1,
-//    //        PageSize = 1
-//    //    };
-
-//    //    var listParkingHasPrice = new List<Domain.Entities.ParkingHasPrice>
-//    //    {
-//    //        new Domain.Entities.ParkingHasPrice
-//    //        {
-//    //            ParkingHasPriceId = 1,
-//    //            ParkingId = 1,
-//    //            Parking = new Domain.Entities.Parking { ManagerId = 1, Name = "Parking 1" },
-//    //            ParkingPrice = new Domain.Entities.PackagePrice { PackagePriceId = 1, Price = 10000 }
-//    //        },
-//    //        new Domain.Entities.ParkingHasPrice
-//    //        {
-//    //            ParkingHasPriceId = 2,
-//    //            Parking = new Domain.Entities.Parking { ManagerId = 2, Name = "Parking 2" },
-//    //            ParkingPrice = new Domain.Entities.PackagePrice { PackagePriceId = 2, Price = 20000 }
-//    //        }
-//    //    };
-
-//    //    var includes = new List<Expression<Func<Domain.Entities.ParkingHasPrice, object>>>
-//    //        {
-//    //            x => x.Parking!,
-//    //            y => y.ParkingPrice!
-//    //        };
-
-//    //    _parkingHasPriceRepositoryMock.Setup(x => x.GetAllItemWithPagination(
-//    //        It.IsAny<Expression<Func<Domain.Entities.ParkingHasPrice, bool>>>(),
-//    //        includes,
-//    //        It.IsAny<Expression<Func<Domain.Entities.ParkingHasPrice, int>>>(),
-//    //        It.IsAny<bool>(),
-//    //        It.IsAny<int>(),
-//    //        It.IsAny<int>()
-//    //    )).ReturnsAsync(listParkingHasPrice);
-
-//    //    var expectedResponse = new ServiceResponse<IEnumerable<GetListParkingHasPriceWithPaginationResponse>>
-//    //    {
-//    //        Data = new List<GetListParkingHasPriceWithPaginationResponse>
-//    //        {
-//    //            new GetListParkingHasPriceWithPaginationResponse
-//    //            {
-//    //                ParkingHasPriceId = 1,
-//    //                ParkingName = "Parking 1",
-//    //                ParkingPrice = new Domain.Entities.PackagePrice
-//    //                {
-//    //                    PackagePriceId = 1,
-//    //                    Price = 10000,
-//    //                }
-//    //            },
-//    //        },
-//    //        Success = true,
-//    //        StatusCode = 200,
-//    //        Message = "Thành công",
-//    //        Count = 1
-//    //    };
-
-//    //    _mapperMock.Setup(x => x.Map<IEnumerable<GetListParkingHasPriceWithPaginationResponse>>(listParkingHasPrice))
-//    //        .Returns(expectedResponse.Data);
-
-//    //    var service = new GetListParkingHasPriceWithPaginationQueryHandler(_parkingHasPriceRepositoryMock.Object, _mapperMock.Object);
-
-//    //    // Act
-//    //    var result = await service.Handle(request, CancellationToken.None);
-
-//    //    // Assert
-//    //    result.Success.ShouldBeTrue();
-//    //    result.StatusCode.ShouldBe(200);
-//    //    result.Message.ShouldBe("Thành công");
-//    //    result.Count.ShouldBe(1);
-//    //}
-
-//    private void GetRecondFromExitedListWithCondition(List<Domain.Entities.ParkingHasPrice> listParkingHasPrice)
-//    {
-//        _parkingHasPriceRepositoryMock.Setup(x => x.GetAllItemWithPagination(
-//            It.IsAny<Expression<Func<Domain.Entities.ParkingHasPrice, bool>>>(),
-//            It.IsAny<List<Expression<Func<Domain.Entities.ParkingHasPrice, object>>>>(),
-//            It.IsAny<Expression<Func<Domain.Entities.ParkingHasPrice, int>>>(),
-//            It.IsAny<bool>(),
-//            It.IsAny<int>(),
-//            It.IsAny<int>()
-//        )).ReturnsAsync(listParkingHasPrice);
-//    }
-
-//    private static GetListParkingHasPriceWithPaginationQuery MediatorRequest()
-//    {
-//        return new GetListParkingHasPriceWithPaginationQuery
-//        {
-//            ManagerId = 1,
-//            PageNo = 1,
-//            PageSize = 10
-//        };
-//    }
-
-//    private static List<Domain.Entities.ParkingHasPrice> ListParkingHasPriceWithOneRecord()
-//    {
-//        return new List<Domain.Entities.ParkingHasPrice>
-//        {
-//            new Domain.Entities.ParkingHasPrice
-//            {
-//                ParkingHasPriceId = 1,
-//                Parking = new Domain.Entities.Parking
-//                {
-//                    ParkingId = 1,
-//                    Name = "Parking 1",
-//                    ManagerId = 1
-//                },
-//                ParkingPrice = new Domain.Entities.TimeLine
-//                {
-//                    PackagePriceId = 1,
-//                    Price = 10000,
-//                }
-//            },
-//        };
-//    }
-//    private static List<Domain.Entities.ParkingHasPrice> ListParkingHasPriceWithTwoRecord()
-//    {
-//        return new List<Domain.Entities.ParkingHasPrice>
-//        {
-//            new Domain.Entities.ParkingHasPrice
-//            {
-//                ParkingHasPriceId = 1,
-//                ParkingId = 1,
-//                ParkingPriceId = 1,
-//                Parking = new Domain.Entities.Parking
-//                {
-//                    ParkingId = 1,
-//                    Name = "Parking 1",
-//                    ManagerId = 1
-//                },
-//                ParkingPrice = new Domain.Entities.TimeLine
-//                {
-//                    PackagePriceId = 1,
-//                    Price = 10000,
-//                }
-//            },
-            
-//            new Domain.Entities.ParkingHasPrice
-//            {
-//                ParkingHasPriceId = 2,
-//                ParkingId = 2,
-//                ParkingPriceId = 2,
-//                Parking = new Domain.Entities.Parking
-//                {
-//                    ParkingId = 2,
-//                    Name = "Parking 2",
-//                    ManagerId = 2
-//                },
-//                ParkingPrice = new Domain.Entities.TimeLine
-//                {
-//                    PackagePriceId = 2,
-//                    Price = 10000,
-//                }
-//            },
-//        };
-//    }
-//}
+        // Act & Assert
+        await Should.ThrowAsync<Exception>(async () => await _handler.Handle(query, CancellationToken.None));
+        // You can also check the specific exception message if needed.
+    }
+}
 
