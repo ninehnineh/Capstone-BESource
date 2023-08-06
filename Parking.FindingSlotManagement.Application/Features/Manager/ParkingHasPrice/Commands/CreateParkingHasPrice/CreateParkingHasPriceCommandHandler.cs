@@ -104,7 +104,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasP
                     }
                 }
                 //check traffic of the parking and the timeline has match
-                if (checkParkingExist.CarSpot != 0 && checkParkingPriceExist.TrafficId != 1)
+                /*if (checkParkingExist.CarSpot != 0 && checkParkingPriceExist.TrafficId != 1)
                 {
                     return new ServiceResponse<int>
                     {
@@ -121,7 +121,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasP
                         Success = false,
                         StatusCode = 400
                     };
-                }
+                }*/
                 //check overnight == true and the timeline will have 24 hours
                 List<TimeSpan> lstTime = new List<TimeSpan>();
                 var lstTimline = await _timelineRepository.GetAllItemWithCondition(x => x.ParkingPriceId == request.ParkingPriceId && x.IsActive == true, null, null, true);
