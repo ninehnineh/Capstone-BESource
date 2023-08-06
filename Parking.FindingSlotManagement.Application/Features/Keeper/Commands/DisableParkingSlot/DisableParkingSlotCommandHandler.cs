@@ -69,28 +69,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots
                             Message = request.Reason,
                         };
                         await conflictRequestRepository.Insert(newConflictRequest);
-                        // List<Expression<Func<Domain.Entities.Transaction, object>>> includes = new()
-                        // {
-                        //     x => x.Wallet
-                        // };
-                        // var transaction = await transactionRepository.GetItemWithCondition(x => x.BookingId == result.BookingId, includes, false);
-                        // var isPrePaid = transaction!.PaymentMethod!.Equals(PaymentMethod.tra_truoc.ToString());
-                        // if (isPrePaid)
-                        // {
-
-                            // var paidMoney = transaction.Price;
-                            // var userWalletId = transaction.WalletId;
-                            // var parkingManagerId = parking.ManagerId;
-
-                            // var userWallet = await walletRepository.GetItemWithCondition(x => x.WalletId == userWalletId, null, false);
-                            // var managerWallet = await walletRepository.GetItemWithCondition(x => x.UserId == parkingManagerId, null, false);
-                            // managerWallet.Balance -= paidMoney;
-                            // userWallet.Balance += paidMoney;
-                            // transaction.Status = "Huy";
-
-                            // await walletRepository.Save();
-                            // await transactionRepository.Save();
-                        // }
                     }
                     await parkingSlotRepository.DisableParkingSlotWhenAllTimeFree(parkingSlotId);
                     await timeSlotRepository.DisableTimeSlot(parkingSlotId);
