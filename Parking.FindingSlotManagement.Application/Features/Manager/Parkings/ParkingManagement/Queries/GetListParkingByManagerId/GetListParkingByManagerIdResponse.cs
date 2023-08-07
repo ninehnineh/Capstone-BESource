@@ -16,5 +16,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
         public int? CarSpot { get; set; }
         public bool? IsActive { get; set; }
         public bool? IsFull { get; set; }
+        public bool? IsAvailable { get; set; }
     }
 }
