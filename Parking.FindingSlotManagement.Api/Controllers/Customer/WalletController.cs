@@ -23,7 +23,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
         /// API For Customer
         /// </summary>
         /// 
-        [Authorize(Roles = "Customer")]
+        [Authorize(Roles = "Customer,Manager")]
         [HttpGet("{userId}", Name = "GetWalletByUserId")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
