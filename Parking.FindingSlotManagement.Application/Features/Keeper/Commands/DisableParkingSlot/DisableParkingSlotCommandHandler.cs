@@ -9,7 +9,7 @@ using Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots.Com
 using Parking.FindingSlotManagement.Application.Models.ParkingSlot;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Domain.Enum;
-
+// Keeper/Manager có thể disable một parking slot cụ thể nếu muốn trong trường hợp hư hỏng hoặc slot ko thể sử dùng
 namespace Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots.Commands.UpdateParkingSlotStatus
 {
     public class DisableParkingSlotCommandHandler : IRequestHandler<DisableParkingSlotCommand, ServiceResponse<string>>
@@ -78,18 +78,19 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots
                         // if (isPrePaid)
                         // {
 
-                            // var paidMoney = transaction.Price;
-                            // var userWalletId = transaction.WalletId;
-                            // var parkingManagerId = parking.ManagerId;
+                        //     var paidMoney = transaction.Price;
+                        //     var userWalletId = transaction.WalletId;
+                        //     var parkingManagerId = parking.ManagerId;
 
-                            // var userWallet = await walletRepository.GetItemWithCondition(x => x.WalletId == userWalletId, null, false);
-                            // var managerWallet = await walletRepository.GetItemWithCondition(x => x.UserId == parkingManagerId, null, false);
-                            // managerWallet.Balance -= paidMoney;
-                            // userWallet.Balance += paidMoney;
-                            // transaction.Status = "Huy";
+                        //     var userWallet = await walletRepository.GetItemWithCondition(x => x.WalletId == userWalletId, null, false);
+                        //     var managerWallet = await walletRepository.GetItemWithCondition(x => x.UserId == parkingManagerId, null, false);
+                        //     managerWallet.Balance -= paidMoney;
+                        //     userWallet.Balance += paidMoney;
+                        //     transaction.Status = "Huy";
+                        //     transaction.Description = $"{request.Reason}";
 
-                            // await walletRepository.Save();
-                            // await transactionRepository.Save();
+                        //     await walletRepository.Save();
+                        //     await transactionRepository.Save();
                         // }
                     }
                     await parkingSlotRepository.DisableParkingSlotWhenAllTimeFree(parkingSlotId);
@@ -105,7 +106,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots
             }
             catch (System.Exception ex)
             {
-                throw new Exception($"Error at DisableParkingSlotCommandHandler: {ex.Message}");
+                throw new Exception($"Error at DisableParkingSlotCommandHandler: Message {ex.Message}");
             }
         }
     }
