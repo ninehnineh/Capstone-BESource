@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Parking.FindingSlotManagement.Application;
+using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.EnableParking;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.ChangeStatusFull;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.CreateNewParking;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.DisableOrEnableParking;
@@ -12,6 +13,9 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Parkin
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetListParkingByManagerId;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetListParkingByParkingPriceId;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetParkingById;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Commands.DisableParkingByDate;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Queries.GetDisableParkingHistory;
+using Parking.FindingSlotManagement.Application.Models.Parking;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using System.Net;
 
@@ -284,6 +288,56 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
             {
 
                 return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpGet("history-disable-parking")]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<Job>>>> GetDisableParking(int parkingId)
+        {
+            try
+            {
+                var query = new GetDisableParkingHistoryQuery() { ParkingId = parkingId };
+                var res = await _mediator.Send(query);
+
+                return StatusCode((int)res.StatusCode, res);
+
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpPut("enable-disable-parking")]
+        public async Task<ActionResult<ServiceResponse<string>>> EnableDisableParking([FromBody] EnableParkingAtDateCommand command)
+        {
+            try
+            {
+                var res = await _mediator.Send(command);
+                return StatusCode((int)res.StatusCode, res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpPut("disable-parking-by-date")]
+        public async Task<ActionResult<ServiceResponse<string>>> DisableByDate([FromBody] DisableParkingByDateCommand command)
+        {
+            try
+            {
+                var res = await _mediator.Send(command);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return NoContent();
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }

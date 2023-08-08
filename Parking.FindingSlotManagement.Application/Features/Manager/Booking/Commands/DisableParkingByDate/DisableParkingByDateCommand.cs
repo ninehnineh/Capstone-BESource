@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 
-namespace Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots.Commands.DisableParkingSlotByDate
+namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Commands.DisableParkingByDate
 {
-    public class DisableParkingSlotByDateCommand : IRequest<ServiceResponse<string>>
-    {
+    public class DisableParkingByDateCommand : IRequest<ServiceResponse<string>>
+    {   
         public int ParkingId { get; set; }
         // public int ParkingSlotId { get; set; }
         public string Reason { get; set; }

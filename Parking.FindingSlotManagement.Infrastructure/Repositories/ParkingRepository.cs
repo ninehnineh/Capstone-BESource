@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.DisableParkingSlotByDate.Model;
 using Parking.FindingSlotManagement.Application.Models.Parking;
+using Parking.FindingSlotManagement.Domain.Enum;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,11 +19,49 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
     {
         private readonly ParkZDbContext dbContext;
         private readonly IMapper mapper;
+        private readonly IConfiguration configuration;
+        private string connectionString;
 
-        public ParkingRepository(ParkZDbContext dbContext, IMapper mapper) : base(dbContext)
+        public ParkingRepository(ParkZDbContext dbContext, IMapper mapper, IConfiguration configuration) : base(dbContext)
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
+            this.configuration = configuration;
+            connectionString = configuration.GetConnectionString("DefaultConnection");
+        }
+
+        public async Task EnableDisableParkingById(int parkingId, DateTime disableDate)
+        {
+            try
+            {
+                var disableParkingIncludeTimeSlots = await dbContext.Parkings
+                    .Include(x => x.Floors)!.ThenInclude(x => x.ParkingSlots)!.ThenInclude(x => x.TimeSlots)
+                    .FirstOrDefaultAsync(x => x.ParkingId == parkingId);
+
+                var floors = disableParkingIncludeTimeSlots!.Floors!;
+                disableParkingIncludeTimeSlots.IsAvailable = true;
+                foreach (var floor in floors)
+                {
+                    var parkingSlots = floor!.ParkingSlots!;
+                    foreach (var parkingSlot in parkingSlots)
+                    {
+                        var timeSlots = parkingSlot.TimeSlots;
+                        parkingSlot.IsAvailable = true;
+                        foreach (var timeSlot in timeSlots)
+                        {
+                            if (timeSlot.StartTime.Date == disableDate.Date)
+                            {
+                                timeSlot.Status = TimeSlotStatus.Free.ToString();
+                            }
+                        }
+                    }
+                }
+                await dbContext.SaveChangesAsync();
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at GetDisableParkingById: Message {ex.Message}");
+            }
         }
 
         public async Task<DisableSlotParking> GetParking(int parkingSlotId)
@@ -37,7 +78,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                         )
                     );
 
-                var response = new DisableSlotParking{ParkingId = parking!.ParkingId, ManagerId = parking.BusinessProfile.UserId!.Value};
+                var response = new DisableSlotParking { ParkingId = parking!.ParkingId, ManagerId = parking.BusinessProfile.UserId!.Value };
 
                 return response;
             }
@@ -61,8 +102,42 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             }
             catch (System.Exception ex)
             {
-                
+
                 throw new Exception($"Error at GetParkingById: Message {ex.Message}");
+            }
+        }
+
+        public async Task<bool> GetDisableParking(int parkingId, DateTime disableDate)
+        {
+            string methodName = "DisableParkingByDate";
+            try
+            {
+                var result = false;
+                var query = "SELECT * " +
+                            "FROM HangFire.Job " +
+                            "WHERE JSON_VALUE(HangFire.Job.InvocationData, '$.m') = @MethodName AND JSON_VALUE(HangFire.Job.Arguments, '$[0]') = @ParkingId AND HangFire.Job.Arguments LIKE '%' + @DisableDate + '%'";
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@MethodName", methodName);
+                        command.Parameters.AddWithValue("@ParkingId", parkingId.ToString());
+                        command.Parameters.AddWithValue("@DisableDate", disableDate.ToString());
+
+                        using (var reader = command.ExecuteReader())
+                        {
+                            result = reader.HasRows;
+                            reader.Close();
+                        };
+                    };
+                }
+
+                return result;
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at GetHistoryDisableParking: Message {ex.Message}");
             }
         }
     }
