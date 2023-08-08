@@ -35,7 +35,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Common
             return res;
         }
         [HttpGet("/api/VNPayDeposit")]
-        public async Task<PaymentResponseModel> GetTransactionsDeposit([FromQuery] int userId)
+        public async Task<IActionResult> GetTransactionsDeposit([FromQuery] int userId)
         {
             var res = _vnPayService.PaymentExecuteForDeposit(Request.Query);
             if (res.VnPayResponseCode.Equals("00"))
@@ -47,7 +47,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Common
                     UserId = userId
                 };
                 await _walletRepository.UpdateMoneyInWallet(entity, "00");
-                return res;
+               return Redirect("https://sandbox.vnpayment.vn/apis/vnpay-demo");
 
             }
             else
@@ -59,8 +59,37 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Common
                     UserId = userId
                 };
                 await _walletRepository.UpdateMoneyInWallet(entity, null);
-                return res;
-                
+                return Redirect("https://sandbox.vnpayment.vn/apis/vnpay-demo");
+
+            }
+        }
+        [HttpGet("/api/VNPayDeposit/manager")]
+        public async Task<IActionResult> GetTransactionsDepositManager([FromQuery] int userId)
+        {
+            var res = _vnPayService.PaymentExecuteForDeposit(Request.Query);
+            if (res.VnPayResponseCode.Equals("00"))
+            {
+
+                Wallet entity = new Wallet
+                {
+                    Balance = decimal.Parse(res.OrderDescription),
+                    UserId = userId
+                };
+                await _walletRepository.UpdateMoneyInWallet(entity, "00");
+                return Redirect("http://localhost:3000/wallet");
+
+            }
+            else
+            {
+
+                Wallet entity = new Wallet
+                {
+                    Balance = 0M,
+                    UserId = userId
+                };
+                await _walletRepository.UpdateMoneyInWallet(entity, null);
+                return Redirect("http://localhost:3000/walletsf");
+
             }
         }
     }

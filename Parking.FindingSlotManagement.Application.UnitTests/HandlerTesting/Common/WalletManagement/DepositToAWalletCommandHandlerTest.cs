@@ -34,7 +34,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Com
         public async Task Handle_WhenUserDoesNotExist_ReturnsNotFoundResponse()
         {
             // Arrange
-            var request = new DepositToAWalletCommand { UserId = 1, TotalPrice = 100 };
+            var request = new DepositToAWalletManagerCommand { UserId = 1, TotalPrice = 100 };
             _userRepositoryMock.Setup(repo => repo.GetItemWithCondition(It.IsAny<Expression<Func<User, bool>>>(), It.IsAny<List<Expression<Func<User, object>>>>(), true))
                                .ReturnsAsync((User)null);
 
@@ -52,7 +52,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Com
         public async Task Handle_WhenUserIsNotAllowedToDeposit_ReturnsUnauthorizedResponse()
         {
             // Arrange
-            var request = new DepositToAWalletCommand { UserId = 1, TotalPrice = 100 };
+            var request = new DepositToAWalletManagerCommand { UserId = 1, TotalPrice = 100 };
             var user = new User { UserId = 1, RoleId = 4, IsActive = true }; // RoleId 4 means unauthorized user
             _userRepositoryMock.Setup(repo => repo.GetItemWithCondition(It.IsAny<Expression<Func<User, bool>>>(), It.IsAny<List<Expression<Func<User, object>>>>(), true))
                                .ReturnsAsync(user);

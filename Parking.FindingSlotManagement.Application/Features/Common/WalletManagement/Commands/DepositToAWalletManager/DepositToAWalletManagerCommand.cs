@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Features.Common.WalletManagement.Commands.DepositToAWallet
 {
-    public class DepositToAWalletManagerCommand : IRequest<ServiceResponse<string>>
+    public class DepositToAWalletCommand : IRequest<ServiceResponse<string>>
     {
         public decimal? TotalPrice { get; set; }
         public int? UserId { get; set; }

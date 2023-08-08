@@ -33,5 +33,19 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Common
             }
             return StatusCode((int)res.StatusCode, res);
         }
+        [HttpPost("deposit/manager", Name = "DepositToAWalletManager")]
+        [Produces("application/json")]
+        [ProducesResponseType((int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> DepositToAWallet([FromBody] DepositToAWalletManagerCommand command)
+        {
+            command.Context = HttpContext;
+            var res = await _mediator.Send(command);
+            if (res.Message == "Thành công")
+            {
+                return StatusCode((int)res.StatusCode, res);
+            }
+            return StatusCode((int)res.StatusCode, res);
+        }
     }
 }
