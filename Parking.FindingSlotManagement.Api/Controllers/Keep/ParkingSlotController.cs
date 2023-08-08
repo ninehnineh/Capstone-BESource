@@ -11,7 +11,7 @@ using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.GetAvai
 using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.ChangeSlotWhenComeEarly;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetAvailableSlotByFloorIdVer2;
 using Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots.Commands.DisableParkingSlot;
-using Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots.Commands.DisableParkingSlotByDate;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Commands.DisableParkingByDate;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Keep
 {
@@ -143,24 +143,6 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Keep
             catch (Exception ex)
             {
                 throw new Exception($"Error at Disable: " + ex.Message);
-            }
-        }
-
-        [HttpPost("disable-parking-slot-by-date")]
-        public async Task<ActionResult<ServiceResponse<string>>> DisableByDate([FromBody] DisableParkingSlotByDateCommand command)
-        {
-            try
-            {
-                var res = await _mediator.Send(command);
-                if (res.Message != "Thành công")
-                {
-                    return StatusCode((int)res.StatusCode, res);
-                }
-                return NoContent();
-            }
-            catch (System.Exception ex)
-            {
-                throw new Exception(ex.Message);
             }
         }
     }
