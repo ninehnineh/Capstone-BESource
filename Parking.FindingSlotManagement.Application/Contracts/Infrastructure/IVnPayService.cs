@@ -14,6 +14,7 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Infrastructure
     {
         string CreatePaymentUrl(BookingTransaction model, string tmnCode, string hashSecret, HttpContext context);
         string CreatePaymentUrlForDeposit(DepositTransaction model, string tmnCode, string hashSecret, HttpContext context);
+        string CreatePaymentUrlForDepositForManager(DepositTransaction model, string tmnCode, string hashSecret, HttpContext context);
         PaymentResponseModel PaymentExecute(IQueryCollection collections);
         PaymentResponseModel PaymentExecuteForDeposit(IQueryCollection collections);
     }
