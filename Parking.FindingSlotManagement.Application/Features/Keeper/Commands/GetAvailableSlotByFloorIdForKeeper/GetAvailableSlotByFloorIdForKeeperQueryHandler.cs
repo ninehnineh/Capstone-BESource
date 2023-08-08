@@ -65,6 +65,19 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Get
                        x => x.Parkingslot,
                        x => x.Parkingslot.Floor
                     };
+                    var timeSlotExist = await _timeSlotRepository.GetAllItemWithCondition(x =>
+                                                            x.Parkingslot.FloorId == request.FloorId &&
+                                                            x.StartTime >= checkInTime &&
+                                                            x.EndTime <= bookingExist.EndTime, includes);
+                    if (!timeSlotExist.Any())
+                    {
+                        return new ServiceResponse<IEnumerable<GetAvailableSlotByFloorIdResponse>>
+                        {
+                            Message = "Chưa có timeSlot",
+                            Success = false,
+                            StatusCode = 400
+                        };
+                    }
                     var currentLstBookedSlot = await _timeSlotRepository.GetAllItemWithCondition(x =>
                                                                 x.Parkingslot.FloorId == request.FloorId &&
                                                                 x.StartTime >= checkInTime &&
@@ -160,6 +173,19 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Get
                        x => x.Parkingslot,
                        x => x.Parkingslot.Floor
                     };
+                    var timeSlotExist = await _timeSlotRepository.GetAllItemWithCondition(x =>
+                                                            x.Parkingslot.FloorId == request.FloorId &&
+                                                            x.StartTime >= checkInTime &&
+                                                            x.EndTime <= bookingExist.EndTime, includes);
+                    if (!timeSlotExist.Any())
+                    {
+                        return new ServiceResponse<IEnumerable<GetAvailableSlotByFloorIdResponse>>
+                        {
+                            Message = "Chưa có timeSlot",
+                            Success = false,
+                            StatusCode = 400
+                        };
+                    }
                     var currentLstBookedSlot = await _timeSlotRepository.GetAllItemWithCondition(x =>
                                                                 x.Parkingslot.FloorId == request.FloorId &&
                                                                 x.StartTime >= checkInTime &&

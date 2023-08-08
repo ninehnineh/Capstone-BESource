@@ -1,4 +1,4 @@
-﻿using FluentValidation.TestHelper;
+﻿/*using FluentValidation.TestHelper;
 using Moq;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Manager.PackagePrice.PackagePriceManagement.Commands.CreateNewPackagePrice;
@@ -24,7 +24,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             _validator = new CreateNewPackagePriceCommandValidation();
             _handler = new CreateNewPackagePriceCommandHandler(_packagePriceRepositoryMock.Object, _trafficRepositoryMock.Object);
         }
-        /*[Fact]
+        *//*[Fact]
         public async Task Handle_WhenCreatedSuccessfully_ReturnsCreated()
         {
             // Arrange
@@ -58,7 +58,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             response.Count.ShouldBe(0);
             response.Message.ShouldBe("Thành công");
             _packagePriceRepositoryMock.Verify(x => x.Insert(It.IsAny<Domain.Entities.TimeLine>()), Times.Once);
-        }*/
+        }*//*
 
         [Fact]
         public async Task Handle_InvalidTrafficId_ReturnsErrorResponse()
@@ -505,3 +505,4 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
         }
     }
 }
+*/

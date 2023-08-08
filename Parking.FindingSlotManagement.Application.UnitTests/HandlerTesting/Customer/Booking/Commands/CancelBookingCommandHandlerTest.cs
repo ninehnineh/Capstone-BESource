@@ -44,18 +44,18 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Cus
                 BookingId = 1,
 
             };
-            var booking = new Domain.Entities.Booking { BookingId = 1, Status = BookingStatus.Success.ToString(), Transactions = new List<Transaction> { new Transaction { BookingId = 1, TransactionId = 1, PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(), Status = TransactionStatus.Chua_thanh_toan.ToString() } }};
+            var booking = new Domain.Entities.Booking { BookingId = 1, Status = BookingStatus.Success.ToString(), Transactions = new List<Domain.Entities.Transaction> { new Domain.Entities.Transaction { BookingId = 1, TransactionId = 1, PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(), Status = TransactionStatus.Chua_thanh_toan.ToString() } }};
             _bookingRepositoryMock.Setup(x => x.GetBookingIncludeParkingSlot(1)).ReturnsAsync(booking);
 
             var bookingDetail = new List<BookingDetails> { new BookingDetails { BookingId = 1, TimeSlotId = 1, BookingDetailsId = 1, TimeSlot = new TimeSlot() { TimeSlotId = 1, ParkingSlotId = 1, Status = TimeSlotStatus.Booked.ToString() } } };
-            var parkingSlot = new ParkingSlot() { ParkingSlotId = 1, FloorId = 1 };
+            var parkingSlot = new Domain.Entities.ParkingSlot() { ParkingSlotId = 1, FloorId = 1 };
             var floor = new Floor() { FloorId = 1, ParkingId = 1 };
             var parking = new Domain.Entities.Parking() { ParkingId = 1, BusinessId = 1 };
             var businessProfile = new Domain.Entities.BusinessProfile() { BusinessProfileId = 1 };
 
             _bookingDetailsRepositoryMock.Setup(x => x.GetAllItemWithCondition(It.IsAny<Expression<Func<Domain.Entities.BookingDetails, bool>>>(), It.IsAny<List<Expression<Func<Domain.Entities.BookingDetails, object>>>>(), null, false)).ReturnsAsync(bookingDetail);
             var managerExist = new User { UserId = 1};
-            var walletOfManaer = new Wallet { UserId = 1, WalletId = 1, Balance = 100 };
+            var walletOfManaer = new Domain.Entities.Wallet { UserId = 1, WalletId = 1, Balance = 100 };
             _userRepositoryMock.Setup(x => x.GetItemWithCondition(It.IsAny<Expression<Func<Domain.Entities.User, bool>>>(), It.IsAny<List<Expression<Func<Domain.Entities.User, object>>>>(), false)).ReturnsAsync(managerExist);
             
             var result = await _handler.Handle(request, CancellationToken.None);
@@ -75,17 +75,17 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Cus
                 BookingId = 1,
 
             };
-            var booking = new Domain.Entities.Booking { BookingId = 1, Status = BookingStatus.Success.ToString(), User = new User { UserId = 2, Wallet = new Wallet {WalletId = 2, UserId = 2, Balance = 50 } }, Transactions = new List<Transaction> { new Transaction { BookingId = 1, TransactionId = 1, PaymentMethod = Domain.Enum.PaymentMethod.tra_truoc.ToString(), Status = TransactionStatus.Da_thanh_toan.ToString(), Price = 50 } } };
+            var booking = new Domain.Entities.Booking { BookingId = 1, Status = BookingStatus.Success.ToString(), User = new User { UserId = 2, Wallet = new Domain.Entities.Wallet {WalletId = 2, UserId = 2, Balance = 50 } }, Transactions = new List<Domain.Entities.Transaction> { new Domain.Entities.Transaction { BookingId = 1, TransactionId = 1, PaymentMethod = Domain.Enum.PaymentMethod.tra_truoc.ToString(), Status = TransactionStatus.Da_thanh_toan.ToString(), Price = 50 } } };
             _bookingRepositoryMock.Setup(x => x.GetBookingIncludeParkingSlot(1)).ReturnsAsync(booking);
 
             var bookingDetail = new List<BookingDetails> { new BookingDetails { BookingId = 1, TimeSlotId = 1, BookingDetailsId = 1, TimeSlot = new TimeSlot() { TimeSlotId = 1, ParkingSlotId = 1, Status = TimeSlotStatus.Booked.ToString() } } };
-            var parkingSlot = new ParkingSlot() { ParkingSlotId = 1, FloorId = 1 };
+            var parkingSlot = new Domain.Entities.ParkingSlot() { ParkingSlotId = 1, FloorId = 1 };
             var floor = new Floor() { FloorId = 1, ParkingId = 1 };
             var parking = new Domain.Entities.Parking() { ParkingId = 1, BusinessId = 1 };
             var businessProfile = new Domain.Entities.BusinessProfile() { BusinessProfileId = 1 };
 
             _bookingDetailsRepositoryMock.Setup(x => x.GetAllItemWithCondition(It.IsAny<Expression<Func<Domain.Entities.BookingDetails, bool>>>(), It.IsAny<List<Expression<Func<Domain.Entities.BookingDetails, object>>>>(), null, false)).ReturnsAsync(bookingDetail);
-            var managerExist = new User { UserId = 1, Wallet = new Wallet { UserId = 1, WalletId = 1, Balance = 100 } };
+            var managerExist = new User { UserId = 1, Wallet = new Domain.Entities.Wallet { UserId = 1, WalletId = 1, Balance = 100 } };
             _userRepositoryMock.Setup(x => x.GetItemWithCondition(It.IsAny<Expression<Func<Domain.Entities.User, bool>>>(), It.IsAny<List<Expression<Func<Domain.Entities.User, object>>>>(), false)).ReturnsAsync(managerExist);
 
             var result = await _handler.Handle(request, CancellationToken.None);
@@ -106,17 +106,17 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Cus
                 BookingId = 1,
 
             };
-            var booking = new Domain.Entities.Booking { BookingId = 1, Status = BookingStatus.Check_In.ToString(), User = new User { UserId = 2, Wallet = new Wallet { WalletId = 2, UserId = 2, Balance = 50 } }, Transactions = new List<Transaction> { new Transaction { BookingId = 1, TransactionId = 1, PaymentMethod = Domain.Enum.PaymentMethod.tra_truoc.ToString(), Status = TransactionStatus.Da_thanh_toan.ToString(), Price = 50 } } };
+            var booking = new Domain.Entities.Booking { BookingId = 1, Status = BookingStatus.Check_In.ToString(), User = new User { UserId = 2, Wallet = new Domain.Entities.Wallet { WalletId = 2, UserId = 2, Balance = 50 } }, Transactions = new List<Domain.Entities.Transaction> { new Domain.Entities.Transaction { BookingId = 1, TransactionId = 1, PaymentMethod = Domain.Enum.PaymentMethod.tra_truoc.ToString(), Status = TransactionStatus.Da_thanh_toan.ToString(), Price = 50 } } };
             _bookingRepositoryMock.Setup(x => x.GetBookingIncludeParkingSlot(1)).ReturnsAsync(booking);
 
             var bookingDetail = new List<BookingDetails> { new BookingDetails { BookingId = 1, TimeSlotId = 1, BookingDetailsId = 1, TimeSlot = new TimeSlot() { TimeSlotId = 1, ParkingSlotId = 1, Status = TimeSlotStatus.Booked.ToString() } } };
-            var parkingSlot = new ParkingSlot() { ParkingSlotId = 1, FloorId = 1 };
+            var parkingSlot = new Domain.Entities.ParkingSlot() { ParkingSlotId = 1, FloorId = 1 };
             var floor = new Floor() { FloorId = 1, ParkingId = 1 };
             var parking = new Domain.Entities.Parking() { ParkingId = 1, BusinessId = 1 };
             var businessProfile = new Domain.Entities.BusinessProfile() { BusinessProfileId = 1 };
 
             _bookingDetailsRepositoryMock.Setup(x => x.GetAllItemWithCondition(It.IsAny<Expression<Func<Domain.Entities.BookingDetails, bool>>>(), It.IsAny<List<Expression<Func<Domain.Entities.BookingDetails, object>>>>(), null, false)).ReturnsAsync(bookingDetail);
-            var managerExist = new User { UserId = 1, Wallet = new Wallet { UserId = 1, WalletId = 1, Balance = 100 } };
+            var managerExist = new User { UserId = 1, Wallet = new Domain.Entities.Wallet { UserId = 1, WalletId = 1, Balance = 100 } };
             _userRepositoryMock.Setup(x => x.GetItemWithCondition(It.IsAny<Expression<Func<Domain.Entities.User, bool>>>(), It.IsAny<List<Expression<Func<Domain.Entities.User, object>>>>(), false)).ReturnsAsync(managerExist);
 
             var result = await _handler.Handle(request, CancellationToken.None);
@@ -124,7 +124,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Cus
             // Assert
             result.Success.ShouldBeFalse();
             result.StatusCode.ShouldBe(400);
-            result.Message.ShouldBe("Yêu cầu đã được duyệt, không thể hủy chỗ đặt");
+            result.Message.ShouldBe("Đơn đang ở trạng thái khác hoặc đã bị hủy nên không thể xử lý.");
             _bookingRepositoryMock.Verify(x => x.Save(), Times.Never);
             _timeSlotRepositoryMock.Verify(x => x.Save(), Times.Never);
             _walletRepositoryMock.Verify(x => x.Save(), Times.Never);

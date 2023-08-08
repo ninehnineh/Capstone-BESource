@@ -50,6 +50,19 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetA
                    x => x.Parkingslot,
                    x => x.Parkingslot.Floor
                 };
+                var timeSlotExist = await _timeSlotRepository.GetAllItemWithCondition(x =>
+                                                            x.Parkingslot.FloorId == request.FloorId &&
+                                                            x.StartTime >= request.StartTimeBooking &&
+                                                            x.EndTime <= request.EndTimeBooking, includes);
+                if (!timeSlotExist.Any())
+                {
+                    return new ServiceResponse<IEnumerable<GetAvailableSlotByFloorIdResponse>>
+                    {
+                        Message = "Chưa có timeSlot",
+                        Success = false,
+                        StatusCode = 400
+                    };
+                }
                 var currentLstBookedSlot = await _timeSlotRepository.GetAllItemWithCondition(x =>
                                                             x.Parkingslot.FloorId == request.FloorId &&
                                                             x.StartTime >= request.StartTimeBooking &&

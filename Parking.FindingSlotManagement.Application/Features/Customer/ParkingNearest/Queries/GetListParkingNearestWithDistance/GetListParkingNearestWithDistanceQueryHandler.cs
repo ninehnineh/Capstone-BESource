@@ -57,7 +57,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
                     x => x.ParkingSpotImages,
                 };
 
-                var lstParking = await _parkingRepository.GetAllItemWithCondition(x => x.IsActive == true && x.Latitude != null && x.Longitude != null && x.ParkingHasPrices.Count() > 0 && x.IsFull == false, includes, null, true);
+                var lstParking = await _parkingRepository.GetAllItemWithCondition(x => x.IsActive == true && x.IsAvailable == true && x.Latitude != null && x.Longitude != null && x.ParkingHasPrices.Count() > 0 && x.IsFull == false, includes, null, true);
                 var _mapper = config.CreateMapper();
                 var lstDto = _mapper.Map<IEnumerable<GetListParkingNearestWithDistanceResponse>>(lstParking);
                 List<ParkingWithDistanceVer2> lst = new();

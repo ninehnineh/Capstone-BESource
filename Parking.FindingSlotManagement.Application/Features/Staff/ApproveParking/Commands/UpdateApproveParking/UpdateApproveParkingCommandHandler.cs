@@ -11,17 +11,12 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
 {
     public class UpdateApproveParkingCommandHandler : IRequestHandler<UpdateApproveParkingCommand, ServiceResponse<int>>
     {
-        private readonly IFieldWorkParkingImgRepository _fieldWorkParkingImgRepository;
-        private readonly IApproveParkingRepository _approveParkingRepository;
-        private readonly IParkingRepository _parkingRepository;
-        private readonly IUserRepository _userRepository;
 
-        public UpdateApproveParkingCommandHandler(IFieldWorkParkingImgRepository fieldWorkParkingImgRepository, IApproveParkingRepository approveParkingRepository, IParkingRepository parkingRepository, IUserRepository userRepository)
+        private readonly IApproveParkingRepository _approveParkingRepository;
+
+        public UpdateApproveParkingCommandHandler(IApproveParkingRepository approveParkingRepository)
         {
-            _fieldWorkParkingImgRepository = fieldWorkParkingImgRepository;
             _approveParkingRepository = approveParkingRepository;
-            _parkingRepository = parkingRepository;
-            _userRepository = userRepository;
         }
         public async Task<ServiceResponse<int>> Handle(UpdateApproveParkingCommand request, CancellationToken cancellationToken)
         {

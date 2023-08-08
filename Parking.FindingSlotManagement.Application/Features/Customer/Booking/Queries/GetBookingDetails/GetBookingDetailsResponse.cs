@@ -33,6 +33,7 @@ public class BookingDetailsDto
     public string? GuestPhone { get; set; }
     public decimal? TotalPrice { get; set; }
     public string? QRImage { get; set; }
+    public bool? IsRating { get; set; }
 }
 public class VehicleInforDtoos
 {
@@ -48,6 +49,8 @@ public class ParkingWithBookingDetailDto
     public int ParkingId { get; set; }
     public string? Name { get; set; }
     public string? Address { get; set; }
+    public decimal? Latitude { get; set; }
+    public decimal? Longitude { get; set; }
 }
 public class ParkingSlotWithBookingDetailDto
 {

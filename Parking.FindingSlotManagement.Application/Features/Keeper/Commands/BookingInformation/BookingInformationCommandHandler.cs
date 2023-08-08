@@ -58,6 +58,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                 var booking = await _bookingRepository
                     .GetBookingInclude(request.BookingId);
 
+
                 if (booking == null)
                 {
                     return new ServiceResponse<BookingInformationResponse>
@@ -67,222 +68,256 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                         Success = false
                     };
                 }
-
+                if (booking.Status.Equals(BookingStatus.Success.ToString()) || booking.Status.Equals(BookingStatus.Cancel.ToString()))
+                {
+                    return new ServiceResponse<BookingInformationResponse>
+                    {
+                        Message = "Đơn chưa check-in hoặc đã bị hủy nên không thể xử lý.",
+                        StatusCode = 400,
+                        Success = false
+                    };
+                }
                 var parkingId = booking.BookingDetails.First().TimeSlot.Parkingslot.Floor.ParkingId;
-
-                var endTimeBooking = booking.EndTime.Value;
-                var startTimeBooking = booking.StartTime;
-                var checkinTime = booking.CheckinTime;
-
-                var checkOutTime = DateTime.UtcNow.AddHours(7);
-                booking.CheckoutTime = checkOutTime;
-
-
-                var includes = new List<Expression<Func<Domain.Entities.ParkingHasPrice, object>>>
+                if (booking.Status.Equals(BookingStatus.Check_Out.ToString()) || booking.Status.Equals(BookingStatus.Done.ToString()))
                 {
-                    x => x.ParkingPrice!,
-                    x => x.ParkingPrice!.Traffic!
-                };
-
-                var parkingHasPrice = await _parkingHasPriceRepository
-                        .GetAllItemWithCondition(x => x.ParkingId == parkingId, includes);
-
-                var vehicle = await _vehicleInfoRepository.GetById(booking.VehicleInforId);
-                var trafficId = vehicle.TrafficId;
-
-                var appliedParkingPriceId = parkingHasPrice
-                    .Where(x => x.ParkingPrice!.Traffic!.TrafficId == trafficId)
-                    .FirstOrDefault()!.ParkingPriceId;
-
-                var parkingPrice = await _parkingPriceRepository.GetById(appliedParkingPriceId!);
-
-                var timeLines = await _timelineRepository
-                    .GetAllItemWithCondition(x => x.ParkingPriceId == appliedParkingPriceId);
-
-                var penaltyPriceStepTime = parkingPrice.PenaltyPriceStepTime;
-                var penaltyPrice = parkingPrice.PenaltyPrice;
-
-                // vào đúng giờ, ra đúng giờ
-                if (checkOutTime <= endTimeBooking && checkinTime >= startTimeBooking)
-                {
-                    if (booking.Transactions.First().Status == BookingPaymentStatus.Chua_thanh_toan.ToString() &&
-                        booking.Transactions.First().PaymentMethod == PaymentMethod.tra_sau.ToString())
+                    var response2 = new BookingInformationResponse
                     {
-                        booking.UnPaidMoney += booking.Transactions.First().Price;
-                    }
+                        ParkingId = (int)parkingId,
+                        Booking = _mapper.Map<BookingCheckoutDto>(booking),
+                    };
+
+                    return new ServiceResponse<BookingInformationResponse>
+                    {
+                        Data = response2,
+                        Message = "Thành công",
+                        Success = true,
+                        StatusCode = 201
+                    };
                 }
-
-                // vào đúng giờ, ra tre
-                else if (checkOutTime > endTimeBooking && checkinTime >= startTimeBooking)
+                else if (booking.Status.Equals(BookingStatus.Check_In.ToString()))
                 {
-                    var actualPriceLate = 0M;
-                    if (penaltyPriceStepTime == 0)
+                    var endTimeBooking = booking.EndTime.Value;
+                    var startTimeBooking = booking.StartTime;
+                    var checkinTime = booking.CheckinTime;
+
+                    var checkOutTime = DateTime.UtcNow.AddHours(7);
+                    booking.CheckoutTime = checkOutTime;
+
+
+                    var includes = new List<Expression<Func<Domain.Entities.ParkingHasPrice, object>>>
                     {
-                        actualPriceLate += (decimal)penaltyPrice;
+                        x => x.ParkingPrice!,
+                        x => x.ParkingPrice!.Traffic!
+                    };
+
+                    var parkingHasPrice = await _parkingHasPriceRepository
+                            .GetAllItemWithCondition(x => x.ParkingId == parkingId, includes);
+
+                    var vehicle = await _vehicleInfoRepository.GetById(booking.VehicleInforId);
+                    var trafficId = vehicle.TrafficId;
+
+                    var appliedParkingPriceId = parkingHasPrice
+                        .Where(x => x.ParkingPrice!.Traffic!.TrafficId == trafficId)
+                        .FirstOrDefault()!.ParkingPriceId;
+
+                    var parkingPrice = await _parkingPriceRepository.GetById(appliedParkingPriceId!);
+
+                    var timeLines = await _timelineRepository
+                        .GetAllItemWithCondition(x => x.ParkingPriceId == appliedParkingPriceId);
+
+                    var penaltyPriceStepTime = parkingPrice.PenaltyPriceStepTime;
+                    var penaltyPrice = parkingPrice.PenaltyPrice;
+
+                    // vào đúng giờ, ra đúng giờ
+                    if (checkOutTime <= endTimeBooking && checkinTime >= startTimeBooking)
+                    {
+                        if (booking.Transactions.First().Status == BookingPaymentStatus.Chua_thanh_toan.ToString() &&
+                            booking.Transactions.First().PaymentMethod == PaymentMethod.tra_sau.ToString())
+                        {
+                            booking.UnPaidMoney += booking.Transactions.First().Price;
+                        }
                     }
-                    else
+
+                    // vào đúng giờ, ra tre
+                    else if (checkOutTime > endTimeBooking && checkinTime >= startTimeBooking)
                     {
-                        if ((checkOutTime - endTimeBooking) <= TimeSpan.FromHours((double)penaltyPriceStepTime))
+                        var actualPriceLate = 0M;
+                        if (penaltyPriceStepTime == 0)
                         {
                             actualPriceLate += (decimal)penaltyPrice;
                         }
                         else
                         {
-                            actualPriceLate += (decimal)penaltyPrice;
-                            var penaltyTime = checkOutTime.Hour - endTimeBooking.Hour;
-                            var step = penaltyTime / (int)penaltyPriceStepTime;
-                            actualPriceLate += (step * (decimal)penaltyPrice);
+                            if ((checkOutTime - endTimeBooking) <= TimeSpan.FromHours((double)penaltyPriceStepTime))
+                            {
+                                actualPriceLate += (decimal)penaltyPrice;
+                            }
+                            else
+                            {
+                                actualPriceLate += (decimal)penaltyPrice;
+                                var penaltyTime = checkOutTime.Hour - endTimeBooking.Hour;
+                                var step = penaltyTime / (int)penaltyPriceStepTime;
+                                actualPriceLate += (step * (decimal)penaltyPrice);
+                            }
                         }
-                    }
 
-                    Transaction bp = new Transaction
-                    {
-                        Price = actualPriceLate,
-                        Status = Domain.Enum.BookingPaymentStatus.Chua_thanh_toan.ToString(),
-                        PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(),
-                        Description = "Phí phạt ra bãi trễ",
-                        BookingId = booking.BookingId,
-                        CreatedDate = DateTime.UtcNow.AddHours(7),
-                    };
-
-                    await _transactionRepository.Insert(bp);
-
-                    foreach (var item in booking.Transactions)
-                    {
-                        if (item.Status == BookingPaymentStatus.Chua_thanh_toan.ToString())
+                        Transaction bp = new Transaction
                         {
-                            booking.UnPaidMoney += item.Price;
-                        }
-                    }
-                }
+                            Price = actualPriceLate,
+                            Status = Domain.Enum.BookingPaymentStatus.Chua_thanh_toan.ToString(),
+                            PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(),
+                            Description = "Phí phạt ra bãi trễ",
+                            BookingId = booking.BookingId,
+                            CreatedDate = DateTime.UtcNow.AddHours(7),
+                        };
 
-                // vao som, ra dung
-                else if (checkOutTime <= endTimeBooking && checkinTime < startTimeBooking)
-                {
-                    var checkinTimeHour = checkinTime.Value.Hour;
-                    var earlyTimeHour = startTimeBooking.Hour - checkinTimeHour;
-                    var money = 0M;
-                    foreach (var item in timeLines)
-                    {
-                        if (item.StartTime <= TimeSpan.FromHours(checkinTime.Value.Hour) &&
-                            TimeSpan.FromHours(checkinTime.Value.Hour) <= item.EndTime)
+                        await _transactionRepository.Insert(bp);
+
+                        foreach (var item in booking.Transactions)
                         {
-                            money += (decimal)item.ExtraFee * earlyTimeHour;
+                            if (item.Status == BookingPaymentStatus.Chua_thanh_toan.ToString())
+                            {
+                                booking.UnPaidMoney += item.Price;
+                            }
                         }
                     }
 
-                    Transaction bp = new Transaction
+                    // vao som, ra dung
+                    else if (checkOutTime <= endTimeBooking && checkinTime < startTimeBooking)
                     {
-                        Price = money,
-                        Status = Domain.Enum.BookingPaymentStatus.Chua_thanh_toan.ToString(),
-                        PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(),
-                        Description = "Phí vào sớm hơn dự kiến",
-                        BookingId = booking.BookingId,
-                        CreatedDate = DateTime.UtcNow.AddHours(7),
-                    };
-
-                    await _transactionRepository.Insert(bp);
-
-                    foreach (var item in booking.Transactions)
-                    {
-                        if (item.Status == BookingPaymentStatus.Chua_thanh_toan.ToString())
+                        var checkinTimeHour = checkinTime.Value.Hour;
+                        var earlyTimeHour = startTimeBooking.Hour - checkinTimeHour;
+                        var money = 0M;
+                        foreach (var item in timeLines)
                         {
-                            booking.UnPaidMoney += item.Price;
+                            if (item.StartTime <= TimeSpan.FromHours(checkinTime.Value.Hour) &&
+                                TimeSpan.FromHours(checkinTime.Value.Hour) <= item.EndTime)
+                            {
+                                money += (decimal)item.ExtraFee * earlyTimeHour;
+                            }
                         }
-                    }
-                }
 
-                // vao som, ra tre
-                else if (checkOutTime > endTimeBooking && checkinTime < startTimeBooking)
-                {
-                    var checkinTimeHour = checkinTime.Value.Hour;
-                    var earlyTimeHour = startTimeBooking.Hour - checkinTimeHour;
-                    var money = 0M;
-                    foreach (var item in timeLines)
-                    {
-                        if (item.StartTime <= TimeSpan.FromHours(checkinTime.Value.Hour) &&
-                            TimeSpan.FromHours(checkinTime.Value.Hour) <= item.EndTime)
+                        Transaction bp = new Transaction
                         {
-                            money += (decimal)item.ExtraFee * earlyTimeHour;
+                            Price = money,
+                            Status = Domain.Enum.BookingPaymentStatus.Chua_thanh_toan.ToString(),
+                            PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(),
+                            Description = "Phí vào sớm hơn dự kiến",
+                            BookingId = booking.BookingId,
+                            CreatedDate = DateTime.UtcNow.AddHours(7),
+                        };
+
+                        await _transactionRepository.Insert(bp);
+
+                        foreach (var item in booking.Transactions)
+                        {
+                            if (item.Status == BookingPaymentStatus.Chua_thanh_toan.ToString())
+                            {
+                                booking.UnPaidMoney += item.Price;
+                            }
                         }
                     }
 
-                    Transaction bp = new Transaction
+                    // vao som, ra tre
+                    else if (checkOutTime > endTimeBooking && checkinTime < startTimeBooking)
                     {
-                        Price = money,
-                        Status = Domain.Enum.BookingPaymentStatus.Chua_thanh_toan.ToString(),
-                        PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(),
-                        Description = "Phí vào sớm hơn dự kiến",
-                        BookingId = booking.BookingId,
-                        CreatedDate = DateTime.UtcNow.AddHours(7),
-                    };
+                        var checkinTimeHour = checkinTime.Value.Hour;
+                        var earlyTimeHour = startTimeBooking.Hour - checkinTimeHour;
+                        var money = 0M;
+                        foreach (var item in timeLines)
+                        {
+                            if (item.StartTime <= TimeSpan.FromHours(checkinTime.Value.Hour) &&
+                                TimeSpan.FromHours(checkinTime.Value.Hour) <= item.EndTime)
+                            {
+                                money += (decimal)item.ExtraFee * earlyTimeHour;
+                            }
+                        }
 
-                    await _transactionRepository.Insert(bp);
+                        Transaction bp = new Transaction
+                        {
+                            Price = money,
+                            Status = Domain.Enum.BookingPaymentStatus.Chua_thanh_toan.ToString(),
+                            PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(),
+                            Description = "Phí vào sớm hơn dự kiến",
+                            BookingId = booking.BookingId,
+                            CreatedDate = DateTime.UtcNow.AddHours(7),
+                        };
 
-                    var actualPriceLate = 0M;
-                    if (penaltyPriceStepTime == 0)
-                    {
-                        actualPriceLate += (decimal)penaltyPrice;
-                    }
-                    else
-                    {
-                        if ((checkOutTime - endTimeBooking) <= TimeSpan.FromHours((double)penaltyPriceStepTime))
+                        await _transactionRepository.Insert(bp);
+
+                        var actualPriceLate = 0M;
+                        if (penaltyPriceStepTime == 0)
                         {
                             actualPriceLate += (decimal)penaltyPrice;
                         }
                         else
                         {
-                            actualPriceLate += (decimal)penaltyPrice;
-                            var penaltyTime = checkOutTime.Hour - endTimeBooking.Hour;
-                            var step = penaltyTime / (int)penaltyPriceStepTime;
-                            actualPriceLate += (step * (decimal)penaltyPrice);
+                            if ((checkOutTime - endTimeBooking) <= TimeSpan.FromHours((double)penaltyPriceStepTime))
+                            {
+                                actualPriceLate += (decimal)penaltyPrice;
+                            }
+                            else
+                            {
+                                actualPriceLate += (decimal)penaltyPrice;
+                                var penaltyTime = checkOutTime.Hour - endTimeBooking.Hour;
+                                var step = penaltyTime / (int)penaltyPriceStepTime;
+                                actualPriceLate += (step * (decimal)penaltyPrice);
+                            }
+                        }
+
+                        Transaction bp1 = new Transaction
+                        {
+                            Price = actualPriceLate,
+                            Status = Domain.Enum.BookingPaymentStatus.Chua_thanh_toan.ToString(),
+                            PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(),
+                            Description = "Phí phạt ra bãi trễ",
+                            BookingId = booking.BookingId,
+                            CreatedDate = DateTime.UtcNow.AddHours(7),
+                        };
+
+                        await _transactionRepository.Insert(bp1);
+
+                        foreach (var item in booking.Transactions)
+                        {
+                            if (item.Status == BookingPaymentStatus.Chua_thanh_toan.ToString())
+                            {
+                                booking.UnPaidMoney += item.Price;
+                            }
                         }
                     }
 
-                    Transaction bp1 = new Transaction
+                    foreach (var bookingDetail in booking.BookingDetails)
                     {
-                        Price = actualPriceLate,
-                        Status = Domain.Enum.BookingPaymentStatus.Chua_thanh_toan.ToString(),
-                        PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(),
-                        Description = "Phí phạt ra bãi trễ",
-                        BookingId = booking.BookingId,
-                        CreatedDate = DateTime.UtcNow.AddHours(7),
+                        bookingDetail.TimeSlot.Status = TimeSlotStatus.Free.ToString();
+                    }
+
+                    await _timeSlotRepository.Save();
+
+                    booking.Status = BookingStatus.Check_Out.ToString();
+                    await _bookingRepository.Save();
+
+                    var response = new BookingInformationResponse
+                    {
+                        ParkingId = (int)parkingId,
+                        Booking = _mapper.Map<BookingCheckoutDto>(booking),
                     };
 
-                    await _transactionRepository.Insert(bp1);
-
-                    foreach (var item in booking.Transactions)
+                    return new ServiceResponse<BookingInformationResponse>
                     {
-                        if (item.Status == BookingPaymentStatus.Chua_thanh_toan.ToString())
-                        {
-                            booking.UnPaidMoney += item.Price;
-                        }
-                    }
+                        Data = response,
+                        Message = "Thành công",
+                        Success = true,
+                        StatusCode = 201
+                    };
                 }
-
-                foreach (var bookingDetail in booking.BookingDetails)
-                {
-                    bookingDetail.TimeSlot.Status = TimeSlotStatus.Free.ToString();
-                }
-
-                await _timeSlotRepository.Save();
-
-                booking.Status = BookingStatus.Check_Out.ToString();
-                await _bookingRepository.Save();
-
-                var response = new BookingInformationResponse
-                {
-                    ParkingId = (int)parkingId,
-                    Booking = _mapper.Map<BookingCheckoutDto>(booking),
-                };
 
                 return new ServiceResponse<BookingInformationResponse>
                 {
-                    Data = response,
-                    Message = "Thành công",
-                    Success = true,
-                    StatusCode = 201
+                    Message = "Có lỗi xảy ra.",
+                    Success = false,
+                    StatusCode = 400
                 };
+
             }
             catch (Exception ex)
             {

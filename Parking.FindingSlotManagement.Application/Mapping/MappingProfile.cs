@@ -60,7 +60,6 @@ using Parking.FindingSlotManagement.Application.Features.Customer.Parking.Querie
 using Parking.FindingSlotManagement.Application.Features.Customer.Booking.Queries.GetBookingDetails;
 using Parking.FindingSlotManagement.Application.Models.Floor;
 using Parking.FindingSlotManagement.Application.Models.User;
-using Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlot.Queries.GetParkingSlots;
 using Parking.FindingSlotManagement.Application.Models.Traffic;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetListBookingByManagerId;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetBookingById;
@@ -99,6 +98,7 @@ using Parking.FindingSlotManagement.Application.Features.Admin.Booking.BookingMa
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries.GetAllBookingByParkingId;
 using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Queries.GetVnPayById;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.DisableParkingSlotByDate.Model;
+using Parking.FindingSlotManagement.Application.Features.Customer.Account.AccountManagement.Queries.GetBanCountByUserId;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -145,6 +145,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ReverseMap();
             CreateMap<User, UserForGetAllBookingByParkingIdResponse>().ReverseMap();
             CreateMap<User, UserForGetAllBookingForAdminResponse>().ReverseMap();
+            CreateMap<User, GetBanCountByUserIdResponse>().ReverseMap();
             #endregion
 
             #region Traffic Mapping
@@ -289,9 +290,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             #region Parkingslots Mapping
             CreateMap<ParkingSlot, CreateParkingSlotsCommand>().ReverseMap();
             CreateMap<ParkingSlot, GetAvailableSlotsResponse>().ReverseMap();
-            CreateMap<ParkingSlot, GetParkingSlotsResponse>().ReverseMap();
             CreateMap<ParkingSlot, GetListParkingSlotByFloorIdResponse>().ReverseMap();
-            CreateMap<ParkingSlot, ParkingSlotsDto>().ReverseMap();
             CreateMap<ParkingSlot, ParkingSlotDto>().ReverseMap();
             CreateMap<ParkingSlot, ParkingSlotWithBookingDetailDto>().ReverseMap();
             CreateMap<ParkingSlot, ParkingSlotSearchResult>()
@@ -378,7 +377,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ReverseMap();
             #endregion
 
-            #region
+            #region ConflictRequest Mapping
             CreateMap<ConflictRequest, GetAllConflictRequestByKeeperIdResponse>().ReverseMap();
             #endregion
         }

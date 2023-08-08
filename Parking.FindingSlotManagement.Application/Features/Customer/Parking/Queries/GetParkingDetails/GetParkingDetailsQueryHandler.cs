@@ -17,7 +17,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Parking.Qu
         private readonly IParkingRepository _parkingRepository;
         private readonly IMapper _mapper;
         private readonly IParkingHasPriceRepository _parkingHasPriceRepository;
-        ParkingDto parkingDto;
         GetParkingDetailsResponse _getParkingDetailsResponse;
 
         public GetParkingDetailsQueryHandler(IParkingRepository parkingRepository,
@@ -27,7 +26,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Parking.Qu
             _parkingRepository = parkingRepository;
             _mapper = mapper;
             _parkingHasPriceRepository = parkingHasPriceRepository;
-             parkingDto = new ParkingDto();
             _getParkingDetailsResponse = new GetParkingDetailsResponse();
         }
 

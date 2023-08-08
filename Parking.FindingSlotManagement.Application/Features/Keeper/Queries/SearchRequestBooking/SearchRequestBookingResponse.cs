@@ -20,6 +20,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Queries.Sear
         public DateTime? EndTime { get; set; }
         public DateTime DateBook { get; set; }
         public string? Status { get; set; }
+        public bool? IsRating { get; set; }
     }
     public class VehicleInforSearchResult
     {
