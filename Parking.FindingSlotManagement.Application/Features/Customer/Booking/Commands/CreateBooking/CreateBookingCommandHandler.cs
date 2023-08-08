@@ -609,7 +609,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     var bookedHours = entity.EndTime.Value - entity.StartTime;
                     var persent = bookedHours * 0.5;
                     var timeToCancel = entity.StartTime.Add(persent) - DateTime.UtcNow.AddHours(7);
-                    Console.WriteLine(timeToCancel);
                     BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
                     return new ServiceResponse<int>
                     {
