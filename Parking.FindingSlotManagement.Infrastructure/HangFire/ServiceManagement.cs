@@ -46,11 +46,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
 
         public async void AutoCancelBookingWhenOverAllowTimeBooking(int bookingId)
         {
-            var lateHoursAllowed = 1;
             var methodName = "AutoCancelBookingWhenOverAllowTimeBooking";
             try
             {
                 var bookedBooking = _context.Bookings
+                    .Include(x => x.User)
                     .Include(x => x.BookingDetails)!
                         .ThenInclude(x => x.TimeSlot)
                     .Include(x => x.Transactions)
@@ -63,7 +63,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     await hangfireRepository.DeleteJob(bookingId, methodName);
                     Console.WriteLine($"Job deleted, because guest is arrived");
                 }
-                if (!guestArrived)
+                else if (!guestArrived)
                 {
                     bookedBooking.Status = BookingStatus.Cancel.ToString();
                     bookedBooking.Transactions.First().Status = BookingPaymentStatus.Huy.ToString();
@@ -75,9 +75,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     }
 
                     // bắn message, đơn của mày đã bị hủy + lý do
-
-                    //PushNotiToCustomerWhenOverLateAllowedTime(lateHoursAllowed, bookedBooking);
-
+                    PushNotiToCustomerWhenOverLateAllowedTime(bookedBooking);
+                    bookedBooking.User.BanCount += 1;
                     _context.SaveChanges();
                 }
                 else
@@ -87,14 +86,14 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception($"Error at ServiceManagement.AutoCancelBookingWhenOverAllowTimeBooking: Message {ex.Message}");
             }
         }
 
-        private void PushNotiToCustomerWhenOverLateAllowedTime(int lateHoursAllowed, Booking? bookedBooking)
+        private void PushNotiToCustomerWhenOverLateAllowedTime(Booking? bookedBooking)
         {
             var titleCustomer = "Trạng thái đơn đặt";
-            var bodyCustomer = $"Đơn của bạn đã bị hủy vì đã quá giờ trễ cho phép ({lateHoursAllowed})";
+            var bodyCustomer = $"Đơn của bạn đã bị hủy vì đã trễ quá 50% thời gian";
 
             var pushNotificationMobile = new PushNotificationMobileModel
             {
@@ -138,7 +137,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                         bookingDetail.TimeSlot.Status = TimeSlotStatus.Free.ToString();
                     }
                     // bắn message, đơn của mày đã bị hủy + lý do
-                    //PushNotiToCustomerWhenCustomerNotArrive(bookedBooking);
+                    PushNotiToCustomerWhenCustomerNotArrive(bookedBooking);
                     _context.SaveChanges();
                 }
                 Console.WriteLine($"Exception");
@@ -434,6 +433,40 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     };
                     _fireBaseMessageServices.SendNotificationToWebAsync(pushNotificationModel);
                 }
+            }
+        }
+
+        public void DisableParkingByDate(int parkingId, DateTime disableDate)
+        {
+            try
+            {
+                var parkingIncludeTimeSlots = _context.Parkings
+                    .Include(x => x.Floors)!.ThenInclude(x => x.ParkingSlots)!.ThenInclude(x => x.TimeSlots)
+                    .FirstOrDefault(x => x.ParkingId == parkingId);
+
+                var floors = parkingIncludeTimeSlots!.Floors!;
+                parkingIncludeTimeSlots.IsAvailable = false;
+                foreach (var floor in floors)
+                {
+                    var parkingSlots = floor!.ParkingSlots!;
+                    foreach (var parkingSlot in parkingSlots)
+                    {
+                        var timeSlots = parkingSlot.TimeSlots;
+                        parkingSlot.IsAvailable = false;
+                        foreach (var timeSlot in timeSlots)
+                        {
+                            if (timeSlot.StartTime.Date == disableDate.Date)
+                            {
+                                timeSlot.Status = TimeSlotStatus.Busy.ToString();
+                            }
+                        }
+                    }
+                }
+                _context.SaveChanges();
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at ServiceManagement.DisableParkingByDate: Message {ex.Message}");
             }
         }
     }
