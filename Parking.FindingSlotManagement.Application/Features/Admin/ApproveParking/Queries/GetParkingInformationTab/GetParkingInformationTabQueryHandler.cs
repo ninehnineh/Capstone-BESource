@@ -16,19 +16,21 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
         private readonly ITimeSlotRepository _timeSlotRepository;
         private readonly IParkingSlotRepository _parkingSlotRepository;
         private readonly IParkingHasPriceRepository _parkingHasPriceRepository;
+        private readonly IParkingSpotImageRepository _parkingSpotImageRepository;
 
         public GetParkingInformationTabQueryHandler(
             IParkingRepository parkingRepository, 
             IFieldWorkParkingImgRepository fieldWorkParkingImgRepository, 
             ITimeSlotRepository timeSlotRepository, 
             IParkingSlotRepository parkingSlotRepository,
-            IParkingHasPriceRepository parkingHasPriceRepository)
+            IParkingHasPriceRepository parkingHasPriceRepository, IParkingSpotImageRepository parkingSpotImageRepository)
         {
             _parkingRepository = parkingRepository;
             _fieldWorkParkingImgRepository = fieldWorkParkingImgRepository;
             _timeSlotRepository = timeSlotRepository;
             _parkingSlotRepository = parkingSlotRepository;
             _parkingHasPriceRepository = parkingHasPriceRepository;
+            _parkingSpotImageRepository = parkingSpotImageRepository;
         }
         public async Task<ServiceResponse<GetParkingInformationTabResponse>> Handle(GetParkingInformationTabQuery request, CancellationToken cancellationToken)
         {
@@ -119,8 +121,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                         StatusCode = 200
                     };
                 }
-                var approveParkingId = parkingExist.ApproveParkings.LastOrDefault().ApproveParkingId;
-                var lstImages = await _fieldWorkParkingImgRepository.GetAllItemWithConditionByNoInclude(x => x.ApproveParkingId == approveParkingId);
+                /*var approveParkingId = parkingExist.ApproveParkings.LastOrDefault().ApproveParkingId;*/
+                var lstImages = await _parkingSpotImageRepository.GetAllItemWithConditionByNoInclude(x => x.ParkingId == parkingExist.ParkingId);
                 if(lstImages == null)
                 {
                     entityRes.Images = null;
@@ -146,7 +148,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                 List<string> imgRes = new();
                 foreach (var item in lstImages)
                 {
-                    imgRes.Add(item.Url);
+                    imgRes.Add(item.ImgPath);
                 }
                 entityRes.Images = imgRes;
                 return new ServiceResponse<GetParkingInformationTabResponse>

@@ -126,6 +126,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                         .GetAllItemWithCondition(x => x.ParkingPriceId == appliedParkingPriceId);
 
                     var penaltyPriceStepTime = parkingPrice.PenaltyPriceStepTime;
+                    if(penaltyPriceStepTime == null)
+                    {
+                        return new ServiceResponse<BookingInformationResponse>
+                        {
+                            Message = "Con chó link quên nhập penaltyPriceStepTime của parking price",
+                            Success = false,
+                            StatusCode = 400
+                        };
+                    }
                     var penaltyPrice = parkingPrice.PenaltyPrice;
 
                     // vào đúng giờ, ra đúng giờ
