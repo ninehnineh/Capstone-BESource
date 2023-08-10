@@ -106,7 +106,8 @@ string[] urlCors = new string[]
     "https://deploy-react-app-to-azure.vercel.app", 
     "https://park-z-manager-web.vercel.app", 
     "https://parkz-admin-web-five.vercel.app",
-    "https://parkz-admin-website-eight.vercel.app"
+    "https://parkz-admin-website-eight.vercel.app",
+    "https://parkzserver-001-site1.btempurl.com"
 };
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddCors(options =>
