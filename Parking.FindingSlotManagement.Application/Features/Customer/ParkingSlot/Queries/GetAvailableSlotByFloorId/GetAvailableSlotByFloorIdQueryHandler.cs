@@ -60,54 +60,65 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingSlo
                         StatusCode = 400
                     };
                 }
+                List<GetAvailableSlotByFloorIdResponse> lstTong = new List<GetAvailableSlotByFloorIdResponse>();
+                HashSet<int> listParkingSlotIdExist = new();
+                HashSet<int> listParkingSlotIdExistVer2 = new();
                 var currentLstBookedSlot = await _timeSlotRepository.GetAllItemWithCondition(x =>
                                                             x.Parkingslot.FloorId == request.FloorId &&
                                                             x.StartTime >= request.StartTimeBooking &&
                                                             x.EndTime <= request.EndTimeBooking && x.Status == "Booked", includes);
-                HashSet<int> listParkingSlotIdExist = new();
-                foreach (var item in currentLstBookedSlot)
+                if(currentLstBookedSlot.Any()) 
                 {
-                    if (!listParkingSlotIdExist.Contains((int)item.ParkingSlotId))
+                    
+                    foreach (var item in currentLstBookedSlot)
                     {
-                        listParkingSlotIdExist.Add((int)item.ParkingSlotId);
+                        if (!listParkingSlotIdExist.Contains((int)item.ParkingSlotId))
+                        {
+                            listParkingSlotIdExist.Add((int)item.ParkingSlotId);
+                        }
+                    }
+                    var lstParkingSlotHasBooked = await _parkingSlotRepository.GetAllItemWithCondition(x => listParkingSlotIdExist.Contains((int)x.ParkingSlotId));
+                    
+                    foreach (var item in lstParkingSlotHasBooked)
+                    {
+                        var entity = _mapper.Map<ParkingSlotDto>(item);
+                        var BigEntity = new GetAvailableSlotByFloorIdResponse
+                        {
+                            ParkingSlotDto = entity,
+                            IsBooked = 1
+                        };
+                        lstTong.Add(BigEntity);
                     }
                 }
-                var lstParkingSlotHasBooked = await _parkingSlotRepository.GetAllItemWithCondition(x => listParkingSlotIdExist.Contains((int)x.ParkingSlotId) || x.FloorId == request.FloorId && x.IsAvailable == false && x.IsBackup == false);
-                List<GetAvailableSlotByFloorIdResponse> lstTong = new List<GetAvailableSlotByFloorIdResponse>();
-                foreach (var item in lstParkingSlotHasBooked)
-                {
-                    var entity = _mapper.Map<ParkingSlotDto>(item);
-                    var BigEntity = new GetAvailableSlotByFloorIdResponse
-                    {
-                        ParkingSlotDto = entity,
-                        IsBooked = 1
-                    };
-                    lstTong.Add(BigEntity);
-                }
+                
                 // get slot bi busy
                 var currentLstBusySlot = await _timeSlotRepository.GetAllItemWithCondition(x =>
                                             x.Parkingslot.FloorId == request.FloorId &&
                                             x.StartTime >= request.StartTimeBooking &&
                                             x.EndTime <= request.EndTimeBooking && x.Status == "Busy", includes);
-                HashSet<int> listParkingSlotIdExistVer2 = new();
-                foreach (var item in currentLstBusySlot)
+                if(currentLstBusySlot.Any())
                 {
-                    if (!listParkingSlotIdExistVer2.Contains((int)item.ParkingSlotId))
+                    
+                    foreach (var item in currentLstBusySlot)
                     {
-                        listParkingSlotIdExistVer2.Add((int)item.ParkingSlotId);
+                        if (!listParkingSlotIdExistVer2.Contains((int)item.ParkingSlotId))
+                        {
+                            listParkingSlotIdExistVer2.Add((int)item.ParkingSlotId);
+                        }
+                    }
+                    var lstParkingSlotHasBusy = await _parkingSlotRepository.GetAllItemWithCondition(x => listParkingSlotIdExistVer2.Contains((int)x.ParkingSlotId));
+                    foreach (var item in lstParkingSlotHasBusy)
+                    {
+                        var entity = _mapper.Map<ParkingSlotDto>(item);
+                        var BigEntity = new GetAvailableSlotByFloorIdResponse
+                        {
+                            ParkingSlotDto = entity,
+                            IsBooked = 2
+                        };
+                        lstTong.Add(BigEntity);
                     }
                 }
-                var lstParkingSlotHasBusy = await _parkingSlotRepository.GetAllItemWithCondition(x => listParkingSlotIdExistVer2.Contains((int)x.ParkingSlotId) || x.FloorId == request.FloorId && x.IsAvailable == false && x.IsBackup == false);
-                foreach (var item in lstParkingSlotHasBusy)
-                {
-                    var entity = _mapper.Map<ParkingSlotDto>(item);
-                    var BigEntity = new GetAvailableSlotByFloorIdResponse
-                    {
-                        ParkingSlotDto = entity,
-                        IsBooked = 2
-                    };
-                    lstTong.Add(BigEntity);
-                }
+                
                 //slot chua book
                 var lstParkingSlot = await _parkingSlotRepository
                     .GetAllItemWithCondition(x => x.FloorId == request.FloorId && x.IsBackup == false);
