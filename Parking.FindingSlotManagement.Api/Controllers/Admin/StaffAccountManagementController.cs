@@ -15,7 +15,7 @@ using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Admin
 {
-    [Authorize(Roles = "Admin")]
+    
     [Route("api/staff-account-management")]
     [ApiController]
     public class StaffAccountManagementController : ControllerBase
@@ -35,6 +35,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// SignalR: LoadStaffAccounts
         /// </remarks>
         /// 
+        [Authorize(Roles = "Admin")]
         [HttpPost("register", Name = "CreateNewStaffAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
@@ -66,6 +67,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
+        /// 
+        [Authorize(Roles = "Admin")]
         [HttpGet(Name = "GetListStaffAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -93,6 +96,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <remarks>
         /// SignalR: LoadStaffAccounts
         /// </remarks>
+        /// 
+        [Authorize(Roles = "Admin")]
         [HttpPut(Name = "UpdateStaffAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -126,6 +131,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
+        /// 
+        [Authorize(Roles = "Admin")]
         [HttpPut("password",Name = "UpdateStaffAccountPassword")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -162,6 +169,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <remarks>
         /// SignalR: LoadStaffAccounts
         /// </remarks>
+        /// 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{staffId}", Name = "DisableOrEnableStaffAccount")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -188,6 +197,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin
         /// </summary>
+        /// 
+        [Authorize(Roles = "Admin,Staff")]
         [HttpGet("{staffId}", Name = "GetStaffAccountById")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
