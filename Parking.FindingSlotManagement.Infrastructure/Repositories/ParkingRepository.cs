@@ -113,9 +113,12 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             try
             {
                 var result = false;
+                // var query = "SELECT * " +
+                //             "FROM HangFire.Job " +
+                //             "WHERE JSON_VALUE(HangFire.Job.InvocationData, '$.m') = @MethodName AND JSON_VALUE(HangFire.Job.Arguments, '$[0]') = @ParkingId AND HangFire.Job.Arguments LIKE '%' + @DisableDate + '%'";
                 var query = "SELECT * " +
                             "FROM HangFire.Job " +
-                            "WHERE JSON_VALUE(HangFire.Job.InvocationData, '$.m') = @MethodName AND JSON_VALUE(HangFire.Job.Arguments, '$[0]') = @ParkingId AND HangFire.Job.Arguments LIKE '%' + @DisableDate + '%'";
+                            "WHERE JSON_VALUE(HangFire.Job.InvocationData, '$.m') = @MethodName AND JSON_VALUE(HangFire.Job.Arguments, '$[0]') = @ParkingId AND JSON_VALUE(HangFire.Job.Arguments, '$[1]') LIKE '%' + @DisableDate + '%'"; 
                 using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
@@ -123,7 +126,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                     {
                         command.Parameters.AddWithValue("@MethodName", methodName);
                         command.Parameters.AddWithValue("@ParkingId", parkingId.ToString());
-                        command.Parameters.AddWithValue("@DisableDate", disableDate.ToString());
+                        command.Parameters.AddWithValue("@DisableDate", disableDate.ToString("yyyy-MM-dd"));
 
                         using (var reader = command.ExecuteReader())
                         {
