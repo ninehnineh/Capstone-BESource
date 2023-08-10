@@ -94,7 +94,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                         StatusCode = 201
                     };
                 }
-                else if (booking.Status.Equals(BookingStatus.Check_In.ToString()))
+                else if (booking.Status.Equals(BookingStatus.Check_In.ToString()) || booking.Status.Equals(BookingStatus.OverTime.ToString()))
                 {
                     var endTimeBooking = booking.EndTime.Value;
                     var startTimeBooking = booking.StartTime;
