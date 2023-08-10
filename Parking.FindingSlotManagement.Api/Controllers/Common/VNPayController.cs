@@ -35,7 +35,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Common
             return res;
         }
         [HttpGet("/api/VNPayDeposit")]
-        public async Task<IActionResult> GetTransactionsDeposit([FromQuery] int userId)
+        public async Task<PaymentResponseModel> GetTransactionsDeposit([FromQuery] int userId)
         {
             var res = _vnPayService.PaymentExecuteForDeposit(Request.Query);
             if (res.VnPayResponseCode.Equals("00"))
@@ -47,7 +47,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Common
                     UserId = userId
                 };
                 await _walletRepository.UpdateMoneyInWallet(entity, "00");
-               return Redirect("https://sandbox.vnpayment.vn/apis/vnpay-demo");
+               return res;
 
             }
             else
@@ -59,7 +59,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Common
                     UserId = userId
                 };
                 await _walletRepository.UpdateMoneyInWallet(entity, null);
-                return Redirect("https://sandbox.vnpayment.vn/apis/vnpay-demo");
+                return res;
 
             }
         }
