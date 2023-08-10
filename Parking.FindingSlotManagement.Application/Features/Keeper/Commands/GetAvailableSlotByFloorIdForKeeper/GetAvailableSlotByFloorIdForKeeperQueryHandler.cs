@@ -139,7 +139,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Get
 
                     //slot chua book
                     var lstParkingSlot = await _parkingSlotRepository
-                        .GetAllItemWithCondition(x => x.FloorId == request.FloorId && x.IsBackup == false);
+                        .GetAllItemWithCondition(x => x.FloorId == request.FloorId);
                     var filterParkingSlot = lstParkingSlot
                         .Where(x => !listParkingSlotIdExist.Contains(x.ParkingSlotId)).ToList();
                     var filterParkingSlot2 = filterParkingSlot
@@ -258,7 +258,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Get
 
                     //slot chua book
                     var lstParkingSlot = await _parkingSlotRepository
-                        .GetAllItemWithCondition(x => x.FloorId == request.FloorId && x.IsBackup == false);
+                        .GetAllItemWithCondition(x => x.FloorId == request.FloorId);
                     var filterParkingSlot = lstParkingSlot
                         .Where(x => !listParkingSlotIdExist.Contains(x.ParkingSlotId)).ToList();
                     var filterParkingSlot2 = filterParkingSlot
