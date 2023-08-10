@@ -28,6 +28,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Que
         public string? LicensePlate { get; set; }
         public string? VehicleName { get; set; }
         public string? Color { get; set; }
-        public string TrafficName { get; set; } 
+        /*public string TrafficName { get; set; } */
     }
 }

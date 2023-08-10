@@ -327,7 +327,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.LicensePlate, act => act.MapFrom(obj => obj.VehicleInfor.LicensePlate))
                 .ForMember(dto => dto.VehicleName, act => act.MapFrom(obj => obj.VehicleInfor.VehicleName))
                 .ForMember(dto => dto.Color, act => act.MapFrom(obj => obj.VehicleInfor.Color))
-                .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.VehicleInfor.Traffic.Name))
+/*                .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.VehicleInfor.Traffic.Name))*/
                 .ReverseMap();
             CreateMap<Booking, GetListBookingFollowCalendarResponse > ()
                 .ForMember(dto => dto.ParkingId, act => act.MapFrom(obj => obj.BookingDetails.First().TimeSlot.Parkingslot.Floor.ParkingId))
