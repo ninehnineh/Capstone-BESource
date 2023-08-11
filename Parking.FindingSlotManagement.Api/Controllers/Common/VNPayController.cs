@@ -76,7 +76,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Common
                     UserId = userId
                 };
                 await _walletRepository.UpdateMoneyInWallet(entity, "00");
-                return Redirect("http://localhost:3000/wallet");
+                return Redirect("https://park-z-manager-web.vercel.app/wallet");
 
             }
             else
@@ -88,7 +88,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Common
                     UserId = userId
                 };
                 await _walletRepository.UpdateMoneyInWallet(entity, null);
-                return Redirect("http://localhost:3000/walletsf");
+                return Redirect("https://park-z-manager-web.vercel.app/failed");
 
             }
         }
