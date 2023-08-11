@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Commands.CreateNewCensorshipManagerAccount
 {
-    public class CreateNewCensorshipManagerAccountCommandValidation : AbstractValidator<CreateNewCensorshipManagerAccountCommand>
+    public class CreateNewCensorshipManagerValidation : AbstractValidator<CreateNewCensorshipManagerAccountCommand>
     {
-        public CreateNewCensorshipManagerAccountCommandValidation()
+        public CreateNewCensorshipManagerValidation()
         {
             RuleFor(p => p.Name)
                 .NotEmpty().WithMessage("Vui lòng nhập {Name}.")

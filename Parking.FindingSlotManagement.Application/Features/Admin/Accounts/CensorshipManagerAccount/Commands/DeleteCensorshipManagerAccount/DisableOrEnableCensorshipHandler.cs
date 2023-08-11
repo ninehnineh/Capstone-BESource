@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Features.Admin.Accounts.CensorshipManagerAccount.Commands.DeleteCensorshipManagerAccount
 {
-    public class DisableOrEnableCensorshipManagerAccountCommandHandler : IRequestHandler<DisableOrEnableManagerAccountCommand, ServiceResponse<string>>
+    public class DisableOrEnableCensorshipHandler : IRequestHandler<DisableOrEnableManagerAccountCommand, ServiceResponse<string>>
     {
         private readonly IAccountRepository _accountRepository;
 
-        public DisableOrEnableCensorshipManagerAccountCommandHandler(IAccountRepository accountRepository)
+        public DisableOrEnableCensorshipHandler(IAccountRepository accountRepository)
         {
             _accountRepository = accountRepository;
         }

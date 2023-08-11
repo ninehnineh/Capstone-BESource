@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Features.Customer.VehicleInfoForGuest.VehicleInfoForGuestManagement.Commands.UpdateVehicleInfoForGuest
 {
-    public class UpdateVehicleInfoForGuestCommandHandler : IRequestHandler<UpdateVehicleInfoForGuestCommand, ServiceResponse<string>>
+    public class UpdateVehicleInfoCommandHandler : IRequestHandler<UpdateVehicleInfoForGuestCommand, ServiceResponse<string>>
     {
         private readonly IVehicleInfoRepository _vehicleInfoRepository;
         private readonly ITrafficRepository _trafficRepository;
 
-        public UpdateVehicleInfoForGuestCommandHandler(IVehicleInfoRepository vehicleInfoRepository, ITrafficRepository trafficRepository)
+        public UpdateVehicleInfoCommandHandler(IVehicleInfoRepository vehicleInfoRepository, ITrafficRepository trafficRepository)
         {
             _vehicleInfoRepository = vehicleInfoRepository;
             _trafficRepository = trafficRepository;
