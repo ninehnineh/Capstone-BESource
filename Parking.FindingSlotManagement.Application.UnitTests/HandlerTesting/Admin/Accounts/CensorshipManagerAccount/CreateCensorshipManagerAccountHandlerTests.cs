@@ -24,7 +24,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
         private readonly IMapper _mapper;
         private readonly CreateNewCensorshipManagerAccountCommandHandler _handler;
         MapperConfiguration configuration;
-        private readonly CreateNewCensorshipManagerAccountCommandValidation _validator;
+        private readonly CreateNewCensorshipManagerValidation _validator;
 
         public CreateCensorshipManagerAccountHandlerTests()
         {
@@ -36,7 +36,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             });
             _mapper = configuration.CreateMapper();
             _handler = new CreateNewCensorshipManagerAccountCommandHandler(_accountRepositoryMock.Object, _emailServiceMock.Object);
-            _validator = new CreateNewCensorshipManagerAccountCommandValidation();
+            _validator = new CreateNewCensorshipManagerValidation();
         }
         [Fact]
         public async Task Handle_WhenEmailExists_ReturnsBadRequest()
