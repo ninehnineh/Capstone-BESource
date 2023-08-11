@@ -99,6 +99,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries
 using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Queries.GetVnPayById;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.DisableParkingSlotByDate.Model;
 using Parking.FindingSlotManagement.Application.Features.Customer.Account.AccountManagement.Queries.GetBanCountByUserId;
+using Parking.FindingSlotManagement.Application.Features.Admin.Wallet.Queries.GetWalletForAdmin;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -369,6 +370,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
 
             #region Wallet Mapping
             CreateMap<Wallet, GetWalletByUserIdResponse>().ReverseMap();
+            CreateMap<Wallet, GetWalletForAdminResponse>().ReverseMap();
             #endregion
 
             #region Bill Mapping
