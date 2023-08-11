@@ -38,17 +38,18 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
         {
             var bookingId = request.BookingId;
             var checkInTime = DateTime.UtcNow.AddHours(7);
+            DateTime roundedTime = checkInTime.Date.AddHours(checkInTime.Hour);
             try
             {
                 
-                var include = new List<Expression<Func<Domain.Entities.Booking, object>>>
+                /*var include = new List<Expression<Func<Domain.Entities.Booking, object>>>
                 {
                     x => x.User,
                     x => x.BookingDetails
                 };
-
+*/
                 var booking = await _bookingRepository
-                    .GetItemWithCondition(x => x.BookingId == bookingId, include, false);
+                    .GetBookingDetailsByBookingIdMethod(bookingId);
 
                 if (booking == null)
                 {
@@ -92,7 +93,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                                 Success = false
                             };
                         }
-                        var getListPreviousSlot = await _timeSlotRepository.GetAllItemWithCondition(x => x.TimeSlotId >= (booking.BookingDetails.FirstOrDefault().TimeSlotId - totalHoursEarly) && x.TimeSlotId < booking.BookingDetails.FirstOrDefault().TimeSlotId);
+                        //var getListPreviousSlot = await _timeSlotRepository.GetAllItemWithCondition(x => x.TimeSlotId >= (booking.BookingDetails.FirstOrDefault().TimeSlotId - totalHoursEarly) && x.TimeSlotId < booking.BookingDetails.FirstOrDefault().TimeSlotId);
+                        var getListPreviousSlot = await _timeSlotRepository.GetAllItemWithCondition(x => booking.BookingDetails.FirstOrDefault().TimeSlot.ParkingSlotId == x.ParkingSlotId && roundedTime == x.StartTime);
                         var checkBooked = false;
                         foreach (var item in getListPreviousSlot)
                         {

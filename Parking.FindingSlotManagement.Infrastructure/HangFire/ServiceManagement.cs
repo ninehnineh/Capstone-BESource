@@ -77,6 +77,10 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     // bắn message, đơn của mày đã bị hủy + lý do
                     PushNotiToCustomerWhenOverLateAllowedTime(bookedBooking);
                     bookedBooking.User.BanCount += 1;
+                    if(bookedBooking.User.BanCount >= 2)
+                    {
+                        bookedBooking.User.IsActive = false;
+                    }
                     _context.SaveChanges();
                 }
                 else
