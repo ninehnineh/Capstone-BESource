@@ -1,9 +1,11 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Features.Customer.Authentication.AuthenticationManagement.Commands.CustomerRegister;
 using Parking.FindingSlotManagement.Application.Features.Customer.Authentication.AuthenticationManagement.Queries.CustomerLogin;
+using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Customer
@@ -13,10 +15,12 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
     public class AuthenticationCustomerController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IHubContext<MessageHub> _messageHub;
 
-        public AuthenticationCustomerController(IMediator mediator)
+        public AuthenticationCustomerController(IMediator mediator, IHubContext<MessageHub> messageHub)
         {
             _mediator = mediator;
+            _messageHub = messageHub;
         }
         /// <summary>
         /// API for Customer
@@ -44,6 +48,10 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
         /// <summary>
         /// API for Customer
         /// </summary>
+        /// /// <remarks>
+        /// SignalR: LoadCustomerAccountsInAdmin
+        /// </remarks>
+        /// 
         [HttpPost("register", Name = "CustomerRegister")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -57,6 +65,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
                 {
                     return StatusCode((int)res.StatusCode, res);
                 }
+                await _messageHub.Clients.All.SendAsync("LoadCustomerAccountsInAdmin");
                 return StatusCode((int)res.StatusCode, res);
             }
             catch (Exception ex)
