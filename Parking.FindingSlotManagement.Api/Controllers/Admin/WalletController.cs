@@ -23,7 +23,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// API For Customer
         /// </summary>
         /// 
-/*        [Authorize(Roles = "Admin")]*/
+        [Authorize(Roles = "Admin")]
         [HttpGet(Name = "GetWalletOfAdmin")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
