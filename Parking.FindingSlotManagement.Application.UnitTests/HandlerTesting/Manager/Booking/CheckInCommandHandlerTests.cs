@@ -71,10 +71,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 /* Other properties */
             };
 
-            _bookingRepositoryMock.Setup(repo => repo.GetItemWithCondition(
-                It.IsAny<Expression<Func<Domain.Entities.Booking, bool>>>(),
-                It.IsAny<List<Expression<Func<Domain.Entities.Booking, object>>>>(),
-                It.IsAny<bool>())).ReturnsAsync(existingBooking);
+            _bookingRepositoryMock.Setup(repo => repo.GetBookingDetailsByBookingIdMethod(bookingId)).ReturnsAsync(existingBooking);
 
 
 
@@ -108,10 +105,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 /* Other properties */
             };
 
-            _bookingRepositoryMock.Setup(repo => repo.GetItemWithCondition(
-                It.IsAny<Expression<Func<Domain.Entities.Booking, bool>>>(),
-                It.IsAny<List<Expression<Func<Domain.Entities.Booking, object>>>>(),
-                It.IsAny<bool>())).ReturnsAsync(existingBooking);
+            _bookingRepositoryMock.Setup(repo => repo.GetBookingDetailsByBookingIdMethod(bookingId)).ReturnsAsync(existingBooking);
 
             _conflictRequestRepositoryMock.Setup(repo => repo.GetItemWithCondition(
                 It.IsAny<Expression<Func<ConflictRequest, bool>>>(),null, true)).ReturnsAsync(existingConflictRequest);
@@ -146,10 +140,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 }
             };
 
-            _bookingRepositoryMock.Setup(repo => repo.GetItemWithCondition(
-                It.IsAny<Expression<Func<Domain.Entities.Booking, bool>>>(),
-                It.IsAny<List<Expression<Func<Domain.Entities.Booking, object>>>>(),
-                It.IsAny<bool>())).ReturnsAsync(booking);
+            _bookingRepositoryMock.Setup(repo => repo.GetBookingDetailsByBookingIdMethod(bookingId)).ReturnsAsync(booking);
 
 
 

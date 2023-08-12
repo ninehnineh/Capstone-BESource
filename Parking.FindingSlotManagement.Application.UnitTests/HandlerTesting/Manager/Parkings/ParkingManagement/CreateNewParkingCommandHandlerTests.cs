@@ -2,6 +2,7 @@
 using Moq;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.CreateNewParking;
+using Parking.FindingSlotManagement.Domain.Entities;
 using Shouldly;
 using System;
 using System.Collections.Generic;
@@ -66,9 +67,12 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             {
                 BusinessProfileId = 1,
                 UserId = 1, User = new Domain.Entities.User { UserId = 1 },
+                FeeId = 1
             };
             _businessProfileRepositoryMock.Setup(x => x.GetItemWithCondition(It.IsAny<Expression<Func<Domain.Entities.BusinessProfile, bool>>>(), null, true)).ReturnsAsync(businessExist);
 
+            var feeExist = new Fee { FeeId = 1, Name = "Cước phí mặc định doanh nghiệp", Price = 500000M, BusinessType = "Doanh nghiệp" };
+            _feeRepositoryMock.Setup(x => x.GetById(feeExist.FeeId)).ReturnsAsync(feeExist);
             // Act
             var response = await _handler.Handle(request, CancellationToken.None);
 
