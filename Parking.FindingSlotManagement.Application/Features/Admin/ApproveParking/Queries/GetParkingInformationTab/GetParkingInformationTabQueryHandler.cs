@@ -110,20 +110,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                     totalSlotBooked += lstParkingSlotHasBooked.Count();
                 }
                 entityRes.SlotHasBooked = totalSlotBooked;
-                if(!parkingExist.ApproveParkings.Any())
-                {
-                    entityRes.Images = null;
-                    return new ServiceResponse<GetParkingInformationTabResponse>
-                    {
-                        Data = entityRes,
-                        Message = "Thành công",
-                        Success = true,
-                        StatusCode = 200
-                    };
-                }
-                /*var approveParkingId = parkingExist.ApproveParkings.LastOrDefault().ApproveParkingId;*/
                 var lstImages = await _parkingSpotImageRepository.GetAllItemWithConditionByNoInclude(x => x.ParkingId == parkingExist.ParkingId);
-                if(lstImages == null)
+                if (lstImages == null)
                 {
                     entityRes.Images = null;
                     return new ServiceResponse<GetParkingInformationTabResponse>
@@ -134,7 +122,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                         StatusCode = 200
                     };
                 }
-                else if(!lstImages.Any())
+                else if (!lstImages.Any())
                 {
                     entityRes.Images = null;
                     return new ServiceResponse<GetParkingInformationTabResponse>
@@ -151,6 +139,19 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                     imgRes.Add(item.ImgPath);
                 }
                 entityRes.Images = imgRes;
+                if (!parkingExist.ApproveParkings.Any())
+                {
+                    return new ServiceResponse<GetParkingInformationTabResponse>
+                    {
+                        Data = entityRes,
+                        Message = "Thành công",
+                        Success = true,
+                        StatusCode = 200
+                    };
+                }
+                /*var approveParkingId = parkingExist.ApproveParkings.LastOrDefault().ApproveParkingId;*/
+                
+                
                 return new ServiceResponse<GetParkingInformationTabResponse>
                 {
                     Data = entityRes,
