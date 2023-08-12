@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetParkingById;
 using Parking.FindingSlotManagement.Application.Mapping;
 using System;
 using System.Collections.Generic;
@@ -91,6 +92,14 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                     parkingEntity.Code = "BX" + parkingEntity.ParkingId;
                     parkingEntity.Stars = (float)0.0;
                     await _parkingRepository.Save();
+                    return new ServiceResponse<int>
+                    {
+                        Data = parkingEntity.ParkingId,
+                        Message = "Thành công",
+                        Success = true,
+                        StatusCode = 201,
+                        Count = 0
+                    };
                 }
                 else if(feeExist.BusinessType.Equals("Doanh nghiệp"))
                 {
@@ -104,19 +113,22 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                     parkingEntity.Code = "BX" + parkingEntity.ParkingId;
                     parkingEntity.Stars = (float)0.0;
                     await _parkingRepository.Save();
+                    return new ServiceResponse<int>
+                    {
+                        Data = parkingEntity.ParkingId,
+                        Message = "Thành công",
+                        Success = true,
+                        StatusCode = 201,
+                        Count = 0
+                    };
                 }
 
-                
-                /*var managerExist = await _userRepository.GetById(checkBusinessExist.UserId);
-                managerExist.ParkingId = parkingEntity.ParkingId;
 
-                await _userRepository.Save();*/
                 return new ServiceResponse<int>
                 {
-                    Data = parkingEntity.ParkingId,
-                    Message = "Thành công",
-                    Success = true,
-                    StatusCode = 201,
+                    Message = "Có lỗi xảy ra",
+                    Success = false,
+                    StatusCode = 400,
                     Count = 0
                 };
             }

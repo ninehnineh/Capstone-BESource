@@ -19,6 +19,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
         private readonly Mock<IBusinessProfileRepository> _businessProfileRepositoryMock;
         private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<IApproveParkingRepository> _approveParkingRepositoryMock;
+        private readonly Mock<IFeeRepository> _feeRepositoryMock;
         private readonly CreateNewParkingCommandValidation _validator;
 
         public CreateNewParkingCommandHandlerTests()
@@ -28,7 +29,8 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             _approveParkingRepositoryMock = new Mock<IApproveParkingRepository>();
             _businessProfileRepositoryMock = new Mock<IBusinessProfileRepository>();
             _userRepositoryMock = new Mock<IUserRepository>();
-            _handler = new CreateNewParkingCommandHandler(_parkingRepositoryMock.Object, _businessProfileRepositoryMock.Object, _userRepositoryMock.Object, _approveParkingRepositoryMock.Object);
+            _feeRepositoryMock = new Mock<IFeeRepository>();
+            _handler = new CreateNewParkingCommandHandler(_parkingRepositoryMock.Object, _businessProfileRepositoryMock.Object, _userRepositoryMock.Object, _approveParkingRepositoryMock.Object, _feeRepositoryMock.Object);
         }
         [Fact]
         public async Task Handle_WhenCreatedSuccessfully_ReturnsCreated()
