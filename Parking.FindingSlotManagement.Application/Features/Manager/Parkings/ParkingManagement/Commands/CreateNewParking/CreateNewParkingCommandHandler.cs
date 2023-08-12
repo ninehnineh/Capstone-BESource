@@ -16,6 +16,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
         private readonly IBusinessProfileRepository _businessProfileRepository;
         private readonly IUserRepository _userRepository;
         private readonly IApproveParkingRepository _approveParkingRepository;
+        private readonly IFeeRepository _feeRepository;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MappingProfile());
@@ -24,12 +25,13 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
         public CreateNewParkingCommandHandler(IParkingRepository parkingRepository,
             IBusinessProfileRepository businessProfileRepository,
             IUserRepository userRepository,
-            IApproveParkingRepository approveParkingRepository)
+            IApproveParkingRepository approveParkingRepository, IFeeRepository feeRepository)
         {
             _parkingRepository = parkingRepository;
             _businessProfileRepository = businessProfileRepository;
             _userRepository = userRepository;
             _approveParkingRepository = approveParkingRepository;
+            _feeRepository = feeRepository;
         }
         public async Task<ServiceResponse<int>> Handle(CreateNewParkingCommand request, CancellationToken cancellationToken)
         {
@@ -57,7 +59,41 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                         StatusCode = 200
                     };
                 }
-
+                var countParking = await _parkingRepository.GetAllItemWithConditionByNoInclude(x => x.BusinessId == checkBusinessExist.BusinessProfileId);
+                var feeExist = await _feeRepository.GetById(checkBusinessExist.FeeId);
+                if(feeExist == null)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Doanh nghiệp chưa áp dụng gói",
+                        Success = false,
+                        StatusCode = 404
+                    };
+                }
+                if(feeExist.BusinessType.Equals("Tư nhân"))
+                {
+                    if(countParking.Count() > 1)
+                    {
+                        return new ServiceResponse<int>
+                        {
+                            Message = "Bạn không thể tạo thêm bãi xe. Do bạn đã sử dụng gói tư nhân chỉ được tạo tối đa 1 bãi xe.",
+                            Success = false,
+                            StatusCode = 400
+                        };
+                    }
+                }
+                else if(feeExist.BusinessType.Equals("Doanh nghiệp"))
+                {
+                    if (countParking.Count() > 5)
+                    {
+                        return new ServiceResponse<int>
+                        {
+                            Message = "Bạn không thể tạo thêm bãi xe. Do bạn đã sử dụng gói tư nhân chỉ được tạo tối đa 1 bãi xe.",
+                            Success = false,
+                            StatusCode = 400
+                        };
+                    }
+                }
 
                 var _mapper = config.CreateMapper();
                 var parkingEntity = _mapper.Map<Domain.Entities.Parking>(request);
