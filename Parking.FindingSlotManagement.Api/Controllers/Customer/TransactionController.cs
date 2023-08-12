@@ -20,7 +20,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
             _mediator = mediator;
         }
         /// <summary>
-        /// API For Customer
+        /// API For Customer, Manager
         /// </summary>
         /// 
         [Authorize(Roles = "Customer,Manager")]
