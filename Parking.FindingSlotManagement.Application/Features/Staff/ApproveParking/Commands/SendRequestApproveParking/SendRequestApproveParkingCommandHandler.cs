@@ -12,10 +12,12 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
     public class SendRequestApproveParkingCommandHandler : IRequestHandler<SendRequestApproveParkingCommand, ServiceResponse<string>>
     {
         private readonly IApproveParkingRepository _approveParkingRepository;
+        private readonly IParkingHasPriceRepository _parkingHasPriceRepository;
 
-        public SendRequestApproveParkingCommandHandler(IApproveParkingRepository approveParkingRepository)
+        public SendRequestApproveParkingCommandHandler(IApproveParkingRepository approveParkingRepository, IParkingHasPriceRepository parkingHasPriceRepository)
         {
             _approveParkingRepository = approveParkingRepository;
+            _parkingHasPriceRepository = parkingHasPriceRepository;
         }
         public async Task<ServiceResponse<string>> Handle(SendRequestApproveParkingCommand request, CancellationToken cancellationToken)
         {
@@ -38,6 +40,16 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
                         Message = "Không thể gửi yêu cầu duyệt.",
                         Success = false,
                         StatusCode = 400
+                    };
+                }
+                var parkingHasPriceExist = await _parkingHasPriceRepository.GetItemWithCondition(x => x.ParkingId == checkRequestExist.ParkingId);
+                if(parkingHasPriceExist == null)
+                {
+                    return new ServiceResponse<string>
+                    {
+                        Message = "Bãi chưa áp dụng gói cước nên không thể gửi duyệt.",
+                        Success = false,
+                        StatusCode = 404
                     };
                 }
                 checkRequestExist.Status = ApproveParkingStatus.Chờ_duyệt.ToString();

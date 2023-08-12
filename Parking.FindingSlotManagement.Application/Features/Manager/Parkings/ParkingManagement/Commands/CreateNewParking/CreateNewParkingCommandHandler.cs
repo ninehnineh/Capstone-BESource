@@ -81,30 +81,32 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                             StatusCode = 400
                         };
                     }
+                    var _mapper = config.CreateMapper();
+                    var parkingEntity = _mapper.Map<Domain.Entities.Parking>(request);
+                    parkingEntity.BusinessId = checkBusinessExist.BusinessProfileId;
+                    parkingEntity.IsActive = false;
+                    parkingEntity.IsFull = false;
+                    parkingEntity.IsAvailable = false;
+                    await _parkingRepository.Insert(parkingEntity);
+                    parkingEntity.Code = "BX" + parkingEntity.ParkingId;
+                    parkingEntity.Stars = (float)0.0;
+                    await _parkingRepository.Save();
                 }
                 else if(feeExist.BusinessType.Equals("Doanh nghiệp"))
                 {
-                    if (countParking.Count() > 5)
-                    {
-                        return new ServiceResponse<int>
-                        {
-                            Message = "Bạn không thể tạo thêm bãi xe. Do bạn đã sử dụng gói tư nhân chỉ được tạo tối đa 1 bãi xe.",
-                            Success = false,
-                            StatusCode = 400
-                        };
-                    }
+                    var _mapper = config.CreateMapper();
+                    var parkingEntity = _mapper.Map<Domain.Entities.Parking>(request);
+                    parkingEntity.BusinessId = checkBusinessExist.BusinessProfileId;
+                    parkingEntity.IsActive = false;
+                    parkingEntity.IsFull = false;
+                    parkingEntity.IsAvailable = false;
+                    await _parkingRepository.Insert(parkingEntity);
+                    parkingEntity.Code = "BX" + parkingEntity.ParkingId;
+                    parkingEntity.Stars = (float)0.0;
+                    await _parkingRepository.Save();
                 }
 
-                var _mapper = config.CreateMapper();
-                var parkingEntity = _mapper.Map<Domain.Entities.Parking>(request);
-                parkingEntity.BusinessId = checkBusinessExist.BusinessProfileId;
-                parkingEntity.IsActive = false;
-                parkingEntity.IsFull = false;
-                parkingEntity.IsAvailable = false;
-                await _parkingRepository.Insert(parkingEntity);
-                parkingEntity.Code = "BX" + parkingEntity.ParkingId;
-                parkingEntity.Stars = (float)0.0;
-                await _parkingRepository.Save();
+                
                 /*var managerExist = await _userRepository.GetById(checkBusinessExist.UserId);
                 managerExist.ParkingId = parkingEntity.ParkingId;
 
