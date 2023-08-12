@@ -89,12 +89,16 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             }
         }
 
-        public async Task<string> DeleteJob(string methodName, int parkingId, DateTime disableDate)
+        public async Task<string> DeleteScheduledJob(int parkingId, DateTime disableDate)
         {
+            var methodName = "DisableParkingByDate";
             try
             {
                 var result = "";
-                var query = "DELETE FROM HangFire.Job WHERE JSON_VALUE(HangFire.Job.InvocationData, '$.m') = @MethodName AND JSON_VALUE(HangFire.Job.Arguments, '$[0]') = @ParkingId AND HangFire.Job.Arguments LIKE '%' + @DisableDate + '%'";
+                var query = "DELETE FROM HangFire.Job " +
+                            "WHERE JSON_VALUE(HangFire.Job.InvocationData, '$.m') = @MethodName AND " +
+                                    "JSON_VALUE(HangFire.Job.Arguments, '$[0]') = @ParkingId AND " + 
+                                    "HangFire.Job.Arguments LIKE '%' + @DisableDate + '%'";
 
                 using (var connection = new SqlConnection(connectionString))
                 {
@@ -122,7 +126,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             }
             catch (System.Exception ex)
             {
-                throw new Exception("Get Tao Lao" + ex.Message);
+                throw new Exception("Error at DeleteScheduledJob: Message " + ex.Message);
             }
         }
 

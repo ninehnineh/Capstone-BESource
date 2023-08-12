@@ -11,6 +11,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         Task<string> DeleteJob(int bookingId, string? methodName);
         Task<string> DeleteJob(int bookingId);
         Task<IEnumerable<Job>> GetHistoryDisableParking(int parkingId);
-        Task<string> DeleteJob(string methodName, int parkingId, DateTime disableDate);
+        Task<string> DeleteScheduledJob(int parkingId, DateTime disableDate);
     }
 }
