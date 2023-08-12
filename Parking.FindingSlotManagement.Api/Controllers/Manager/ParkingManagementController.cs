@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.EnableParking;
+using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.CancelDisableScheduledParking;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.ChangeStatusFull;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.CreateNewParking;
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.DisableOrEnableParking;
@@ -325,6 +326,24 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 
         [HttpPut("disable-parking-by-date")]
         public async Task<ActionResult<ServiceResponse<string>>> DisableByDate([FromBody] DisableParkingByDateCommand command)
+        {
+            try
+            {
+                var res = await _mediator.Send(command);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return NoContent();
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        [HttpDelete("cancel-disable-scheduled-parking")]
+        public async Task<ActionResult<ServiceResponse<string>>> CancelDisableScheduledParking( [FromBody] CancelDisableScheduledParkingCommand command)
         {
             try
             {

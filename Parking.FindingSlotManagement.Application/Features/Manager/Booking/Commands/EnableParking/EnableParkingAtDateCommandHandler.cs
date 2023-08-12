@@ -37,7 +37,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                 else if (hasRow)
                 {
                     await parkingRepository.EnableDisableParkingById(parkingId, disableDate);
-                    await hangfireRepository.DeleteJob("DisableParkingByDate", parkingId, disableDate);
+                    // await hangfireRepository.DeleteJob("DisableParkingByDate", parkingId, disableDate);
                 }
 
                 return new ServiceResponse<string>

@@ -13,5 +13,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         Task<bool> isExists(ParkingSlotDTO parkingSlotDTO);
         Task DisableParkingSlotWhenAllTimeFree(int parkingSlotId);
         Task DisableParkingSlotWhenSomeTimeBooked(int parkingSlotId);
+        Task EnableParkingSlot(int parkingSlotId);
     }
 }

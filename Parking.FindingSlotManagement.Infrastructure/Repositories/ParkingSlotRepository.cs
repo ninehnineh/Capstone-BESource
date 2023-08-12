@@ -53,6 +53,28 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             }
         }
 
+        public async Task EnableParkingSlot(int parkingSlotId)
+        {
+            try
+            {
+                var disableParkingSlot = await _dbContext.ParkingSlots
+                    .Include(x => x.TimeSlots)
+                    .FirstOrDefaultAsync(x => x.ParkingSlotId == parkingSlotId);
+
+                disableParkingSlot.IsAvailable = true;
+                var timeSlot =  disableParkingSlot.TimeSlots;
+                foreach (var time in timeSlot)
+                {
+                    time.Status = TimeSlotStatus.Free.ToString();
+                }
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at EnableParkingSlot: Message {ex.Message}");
+            }
+        }
+
         public async Task<bool> isExists(ParkingSlotDTO parkingSlotDTO)
         {
             var slotNameExist = await _dbContext.ParkingSlots
@@ -64,6 +86,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             return slotNameExist;
         }
 
+        
         // public async Task<List<Domain.Entities.ParkingSlot>> GetParkingSlotsByParkingId(int parkingId)
         // {
         //     try

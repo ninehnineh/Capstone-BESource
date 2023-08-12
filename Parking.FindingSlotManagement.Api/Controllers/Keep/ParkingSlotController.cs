@@ -12,6 +12,7 @@ using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.ChangeS
 using Parking.FindingSlotManagement.Application.Features.Keeper.Queries.GetAvailableSlotByFloorIdVer2;
 using Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots.Commands.DisableParkingSlot;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Commands.DisableParkingByDate;
+using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.EnableParkingSlot;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Keep
 {
@@ -124,7 +125,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Keep
             }
             catch (Exception ex)
             {
-              throw new Exception(ex.Message);
+                throw new Exception(ex.Message);
             }
         }
 
@@ -142,7 +143,26 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Keep
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error at Disable: " + ex.Message);
+                throw new Exception($"Error at Disable slot: " + ex.Message);
+            }
+        }
+
+        [HttpPut("enable")]
+        public async Task<ActionResult<ServiceResponse<string>>> Enable( [FromBody] EnableParkingSlotCommand command)
+        {
+            try
+            {
+                var res = await _mediator.Send(command);
+                if (res.Message != "Thành công")
+                {
+                    return StatusCode((int)res.StatusCode, res);
+                }
+                return NoContent();
+            }
+            catch (System.Exception ex)
+            {
+
+                throw new Exception($"Error at Enable slot: " + ex.Message);
             }
         }
     }

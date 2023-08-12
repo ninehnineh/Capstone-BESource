@@ -93,6 +93,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots
                         //     await transactionRepository.Save();
                         // }
                     }
+                    // Bắn message
                     await parkingSlotRepository.DisableParkingSlotWhenAllTimeFree(parkingSlotId);
                     await timeSlotRepository.DisableTimeSlot(parkingSlotId);
                 }

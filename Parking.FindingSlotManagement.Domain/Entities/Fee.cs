@@ -12,6 +12,7 @@ namespace Parking.FindingSlotManagement.Domain.Entities
         public string? BusinessType { get; set; }
         public decimal Price { get; set; }
         public string? Name { get; set; }
+        public string NumberOfParking { get; set; }
 
         public ICollection<BusinessProfile> BusinessProfiles { get; set; }
     }
