@@ -19,7 +19,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Que
         public string CustomerAvatar { get; set; }
         public string? GuestName { get; set; }
         public string? GuestPhone { get; set; }
-        public decimal? ActualPrice { get; set; }
+        public decimal UnPaidMoney { get; set; }
         public decimal? TotalPrice { get; set; }
         public string ParkingSlotName { get; set; }
         public string? FloorName { get; set; }
