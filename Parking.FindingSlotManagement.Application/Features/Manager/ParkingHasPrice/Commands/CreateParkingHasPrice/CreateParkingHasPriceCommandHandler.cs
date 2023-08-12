@@ -58,7 +58,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasP
                         StatusCode = 200
                     };
                 }
-                if (checkParkingExist.IsActive == false)
+/*                if (checkParkingExist.IsActive == false)
                 {
                     return new ServiceResponse<int>
                     {
@@ -66,7 +66,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingHasP
                         StatusCode = 400,
                         Success = false
                     };
-                }
+                }*/
                 if (checkParkingPriceExist.IsActive == false)
                 {
                     return new ServiceResponse<int>
