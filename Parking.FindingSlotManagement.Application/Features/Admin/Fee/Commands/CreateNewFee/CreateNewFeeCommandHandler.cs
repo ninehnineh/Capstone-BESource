@@ -27,7 +27,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Fee.Commands.
             {
                 var _mapper = config.CreateMapper();
                 var entity = _mapper.Map<Domain.Entities.Fee>(request);
-                entity.NumberOfParking = "Unlimited";
                 await _feeRepository.Insert(entity);
                 return new ServiceResponse<int>
                 {
