@@ -164,8 +164,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                             else
                             {
                                 actualPriceLate += (decimal)penaltyPrice;
-                                var penaltyTime = checkOutTime.Hour - endTimeBooking.Hour;
-                                var step = penaltyTime / (int)penaltyPriceStepTime;
+                                var penaltyTime = checkOutTime - endTimeBooking;
+                                var step = penaltyTime.Hours / (int)penaltyPriceStepTime;
                                 actualPriceLate += (step * (decimal)penaltyPrice);
                             }
                         }
@@ -268,8 +268,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                             else
                             {
                                 actualPriceLate += (decimal)penaltyPrice;
-                                var penaltyTime = checkOutTime.Hour - endTimeBooking.Hour;
-                                var step = penaltyTime / (int)penaltyPriceStepTime;
+                                var penaltyTime = checkOutTime - endTimeBooking;
+                                var step = penaltyTime.Hours / (int)penaltyPriceStepTime;
                                 actualPriceLate += (step * (decimal)penaltyPrice);
                             }
                         }
