@@ -58,11 +58,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Account.Reg
                     UserId = userEntity.UserId
                 };
                 await _walletRepository.Insert(entityWallet);
-                businessProfileEntity.UserId = userEntity.UserId;
-                await _businessProfileRepository.Insert(businessProfileEntity);
                 var feeExist = await _feeRepository.GetItemWithCondition(x => x.FeeId == businessProfileEntity.FeeId);
                 var getUser = await _userRepository.GetItemWithCondition(x => x.UserId == userEntity.UserId);
-                if(feeExist == null)
+                if (feeExist == null)
                 {
                     return new ServiceResponse<int>
                     {
@@ -71,6 +69,17 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Account.Reg
                         StatusCode = 200
                     };
                 }
+                if(feeExist.FeeId == 1)
+                {
+                    businessProfileEntity.Type = "Tư nhân";
+                }
+                else if(feeExist.FeeId == 2)
+                {
+                    businessProfileEntity.Type = "Doanh nghiệp";
+                }
+                businessProfileEntity.UserId = userEntity.UserId;
+                await _businessProfileRepository.Insert(businessProfileEntity);
+                
                 Bill entityBill = new()
                 {
                     Time = DateTime.UtcNow.AddHours(7),
