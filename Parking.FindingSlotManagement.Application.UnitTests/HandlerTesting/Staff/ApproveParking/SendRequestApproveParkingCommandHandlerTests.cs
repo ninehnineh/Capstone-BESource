@@ -14,13 +14,15 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Sta
     public class SendRequestApproveParkingCommandHandlerTests
     {
         private readonly Mock<IApproveParkingRepository> _approveParkingRepositoryMock;
+        private readonly Mock<IParkingHasPriceRepository> _parkingHasPriceRepositoryMock;
 
         private readonly SendRequestApproveParkingCommandHandler _commandHandler;
 
         public SendRequestApproveParkingCommandHandlerTests()
         {
             _approveParkingRepositoryMock = new Mock<IApproveParkingRepository>();
-            _commandHandler = new SendRequestApproveParkingCommandHandler(_approveParkingRepositoryMock.Object);
+            _parkingHasPriceRepositoryMock = new Mock<IParkingHasPriceRepository>();
+            _commandHandler = new SendRequestApproveParkingCommandHandler(_approveParkingRepositoryMock.Object, _parkingHasPriceRepositoryMock.Object);
         }
         [Fact]
         public async Task Handle_ApproveParkingRequestNotFound_ReturnsErrorResponse()
