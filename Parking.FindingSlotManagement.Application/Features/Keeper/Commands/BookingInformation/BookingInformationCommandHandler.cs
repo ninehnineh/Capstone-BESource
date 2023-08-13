@@ -204,6 +204,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                             {
                                 money += (decimal)item.ExtraFee * earlyTimeHour;
                             }
+                            else if(item.StartTime <= TimeSpan.FromHours(checkinTime.Value.Hour) &&
+                                TimeSpan.FromHours(checkinTime.Value.Hour) > item.EndTime && item.StartTime > item.EndTime)
+                            {
+                                money += (decimal)item.ExtraFee * earlyTimeHour;
+                            }
                         }
 
                         Transaction bp = new Transaction
@@ -237,6 +242,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                         {
                             if (item.StartTime <= TimeSpan.FromHours(checkinTime.Value.Hour) &&
                                 TimeSpan.FromHours(checkinTime.Value.Hour) <= item.EndTime)
+                            {
+                                money += (decimal)item.ExtraFee * earlyTimeHour;
+                            }
+                            else if (item.StartTime <= TimeSpan.FromHours(checkinTime.Value.Hour) &&
+                                TimeSpan.FromHours(checkinTime.Value.Hour) > item.EndTime && item.StartTime > item.EndTime)
                             {
                                 money += (decimal)item.ExtraFee * earlyTimeHour;
                             }
