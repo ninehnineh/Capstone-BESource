@@ -301,7 +301,13 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             }
 
             decimal expectedPrice = await CaculateExpectedPrice(request, parkingId, trafficid);
-
+            List<Expression<Func<Domain.Entities.Parking, object>>> includesxx = new()
+                {
+                    x => x.BusinessProfile
+                };
+            var parkingExist = await _parkingRepository.GetItemWithCondition(x => x.ParkingId == parkingId, includesxx);
+            var managerWallet = await _userRepository
+                .GetItemWithCondition(x => x.UserId == parkingExist.BusinessProfile.UserId && x.RoleId == MANAGER, includesWallet, false);
             if (user.Wallet.Balance < expectedPrice)
             {
                 return new ServiceResponse<int>
@@ -313,22 +319,27 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             }
             else
             {
-                List<Expression<Func<Domain.Entities.Parking, object>>> includesxx = new()
-                {
-                    x => x.BusinessProfile
-                };
-                var parkingExist = await _parkingRepository.GetItemWithCondition(x => x.ParkingId == parkingId, includesxx);
-                var managerWallet = await _userRepository
-                    .GetItemWithCondition(x => x.UserId == parkingExist.BusinessProfile.UserId && x.RoleId == MANAGER, includesWallet, false);
+               
 
                 managerWallet.Wallet!.Balance += expectedPrice;
                 user.Wallet.Balance -= expectedPrice;
+                
                 await _walletRepository.Save();
             }
 
             entity.TotalPrice = expectedPrice;
             entity.IsRating = false;
             await _bookingRepository.Insert(entity);
+
+            Domain.Entities.Transaction transactionForManager = new()
+            {
+                Price = expectedPrice,
+                Status = BookingPaymentStatus.Da_thanh_toan.ToString(),
+                PaymentMethod = Domain.Enum.PaymentMethod.thanh_toan_online.ToString(),
+                Description = "Nhận tiền thanh toán từ đơn đặt: Có Id: " + entity.BookingId,
+                WalletId = managerWallet.Wallet!.WalletId
+            };
+            await _transactionRepository.Insert(transactionForManager);
 
             var linkQRImage = await UploadQRImagess(entity.BookingId);
             var currentBooking = await _bookingRepository
