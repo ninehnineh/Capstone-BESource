@@ -73,6 +73,27 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                 }
                 if(feeExist.BusinessType.Equals("Tư nhân"))
                 {
+                    if(countParking == null)
+                    {
+                        var _mapper = config.CreateMapper();
+                        var parkingEntity = _mapper.Map<Domain.Entities.Parking>(request);
+                        parkingEntity.BusinessId = checkBusinessExist.BusinessProfileId;
+                        parkingEntity.IsActive = false;
+                        parkingEntity.IsFull = false;
+                        parkingEntity.IsAvailable = false;
+                        await _parkingRepository.Insert(parkingEntity);
+                        parkingEntity.Code = "BX" + parkingEntity.ParkingId;
+                        parkingEntity.Stars = (float)0.0;
+                        await _parkingRepository.Save();
+                        return new ServiceResponse<int>
+                        {
+                            Data = parkingEntity.ParkingId,
+                            Message = "Thành công",
+                            Success = true,
+                            StatusCode = 201,
+                            Count = 0
+                        };
+                    }
                     if(countParking.Count() > 1)
                     {
                         return new ServiceResponse<int>
@@ -82,24 +103,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                             StatusCode = 400
                         };
                     }
-                    var _mapper = config.CreateMapper();
-                    var parkingEntity = _mapper.Map<Domain.Entities.Parking>(request);
-                    parkingEntity.BusinessId = checkBusinessExist.BusinessProfileId;
-                    parkingEntity.IsActive = false;
-                    parkingEntity.IsFull = false;
-                    parkingEntity.IsAvailable = false;
-                    await _parkingRepository.Insert(parkingEntity);
-                    parkingEntity.Code = "BX" + parkingEntity.ParkingId;
-                    parkingEntity.Stars = (float)0.0;
-                    await _parkingRepository.Save();
-                    return new ServiceResponse<int>
-                    {
-                        Data = parkingEntity.ParkingId,
-                        Message = "Thành công",
-                        Success = true,
-                        StatusCode = 201,
-                        Count = 0
-                    };
+                    
                 }
                 else if(feeExist.BusinessType.Equals("Doanh nghiệp"))
                 {
