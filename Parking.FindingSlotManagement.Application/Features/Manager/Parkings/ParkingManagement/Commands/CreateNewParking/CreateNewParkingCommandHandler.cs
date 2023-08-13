@@ -94,7 +94,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                             Count = 0
                         };
                     }
-                    if(countParking.Count() > 1)
+                    if(countParking.Count() >= 1)
                     {
                         return new ServiceResponse<int>
                         {
