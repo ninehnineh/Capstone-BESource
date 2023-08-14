@@ -41,7 +41,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Transactio
                         StatusCode = 404
                     };
                 }
-                var entityRes = _mapper.Map<IEnumerable<GetAllTransactionByUserIdResponse>>(userExist.Wallet.Transactions);
+                var entityRes = _mapper.Map<IEnumerable<GetAllTransactionByUserIdResponse>>(userExist.Wallet.Transactions.OrderByDescending(x => x.TransactionId));
                 return new ServiceResponse<IEnumerable<GetAllTransactionByUserIdResponse>>
                 {
                     Message = "Thành công",
