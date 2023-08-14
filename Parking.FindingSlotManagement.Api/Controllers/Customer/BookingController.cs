@@ -96,7 +96,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
         /// API For Customer
         /// </summary>
         /// <remark>
-        /// SignalR: CustomerCreateBookingSuccess
+        /// SignalR: CustomerCreateBookingSuccess, LoadHistoryInManager
         /// </remark>
         [HttpPost]
         public async Task<ActionResult<ServiceResponse<int>>> CreateBooking([FromBody] CreateBookingCommand command)
@@ -107,6 +107,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
                 if (res.Message == "Thành công")
                 {
                     await _hubContext.Clients.All.SendAsync("CustomerCreateBookingSuccess");
+                    await _hubContext.Clients.All.SendAsync("LoadHistoryInManager");
                     return StatusCode((int)res.StatusCode, res);
                 }
                 return StatusCode((int)res.StatusCode, res);
