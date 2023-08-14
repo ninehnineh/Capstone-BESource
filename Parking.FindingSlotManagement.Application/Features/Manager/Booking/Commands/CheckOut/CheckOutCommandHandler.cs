@@ -190,18 +190,27 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                 }
                 var userDiviceToken = booking.User!.Devicetoken;
 
-
-
-                var pushNotificationMobile = new PushNotificationMobileModel
+                if (userDiviceToken == null)
                 {
-                    Title = titleCustomer,
-                    Message = bodyCustomer,
-                    TokenMobile = userDiviceToken,
-                };
+                    return new ServiceResponse<string>
+                    {
+                        Message = "Thành công",
+                        StatusCode = 201,
+                        Success = true,
+                    };
+                }
+                else
+                {
+                    var pushNotificationMobile = new PushNotificationMobileModel
+                    {
+                        Title = titleCustomer,
+                        Message = bodyCustomer,
+                        TokenMobile = userDiviceToken,
+                    };
 
-                await _fireBaseMessageServices
-                    .SendNotificationToMobileAsync(pushNotificationMobile);
-
+                    await _fireBaseMessageServices
+                        .SendNotificationToMobileAsync(pushNotificationMobile);
+                }
                 return new ServiceResponse<string>
                 {
                     StatusCode = 204,
