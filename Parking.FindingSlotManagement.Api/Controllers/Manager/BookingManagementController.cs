@@ -107,7 +107,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
                 throw new Exception(ex.Message);
             }
         }
-
+        /// <remarks>
+        /// SignalR: LoadHistoryInManager
+        /// </remarks>
         [HttpPut("check-out")]
         public async Task<ActionResult<ServiceResponse<string>>> CheckOut([FromBody] CheckOutCommand command)
         {
@@ -116,6 +118,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
                 var res = await _mediator.Send(command);
                 if (res.Message == "Thành công")
                 {
+                    await _hubContext.Clients.All.SendAsync("LoadHistoryInManager");
                     return NoContent();
                 }
                 return StatusCode((int)res.StatusCode, res);
