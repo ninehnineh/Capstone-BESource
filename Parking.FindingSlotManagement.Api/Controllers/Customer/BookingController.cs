@@ -161,6 +161,9 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
         /// <summary>
         /// API For Customer
         /// </summary>
+        /// /// <remark>
+        /// SignalR: LoadHistoryInManager
+        /// </remark>
         [HttpPost("cancel-booking")]
         public async Task<ActionResult<ServiceResponse<string>>> CancelBooking([FromBody] CancelBookingCommand command)
         {
@@ -169,6 +172,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
                 var res = await _mediator.Send(command);
                 if (res.Message == "Thành công")
                 {
+                    await _hubContext.Clients.All.SendAsync("LoadHistoryInManager");
                     return StatusCode((int)res.StatusCode, res);
                 }
                 return StatusCode((int)res.StatusCode, res);
