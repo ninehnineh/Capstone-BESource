@@ -336,7 +336,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 Price = expectedPrice,
                 Status = BookingPaymentStatus.Da_thanh_toan.ToString(),
                 PaymentMethod = Domain.Enum.PaymentMethod.thanh_toan_online.ToString(),
-                Description = "Nhận tiền thanh toán từ đơn đặt: Có Id: " + entity.BookingId,
+                Description = "Nhận tiền thanh toán từ đơn đặt có Mã: " + entity.BookingId,
                 WalletId = managerWallet.Wallet!.WalletId
             };
             await _transactionRepository.Insert(transactionForManager);

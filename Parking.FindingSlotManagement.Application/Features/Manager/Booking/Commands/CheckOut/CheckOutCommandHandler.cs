@@ -129,7 +129,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                         Price = moneyCustomerMustPayAfterCheckOut,
                         Status = BookingPaymentStatus.Da_thanh_toan.ToString(),
                         PaymentMethod = PaymentMethod.thanh_toan_online.ToString(),
-                        Description = "Nhận tiền thanh toán từ đơn đặt: Có Id: " +booking.BookingId+" Tên khách hàng: "+ booking.User.Name,
+                        Description = "Nhận tiền thanh toán từ đơn đặt có Mã: " + booking.BookingId,
                         WalletId = parking.BusinessProfile.User.Wallet.WalletId
                     };
                     await _transactionRepository.Insert(transactionForManager);
@@ -163,7 +163,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                         Price = moneyCustomerMustPayAfterCheckOut,
                         Status = BookingPaymentStatus.Da_thanh_toan.ToString(),
                         PaymentMethod = PaymentMethod.thanh_toan_tien_mat.ToString(),
-                        Description = "Nhận tiền thanh toán từ đơn đặt: Có Id: " + booking.BookingId,
+                        Description = "Nhận tiền thanh toán từ đơn đặt có Mã: " + booking.BookingId,
                         WalletId = parking.BusinessProfile.User.Wallet.WalletId
                     };
                     await _transactionRepository.Insert(transactionForManager);
