@@ -161,7 +161,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
         /// <summary>
         /// API For Customer
         /// </summary>
-        /// /// <remark>
+        /// <remark>
         /// SignalR: LoadHistoryInManager
         /// </remark>
         [HttpPost("cancel-booking")]
@@ -172,6 +172,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Customer
                 var res = await _mediator.Send(command);
                 if (res.Message == "Thành công")
                 {
+                    await _hubContext.Clients.All.SendAsync("CustomerCreateBookingSuccess");
                     await _hubContext.Clients.All.SendAsync("LoadHistoryInManager");
                     return StatusCode((int)res.StatusCode, res);
                 }
