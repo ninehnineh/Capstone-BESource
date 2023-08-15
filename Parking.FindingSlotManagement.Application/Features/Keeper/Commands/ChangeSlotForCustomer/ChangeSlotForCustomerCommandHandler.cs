@@ -16,18 +16,21 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Cha
         private readonly IBookingRepository _bookingRepository;
         private readonly IBookingDetailsRepository _bookingDetailsRepository;
         private readonly ITimeSlotRepository _timeSlotRepository;
+        private readonly IConflictRequestRepository _conflictRequestRepository;
 
-        public ChangeSlotForCustomerCommandHandler(IBookingRepository bookingRepository, IBookingDetailsRepository bookingDetailsRepository, ITimeSlotRepository timeSlotRepository)
+        public ChangeSlotForCustomerCommandHandler(IBookingRepository bookingRepository, IBookingDetailsRepository bookingDetailsRepository, ITimeSlotRepository timeSlotRepository, IConflictRequestRepository conflictRequestRepository)
         {
             _bookingRepository = bookingRepository;
             _bookingDetailsRepository = bookingDetailsRepository;
             _timeSlotRepository = timeSlotRepository;
+            _conflictRequestRepository = conflictRequestRepository;
         }
         public async Task<ServiceResponse<string>> Handle(ChangeSlotForCustomerCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 var bookingExist = await _bookingRepository.GetById(request.BookingId);
+                
                 if (bookingExist == null)
                 {
                     return new ServiceResponse<string>
@@ -37,6 +40,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Cha
                         StatusCode = 404
                     };
                 }
+                
                 List<int> lstTsId = new();
                 var oldbookingDetail = await _bookingDetailsRepository.GetParkingSlotIdByBookingDetail(request.BookingId);
                 if (oldbookingDetail == null)
@@ -96,7 +100,9 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Cha
                     }
                     await _timeSlotRepository.Save();
                 }
-
+                var conflictRequest = await _conflictRequestRepository.GetItemWithCondition(x => x.BookingId == request.BookingId, null, false);
+                conflictRequest.Status = ConflictRequestStatus.Done.ToString();
+                await _conflictRequestRepository.Save();
                 return new ServiceResponse<string>
                 {
                     Message = "Thành công",
