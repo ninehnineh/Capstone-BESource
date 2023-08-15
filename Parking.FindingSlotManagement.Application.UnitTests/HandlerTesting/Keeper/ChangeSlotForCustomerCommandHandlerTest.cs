@@ -17,13 +17,15 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Kee
         private readonly Mock<IBookingRepository> _bookingRepositoryMock;
         private readonly Mock<IBookingDetailsRepository> _bookingDetailsRepositoryMock;
         private readonly Mock<ITimeSlotRepository> _timeSlotRepositoryMock;
+        private readonly Mock<IConflictRequestRepository> _conflictRequestRepositoryMock;
         private readonly ChangeSlotForCustomerCommandHandler _handler;
         public ChangeSlotForCustomerCommandHandlerTest()
         {
             _bookingDetailsRepositoryMock = new Mock<IBookingDetailsRepository>();
             _bookingRepositoryMock = new Mock<IBookingRepository>();
             _timeSlotRepositoryMock = new Mock<ITimeSlotRepository>();
-            _handler = new ChangeSlotForCustomerCommandHandler(_bookingRepositoryMock.Object, _bookingDetailsRepositoryMock.Object, _timeSlotRepositoryMock.Object);
+            _conflictRequestRepositoryMock = new Mock<IConflictRequestRepository>();
+            _handler = new ChangeSlotForCustomerCommandHandler(_bookingRepositoryMock.Object, _bookingDetailsRepositoryMock.Object, _timeSlotRepositoryMock.Object, _conflictRequestRepositoryMock.Object);
         }
         [Fact]
         public async Task Handle_ValidBookingIdAndExistingBookingWithValidTimeSlotChange_ShouldReturnSuccessResponse()
@@ -79,6 +81,15 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Kee
             };
             _timeSlotRepositoryMock.Setup(repo => repo.GetAllItemWithCondition(It.IsAny<System.Linq.Expressions.Expression<Func<TimeSlot, bool>>>(), null, null, false))
                 .ReturnsAsync(new List<TimeSlot> { oldTimeSlot });
+
+            var conflictRequestExist = new ConflictRequest
+            {
+                ConflictRequestId = 1,
+                BookingId = 1,
+                Status = ConflictRequestStatus.InProcess.ToString(),
+
+            };
+            _conflictRequestRepositoryMock.Setup(x => x.GetItemWithCondition(It.IsAny<System.Linq.Expressions.Expression<Func<ConflictRequest, bool>>>(), null, false)).ReturnsAsync(conflictRequestExist);
             // Act
             var result = await _handler.Handle(request, CancellationToken.None);
 

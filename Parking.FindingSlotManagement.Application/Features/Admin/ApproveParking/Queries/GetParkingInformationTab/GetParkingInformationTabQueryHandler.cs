@@ -16,19 +16,21 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
         private readonly ITimeSlotRepository _timeSlotRepository;
         private readonly IParkingSlotRepository _parkingSlotRepository;
         private readonly IParkingHasPriceRepository _parkingHasPriceRepository;
+        private readonly IParkingSpotImageRepository _parkingSpotImageRepository;
 
         public GetParkingInformationTabQueryHandler(
             IParkingRepository parkingRepository, 
             IFieldWorkParkingImgRepository fieldWorkParkingImgRepository, 
             ITimeSlotRepository timeSlotRepository, 
             IParkingSlotRepository parkingSlotRepository,
-            IParkingHasPriceRepository parkingHasPriceRepository)
+            IParkingHasPriceRepository parkingHasPriceRepository, IParkingSpotImageRepository parkingSpotImageRepository)
         {
             _parkingRepository = parkingRepository;
             _fieldWorkParkingImgRepository = fieldWorkParkingImgRepository;
             _timeSlotRepository = timeSlotRepository;
             _parkingSlotRepository = parkingSlotRepository;
             _parkingHasPriceRepository = parkingHasPriceRepository;
+            _parkingSpotImageRepository = parkingSpotImageRepository;
         }
         public async Task<ServiceResponse<GetParkingInformationTabResponse>> Handle(GetParkingInformationTabQuery request, CancellationToken cancellationToken)
         {
@@ -108,7 +110,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                     totalSlotBooked += lstParkingSlotHasBooked.Count();
                 }
                 entityRes.SlotHasBooked = totalSlotBooked;
-                if(!parkingExist.ApproveParkings.Any())
+                var lstImages = await _parkingSpotImageRepository.GetAllItemWithConditionByNoInclude(x => x.ParkingId == parkingExist.ParkingId);
+                if (lstImages == null)
                 {
                     entityRes.Images = null;
                     return new ServiceResponse<GetParkingInformationTabResponse>
@@ -119,20 +122,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                         StatusCode = 200
                     };
                 }
-                var approveParkingId = parkingExist.ApproveParkings.LastOrDefault().ApproveParkingId;
-                var lstImages = await _fieldWorkParkingImgRepository.GetAllItemWithConditionByNoInclude(x => x.ApproveParkingId == approveParkingId);
-                if(lstImages == null)
-                {
-                    entityRes.Images = null;
-                    return new ServiceResponse<GetParkingInformationTabResponse>
-                    {
-                        Data = entityRes,
-                        Message = "Thành công",
-                        Success = true,
-                        StatusCode = 200
-                    };
-                }
-                else if(!lstImages.Any())
+                else if (!lstImages.Any())
                 {
                     entityRes.Images = null;
                     return new ServiceResponse<GetParkingInformationTabResponse>
@@ -146,9 +136,22 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                 List<string> imgRes = new();
                 foreach (var item in lstImages)
                 {
-                    imgRes.Add(item.Url);
+                    imgRes.Add(item.ImgPath);
                 }
                 entityRes.Images = imgRes;
+                if (!parkingExist.ApproveParkings.Any())
+                {
+                    return new ServiceResponse<GetParkingInformationTabResponse>
+                    {
+                        Data = entityRes,
+                        Message = "Thành công",
+                        Success = true,
+                        StatusCode = 200
+                    };
+                }
+                /*var approveParkingId = parkingExist.ApproveParkings.LastOrDefault().ApproveParkingId;*/
+                
+                
                 return new ServiceResponse<GetParkingInformationTabResponse>
                 {
                     Data = entityRes,

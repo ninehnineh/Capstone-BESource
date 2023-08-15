@@ -94,7 +94,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                         StatusCode = 201
                     };
                 }
-                else if (booking.Status.Equals(BookingStatus.Check_In.ToString()))
+                else if (booking.Status.Equals(BookingStatus.Check_In.ToString()) || booking.Status.Equals(BookingStatus.OverTime.ToString()))
                 {
                     var endTimeBooking = booking.EndTime.Value;
                     var startTimeBooking = booking.StartTime;
@@ -126,6 +126,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                         .GetAllItemWithCondition(x => x.ParkingPriceId == appliedParkingPriceId);
 
                     var penaltyPriceStepTime = parkingPrice.PenaltyPriceStepTime;
+                    if(penaltyPriceStepTime == null)
+                    {
+                        return new ServiceResponse<BookingInformationResponse>
+                        {
+                            Message = "Con chó link quên nhập penaltyPriceStepTime của parking price",
+                            Success = false,
+                            StatusCode = 400
+                        };
+                    }
                     var penaltyPrice = parkingPrice.PenaltyPrice;
 
                     // vào đúng giờ, ra đúng giờ
@@ -155,8 +164,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                             else
                             {
                                 actualPriceLate += (decimal)penaltyPrice;
-                                var penaltyTime = checkOutTime.Hour - endTimeBooking.Hour;
-                                var step = penaltyTime / (int)penaltyPriceStepTime;
+                                var penaltyTime = checkOutTime - endTimeBooking;
+                                var step = penaltyTime.Hours / (int)penaltyPriceStepTime;
                                 actualPriceLate += (step * (decimal)penaltyPrice);
                             }
                         }
@@ -192,6 +201,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                         {
                             if (item.StartTime <= TimeSpan.FromHours(checkinTime.Value.Hour) &&
                                 TimeSpan.FromHours(checkinTime.Value.Hour) <= item.EndTime)
+                            {
+                                money += (decimal)item.ExtraFee * earlyTimeHour;
+                            }
+                            else if(item.StartTime <= TimeSpan.FromHours(checkinTime.Value.Hour) &&
+                                TimeSpan.FromHours(checkinTime.Value.Hour) > item.EndTime && item.StartTime > item.EndTime)
                             {
                                 money += (decimal)item.ExtraFee * earlyTimeHour;
                             }
@@ -231,6 +245,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                             {
                                 money += (decimal)item.ExtraFee * earlyTimeHour;
                             }
+                            else if (item.StartTime <= TimeSpan.FromHours(checkinTime.Value.Hour) &&
+                                TimeSpan.FromHours(checkinTime.Value.Hour) > item.EndTime && item.StartTime > item.EndTime)
+                            {
+                                money += (decimal)item.ExtraFee * earlyTimeHour;
+                            }
                         }
 
                         Transaction bp = new Transaction
@@ -259,8 +278,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                             else
                             {
                                 actualPriceLate += (decimal)penaltyPrice;
-                                var penaltyTime = checkOutTime.Hour - endTimeBooking.Hour;
-                                var step = penaltyTime / (int)penaltyPriceStepTime;
+                                var penaltyTime = checkOutTime - endTimeBooking;
+                                var step = penaltyTime.Hours / (int)penaltyPriceStepTime;
                                 actualPriceLate += (step * (decimal)penaltyPrice);
                             }
                         }

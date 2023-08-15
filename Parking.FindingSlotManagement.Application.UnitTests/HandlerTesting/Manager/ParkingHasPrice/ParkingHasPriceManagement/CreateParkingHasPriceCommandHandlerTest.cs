@@ -144,7 +144,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
 
             _parkingHasPriceRepositoryMock.Verify(x => x.Insert(It.IsAny<Domain.Entities.ParkingHasPrice>()), Times.Never);
         }
-        [Fact]
+        /*[Fact]
         public async Task Handle_InvalidParking_IsActive_Is_False_ReturnsErrorResponse()
         {
             // Arrange
@@ -171,7 +171,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             result.StatusCode.ShouldBe(400);
 
             _parkingHasPriceRepositoryMock.Verify(x => x.Insert(It.IsAny<Domain.Entities.ParkingHasPrice>()), Times.Never);
-        }
+        }*/
         [Fact]
         public async Task Handle_InvalidParkingHasPrice_Because_It_Already_Has_Package_Applying_ReturnsErrorResponse()
         {

@@ -77,6 +77,10 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     // bắn message, đơn của mày đã bị hủy + lý do
                     PushNotiToCustomerWhenOverLateAllowedTime(bookedBooking);
                     bookedBooking.User.BanCount += 1;
+                    if(bookedBooking.User.BanCount >= 2)
+                    {
+                        bookedBooking.User.IsActive = false;
+                    }
                     _context.SaveChanges();
                 }
                 else
@@ -295,6 +299,18 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     BusinessId = bussinesId
                 };
                 _context.Bills.Add(newBill);
+                _context.SaveChanges();
+
+                Transaction transaction = new Transaction()
+                {
+                    Price = fee.Price,
+                    WalletId = userWallet.WalletId,
+                    PaymentMethod = PaymentMethod.thanh_toan_online.ToString(),
+                    Status = BillStatus.Đã_Thanh_Toán.ToString(),
+                    CreatedDate = DateTime.UtcNow.AddHours(7),
+                    Description = "Hệ thống trừ tiền sử dụng dịch vụ"
+                };
+                _context.Transactions.Add(transaction);
                 _context.SaveChanges();
 
                 SendMailToManager(fee, user);

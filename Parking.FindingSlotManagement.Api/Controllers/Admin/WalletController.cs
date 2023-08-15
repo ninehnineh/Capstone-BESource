@@ -5,34 +5,34 @@ using Microsoft.AspNetCore.Mvc;
 using Parking.FindingSlotManagement.Application.Features.Customer.Wallet.Queries.GetWalletByUserId;
 using Parking.FindingSlotManagement.Application;
 using System.Net;
-using Parking.FindingSlotManagement.Application.Features.Customer.Transaction.Queries.GetAllTransactionByUserId;
+using Parking.FindingSlotManagement.Application.Features.Admin.Wallet.Queries.GetWalletForAdmin;
 
-namespace Parking.FindingSlotManagement.Api.Controllers.Customer
+namespace Parking.FindingSlotManagement.Api.Controllers.Admin
 {
-    [Route("api/customer/transactions")]
+    [Route("api/admin-wallet")]
     [ApiController]
-    public class TransactionController : ControllerBase
+    public class WalletController : ControllerBase
     {
         private readonly IMediator _mediator;
 
-        public TransactionController(IMediator mediator)
+        public WalletController(IMediator mediator)
         {
             _mediator = mediator;
         }
         /// <summary>
-        /// API For Customer, Manager
+        /// API For Customer
         /// </summary>
         /// 
-        [Authorize(Roles = "Customer,Manager")]
-        [HttpGet("{userId}", Name = "GetAllTransactionByUserId")]
+        [Authorize(Roles = "Admin")]
+        [HttpGet(Name = "GetWalletOfAdmin")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ServiceResponse<IEnumerable<GetAllTransactionByUserIdResponse>>>> GetAllTransactionByUserId(int userId)
+        public async Task<ActionResult<ServiceResponse<GetWalletForAdminResponse>>> GetWalletOfAdmin()
         {
             try
             {
-                var query = new GetAllTransactionByUserIdQuery() { UserId = userId };
+                var query = new GetWalletForAdminQuery();
                 var res = await _mediator.Send(query);
                 if (res.Message != "Thành công")
                 {

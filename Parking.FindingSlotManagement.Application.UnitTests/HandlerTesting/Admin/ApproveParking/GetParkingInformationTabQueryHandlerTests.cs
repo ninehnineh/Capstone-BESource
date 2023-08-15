@@ -20,6 +20,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
         private readonly Mock<IParkingSlotRepository> _parkingSlotRepositoryMock;
         private readonly Mock<IParkingHasPriceRepository> _parkingHasPriceRepositoryMock;
         private readonly Mock<IFieldWorkParkingImgRepository> _fieldWorkParkingImgRepositoryMock;
+        private readonly Mock<IParkingSpotImageRepository> _parkingSpotImageRepositoryMock;
         private readonly GetParkingInformationTabQueryHandler _handler;
         public GetParkingInformationTabQueryHandlerTests()
         {
@@ -29,7 +30,8 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
             _fieldWorkParkingImgRepositoryMock = new Mock<IFieldWorkParkingImgRepository>();
             _parkingSlotRepositoryMock = new Mock<IParkingSlotRepository>();
             _parkingHasPriceRepositoryMock = new Mock<IParkingHasPriceRepository>();
-            _handler = new GetParkingInformationTabQueryHandler(_parkingRepositoryMock.Object, _fieldWorkParkingImgRepositoryMock.Object,_timeSlotRepositoryMock.Object, _parkingSlotRepositoryMock.Object, _parkingHasPriceRepositoryMock.Object);
+            _parkingSpotImageRepositoryMock = new Mock<IParkingSpotImageRepository>();
+            _handler = new GetParkingInformationTabQueryHandler(_parkingRepositoryMock.Object, _fieldWorkParkingImgRepositoryMock.Object,_timeSlotRepositoryMock.Object, _parkingSlotRepositoryMock.Object, _parkingHasPriceRepositoryMock.Object, _parkingSpotImageRepositoryMock.Object);
         }
         [Fact]
         public async Task Handle_WhenParkingDoesNotExist_ShouldReturnNotFoundResponse()

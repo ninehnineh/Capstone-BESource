@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetParkingById;
 using Parking.FindingSlotManagement.Application.Mapping;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
         private readonly IBusinessProfileRepository _businessProfileRepository;
         private readonly IUserRepository _userRepository;
         private readonly IApproveParkingRepository _approveParkingRepository;
+        private readonly IFeeRepository _feeRepository;
         MapperConfiguration config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(new MappingProfile());
@@ -24,12 +26,13 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
         public CreateNewParkingCommandHandler(IParkingRepository parkingRepository,
             IBusinessProfileRepository businessProfileRepository,
             IUserRepository userRepository,
-            IApproveParkingRepository approveParkingRepository)
+            IApproveParkingRepository approveParkingRepository, IFeeRepository feeRepository)
         {
             _parkingRepository = parkingRepository;
             _businessProfileRepository = businessProfileRepository;
             _userRepository = userRepository;
             _approveParkingRepository = approveParkingRepository;
+            _feeRepository = feeRepository;
         }
         public async Task<ServiceResponse<int>> Handle(CreateNewParkingCommand request, CancellationToken cancellationToken)
         {
@@ -57,28 +60,79 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                         StatusCode = 200
                     };
                 }
+                var countParking = await _parkingRepository.GetAllItemWithConditionByNoInclude(x => x.BusinessId == checkBusinessExist.BusinessProfileId);
+                var feeExist = await _feeRepository.GetById(checkBusinessExist.FeeId);
+                if(feeExist == null)
+                {
+                    return new ServiceResponse<int>
+                    {
+                        Message = "Doanh nghiệp chưa áp dụng gói",
+                        Success = false,
+                        StatusCode = 404
+                    };
+                }
+                if(feeExist.BusinessType.Equals("Tư nhân"))
+                {
+                    if(countParking == null)
+                    {
+                        var _mapper = config.CreateMapper();
+                        var parkingEntity = _mapper.Map<Domain.Entities.Parking>(request);
+                        parkingEntity.BusinessId = checkBusinessExist.BusinessProfileId;
+                        parkingEntity.IsActive = false;
+                        parkingEntity.IsFull = false;
+                        parkingEntity.IsAvailable = false;
+                        await _parkingRepository.Insert(parkingEntity);
+                        parkingEntity.Code = "BX" + parkingEntity.ParkingId;
+                        parkingEntity.Stars = (float)0.0;
+                        await _parkingRepository.Save();
+                        return new ServiceResponse<int>
+                        {
+                            Data = parkingEntity.ParkingId,
+                            Message = "Thành công",
+                            Success = true,
+                            StatusCode = 201,
+                            Count = 0
+                        };
+                    }
+                    if(countParking.Count() >= 1)
+                    {
+                        return new ServiceResponse<int>
+                        {
+                            Message = "Bạn không thể tạo thêm bãi xe. Do bạn đã sử dụng gói tư nhân chỉ được tạo tối đa 1 bãi xe.",
+                            Success = false,
+                            StatusCode = 400
+                        };
+                    }
+                    
+                }
+                else if(feeExist.BusinessType.Equals("Doanh nghiệp"))
+                {
+                    var _mapper = config.CreateMapper();
+                    var parkingEntity = _mapper.Map<Domain.Entities.Parking>(request);
+                    parkingEntity.BusinessId = checkBusinessExist.BusinessProfileId;
+                    parkingEntity.IsActive = false;
+                    parkingEntity.IsFull = false;
+                    parkingEntity.IsAvailable = false;
+                    await _parkingRepository.Insert(parkingEntity);
+                    parkingEntity.Code = "BX" + parkingEntity.ParkingId;
+                    parkingEntity.Stars = (float)0.0;
+                    await _parkingRepository.Save();
+                    return new ServiceResponse<int>
+                    {
+                        Data = parkingEntity.ParkingId,
+                        Message = "Thành công",
+                        Success = true,
+                        StatusCode = 201,
+                        Count = 0
+                    };
+                }
 
 
-                var _mapper = config.CreateMapper();
-                var parkingEntity = _mapper.Map<Domain.Entities.Parking>(request);
-                parkingEntity.BusinessId = checkBusinessExist.BusinessProfileId;
-                parkingEntity.IsActive = false;
-                parkingEntity.IsFull = false;
-                parkingEntity.IsAvailable = false;
-                await _parkingRepository.Insert(parkingEntity);
-                parkingEntity.Code = "BX" + parkingEntity.ParkingId;
-                parkingEntity.Stars = (float)0.0;
-                await _parkingRepository.Save();
-                /*var managerExist = await _userRepository.GetById(checkBusinessExist.UserId);
-                managerExist.ParkingId = parkingEntity.ParkingId;
-
-                await _userRepository.Save();*/
                 return new ServiceResponse<int>
                 {
-                    Data = parkingEntity.ParkingId,
-                    Message = "Thành công",
-                    Success = true,
-                    StatusCode = 201,
+                    Message = "Có lỗi xảy ra",
+                    Success = false,
+                    StatusCode = 400,
                     Count = 0
                 };
             }

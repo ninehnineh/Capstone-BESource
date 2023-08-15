@@ -99,6 +99,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Booking.Queries
 using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManagement.Queries.GetVnPayById;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.DisableParkingSlotByDate.Model;
 using Parking.FindingSlotManagement.Application.Features.Customer.Account.AccountManagement.Queries.GetBanCountByUserId;
+using Parking.FindingSlotManagement.Application.Features.Admin.Wallet.Queries.GetWalletForAdmin;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -327,7 +328,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.LicensePlate, act => act.MapFrom(obj => obj.VehicleInfor.LicensePlate))
                 .ForMember(dto => dto.VehicleName, act => act.MapFrom(obj => obj.VehicleInfor.VehicleName))
                 .ForMember(dto => dto.Color, act => act.MapFrom(obj => obj.VehicleInfor.Color))
-                .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.VehicleInfor.Traffic.Name))
+/*                .ForMember(dto => dto.TrafficName, act => act.MapFrom(obj => obj.VehicleInfor.Traffic.Name))*/
                 .ReverseMap();
             CreateMap<Booking, GetListBookingFollowCalendarResponse > ()
                 .ForMember(dto => dto.ParkingId, act => act.MapFrom(obj => obj.BookingDetails.First().TimeSlot.Parkingslot.Floor.ParkingId))
@@ -369,6 +370,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
 
             #region Wallet Mapping
             CreateMap<Wallet, GetWalletByUserIdResponse>().ReverseMap();
+            CreateMap<Wallet, GetWalletForAdminResponse>().ReverseMap();
             #endregion
 
             #region Bill Mapping

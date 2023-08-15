@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Models.PushNotification;
+using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Domain.Enum;
 using System.Linq.Expressions;
 
@@ -123,6 +124,16 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                     }
                     await _transactionRepository.Save();
 
+                    Transaction transactionForManager = new()
+                    {
+                        Price = moneyCustomerMustPayAfterCheckOut,
+                        Status = BookingPaymentStatus.Da_thanh_toan.ToString(),
+                        PaymentMethod = PaymentMethod.thanh_toan_online.ToString(),
+                        Description = "Nhận tiền thanh toán từ đơn đặt có Mã: " + booking.BookingId,
+                        WalletId = parking.BusinessProfile.User.Wallet.WalletId
+                    };
+                    await _transactionRepository.Insert(transactionForManager);
+
                     booking.Status = BookingStatus.Done.ToString();
                     booking.TotalPrice = sumPrice;
                     booking.UnPaidMoney = 0;
@@ -147,6 +158,16 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                     }
                     await _transactionRepository.Save();
 
+                    Transaction transactionForManager = new()
+                    {
+                        Price = moneyCustomerMustPayAfterCheckOut,
+                        Status = BookingPaymentStatus.Da_thanh_toan.ToString(),
+                        PaymentMethod = PaymentMethod.thanh_toan_tien_mat.ToString(),
+                        Description = "Nhận tiền thanh toán từ đơn đặt có Mã: " + booking.BookingId,
+                        WalletId = parking.BusinessProfile.User.Wallet.WalletId
+                    };
+                    await _transactionRepository.Insert(transactionForManager);
+
                     booking.Status = BookingStatus.Done.ToString();
                     booking.TotalPrice = sumPrice;
                     booking.UnPaidMoney = 0;
@@ -169,18 +190,27 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                 }
                 var userDiviceToken = booking.User!.Devicetoken;
 
-
-
-                var pushNotificationMobile = new PushNotificationMobileModel
+                if (userDiviceToken == null)
                 {
-                    Title = titleCustomer,
-                    Message = bodyCustomer,
-                    TokenMobile = userDiviceToken,
-                };
+                    return new ServiceResponse<string>
+                    {
+                        Message = "Thành công",
+                        StatusCode = 201,
+                        Success = true,
+                    };
+                }
+                else
+                {
+                    var pushNotificationMobile = new PushNotificationMobileModel
+                    {
+                        Title = titleCustomer,
+                        Message = bodyCustomer,
+                        TokenMobile = userDiviceToken,
+                    };
 
-                await _fireBaseMessageServices
-                    .SendNotificationToMobileAsync(pushNotificationMobile);
-
+                    await _fireBaseMessageServices
+                        .SendNotificationToMobileAsync(pushNotificationMobile);
+                }
                 return new ServiceResponse<string>
                 {
                     StatusCode = 204,

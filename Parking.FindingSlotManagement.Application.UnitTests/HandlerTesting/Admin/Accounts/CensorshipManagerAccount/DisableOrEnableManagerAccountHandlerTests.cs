@@ -15,12 +15,12 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Adm
     public class DisableOrEnableManagerAccountHandlerTests
     {
         private readonly Mock<IAccountRepository> _mockAccountRepository;
-        private readonly DisableOrEnableCensorshipManagerAccountCommandHandler _handler;
+        private readonly DisableOrEnableCensorshipHandler _handler;
 
         public DisableOrEnableManagerAccountHandlerTests()
         {
             _mockAccountRepository = new Mock<IAccountRepository>();
-            _handler = new DisableOrEnableCensorshipManagerAccountCommandHandler(_mockAccountRepository.Object);
+            _handler = new DisableOrEnableCensorshipHandler(_mockAccountRepository.Object);
         }
         [Fact]
         public async Task Handle_Should_Return_Successful_Response()

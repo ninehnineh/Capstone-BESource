@@ -88,6 +88,18 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                                 Status = Domain.Enum.BookingPaymentStatus.Da_thanh_toan.ToString()
                             };
                             await _transactionRepository.Insert(billTrans);
+
+                            Domain.Entities.Transaction billTransManager = new Domain.Entities.Transaction()
+                            {
+                                BookingId = request.BookingId,
+                                CreatedDate = DateTime.UtcNow.AddHours(7),
+                                Description = "Hoàn tiền cho khách hàng",
+                                Price = item.Price,
+                                WalletId = managerExist.Wallet.WalletId,
+                                PaymentMethod = Domain.Enum.PaymentMethod.thanh_toan_online.ToString(),
+                                Status = Domain.Enum.BookingPaymentStatus.Da_thanh_toan.ToString()
+                            };
+                            await _transactionRepository.Insert(billTransManager);
                         }
                     }
                     booking.Status = BookingStatus.Cancel.ToString();
