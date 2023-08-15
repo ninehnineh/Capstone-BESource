@@ -12,5 +12,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         Task AddRange(List<BookingDetails> bookingDetails);
         Task DeleteRange(List<BookingDetails> bookingDetails);
         Task<IEnumerable<BookingDetails>> GetParkingSlotIdByBookingDetail(int bookingId);
+        Task<IEnumerable<BookingDetails>> GetBookingDetailsByTimeSlotId(List<TimeSlot> timeSlots);
     }
 }

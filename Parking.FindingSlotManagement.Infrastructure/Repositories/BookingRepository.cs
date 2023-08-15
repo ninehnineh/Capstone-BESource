@@ -1,6 +1,7 @@
 ﻿using Firebase.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Org.BouncyCastle.Math.EC;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Models.Booking;
@@ -33,7 +34,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 .Include(x => x.BookingDetails)!
                 .ThenInclude(x => x.TimeSlot)
                 .FirstOrDefaultAsync(x => x.BookingId == bookingId);
-            
+
             if (booking == null) { return null!; }
 
             return booking;
@@ -49,7 +50,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                     .ThenInclude(x => x.TimeSlot)
                         .ThenInclude(x => x.Parkingslot)
                 .FirstOrDefaultAsync(x => x.BookingId == bookingId);
-            
+
             if (booking == null) { return null!; }
 
             return booking;
@@ -59,7 +60,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             var booking = await _dbContext.Bookings
                 .Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.BookingId == bookingId);
-            
+
             if (booking == null) { return null!; }
 
             return booking;
@@ -71,7 +72,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 .Include(x => x.Transactions)
                 .Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.BookingId == bookingId);
-            
+
             if (booking == null) { return null!; }
 
             return booking;
@@ -83,7 +84,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 .Include(x => x.BookingDetails)!
                 .ThenInclude(x => x.TimeSlot)
                 .FirstOrDefaultAsync(x => x.BookingId == bookingId);
-            
+
             if (booking == null) { return null!; }
 
             return booking;
@@ -99,7 +100,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                     .ThenInclude(x => x.Parkingslot)
                     .ThenInclude(x => x.Floor)
                 .FirstOrDefaultAsync(x => x.BookingId == bookingId);
-            
+
             if (booking == null) { return null!; }
 
             return booking;
@@ -117,7 +118,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                                                     .ThenInclude(x => x.Floor)
                                                     .ThenInclude(x => x.Parking)
                                                 .Where(x => x.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.Parking.BusinessId == businessId).ToListAsync();
-                if(!booking.Any())
+                if (!booking.Any())
                 {
                     return null;
                 }
@@ -205,7 +206,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                                                 .Where(x => x.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.ParkingId == parkingId && x.Status == BookingStatus.Done.ToString() && x.DateBook.Date == date.Date)
                                                 .Select(x => x.TotalPrice)
                                                 .ToListAsync();
-                                            
+
             var totalRevenueOfTheDate = 0M;
             if (!booking.Any())
             {
@@ -271,7 +272,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             List<Booking> filter = new();
             foreach (var item in booking)
             {
-                if(item.DateBook.Date == DateTime.UtcNow.Date)
+                if (item.DateBook.Date == DateTime.UtcNow.Date)
                 {
                     filter.Add(item);
                 }
@@ -307,7 +308,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                                                     .ThenInclude(x => x.Floor)
                                                     .ThenInclude(x => x.Parking)
                                                 .FirstOrDefaultAsync(x => x.BookingId == bookingId);
-                if(booking == null)
+                if (booking == null)
                 {
                     return null;
                 }
@@ -405,7 +406,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 
                 throw new Exception(ex.Message);
             }
-            
+
         }
 
         public async Task<IEnumerable<Booking>> FilterBookingForKeeperMethod(int parkingId, DateTime? date, string? status, int pageNo, int pageSize)
@@ -486,9 +487,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                                                      .ThenInclude(x => x.Parkingslot)
                                                      .ThenInclude(x => x.Floor)
                                                      .ThenInclude(x => x.Parking)
-                                                 .Where(x => x.UserId == userId && x.Status.Equals(BookingStatus.Initial.ToString()) || 
-                                                 x.UserId == userId && x.Status.Equals(BookingStatus.Success.ToString()) || 
-                                                 x.UserId == userId && x.Status.Equals(BookingStatus.Check_In.ToString()) || 
+                                                 .Where(x => x.UserId == userId && x.Status.Equals(BookingStatus.Initial.ToString()) ||
+                                                 x.UserId == userId && x.Status.Equals(BookingStatus.Success.ToString()) ||
+                                                 x.UserId == userId && x.Status.Equals(BookingStatus.Check_In.ToString()) ||
                                                  x.UserId == userId && x.Status.Equals(BookingStatus.Check_Out.ToString()) ||
                                                  x.UserId == userId && x.Status.Equals(BookingStatus.OverTime.ToString())).ToListAsync();
             if (!booking.Any())
@@ -587,6 +588,94 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 return null;
             }
             return booking;
+        }
+
+        public async Task<bool> GetBookingStatusByParkingSlotId(int parkingSlotId)
+        {
+            try
+            {
+                bool isCheckIn;
+
+                var bookingStatus = await _dbContext.Bookings
+                    .Include(x => x.BookingDetails)!
+                    .ThenInclude(x => x.TimeSlot)!
+                    .ThenInclude(x => x.Parkingslot)
+                    .FirstOrDefaultAsync(x => x.BookingDetails!.Any(x => x.TimeSlot!.Parkingslot!.ParkingSlotId! == parkingSlotId) &&
+                                                x.Status.Equals(BookingStatus.Check_In.ToString()));
+
+                if (bookingStatus == null)
+                {
+                    isCheckIn = false;
+                }
+                else
+                {
+                    isCheckIn = true;
+                }
+                // var isCheckIn = bookingStatus.Status.Equals(BookingStatus.Check_In.ToString()) ? true : false;
+
+                return isCheckIn;
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at GetBookingStatusByParkingSlotId: Message {ex.Message}");
+            }
+        }
+
+        public async Task<IEnumerable<Booking>> GetBookingsByBookingDetailId(List<BookingDetails> bookingDetails)
+        {
+            try
+            {
+                return null;
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at GetBookingsByBookingDetailId: Message {ex.Message}");
+            }
+        }
+
+        public async Task CancelBookedBookingWhenDisableParking(List<BookingDetails> bookings)
+        {
+            try
+            {
+                foreach (var booking in bookings)
+                {
+                    var book = await _dbContext.Bookings
+                        .FindAsync(booking.BookingId);
+                    book.Status = BookingStatus.Cancel.ToString();
+                }
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at CancelBookedBookingWhenDisableParking: Message {ex.Message}");
+            }
+        }
+
+        
+        public async Task<List<Domain.Entities.User>> GetUsersByBookingId(List<BookingDetails> bookingDetails)
+        {
+            try
+            {
+                List<Domain.Entities.User> result = new List<Domain.Entities.User>();
+
+                foreach (var bookingDetail in bookingDetails)
+                {
+                    var booking = await _dbContext.Bookings
+                        .Include(x => x.User)
+                        .FirstOrDefaultAsync(x => x.BookingId == bookingDetail.BookingId);
+
+                    if (booking != null)
+                        result.Add(booking.User);                        
+                }
+
+                return result;
+            }
+            catch (System.Exception ex)
+            {
+                
+                throw new Exception($"Error at GetUsersByBookingId: Message {ex.Message}");
+            }
         }
     }
 }

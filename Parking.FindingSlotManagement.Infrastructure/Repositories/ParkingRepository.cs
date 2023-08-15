@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.DisableParkingSlotByDate.Model;
 using Parking.FindingSlotManagement.Application.Models.Parking;
+using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Domain.Enum;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using System;
@@ -141,6 +142,24 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             catch (System.Exception ex)
             {
                 throw new Exception($"Error at GetHistoryDisableParking: Message {ex.Message}");
+            }
+        }
+
+        public async Task<int> GetManagerIdByParkingId(int parkingId)
+        {
+            try
+            {
+                var parking = await dbContext.Parkings
+                    .Include(x => x.BusinessProfile)
+                    .FirstOrDefaultAsync(x => x.ParkingId == parkingId);
+                
+                var managerId = parking!.BusinessProfile.UserId;
+
+                return managerId.Value;
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at GetManagerIdByParkingId: Message {ex.Message}");
             }
         }
     }
