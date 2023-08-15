@@ -85,7 +85,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             result.Message.ShouldBe("Đơn đang ở trạng thái khác hoặc đã bị hủy nên không thể xử lý.");
         }
         [Fact]
-        public async Task Handle_BookingWithConflictRequest_ShouldReturnError()
+        public async Task Handle_BookingWithConflictRequest_Bao_Tri_ShouldReturnError()
         {
 
 
@@ -96,12 +96,18 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             {
                 BookingId = bookingId,
                 Status = BookingStatus.Success.ToString(),
+                BookingDetails = new List<BookingDetails>
+                { 
+                    new BookingDetails {BookingDetailsId = 1, BookingId = 1, TimeSlot = new TimeSlot{ TimeSlotId = 1, Status = TimeSlotStatus.Busy.ToString()} },
+                    new BookingDetails {BookingDetailsId = 2, BookingId = 1, TimeSlot = new TimeSlot{ TimeSlotId = 2, Status = TimeSlotStatus.Busy.ToString()} },
+                }
                 /* Other properties */
             };
 
             var existingConflictRequest = new ConflictRequest
             {
                 BookingId = bookingId,
+                Message = ConflictRequestMessage.Bao_tri.ToString()
                 /* Other properties */
             };
 
@@ -109,6 +115,49 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
 
             _conflictRequestRepositoryMock.Setup(repo => repo.GetItemWithCondition(
                 It.IsAny<Expression<Func<ConflictRequest, bool>>>(),null, true)).ReturnsAsync(existingConflictRequest);
+
+
+
+            // Act
+            var result = await _handler.Handle(checkInCommand, CancellationToken.None);
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.Success.ShouldBeFalse();
+            result.StatusCode.ShouldBe(400);
+            result.Message.ShouldBe("Đơn đặt xảy ra lỗi. Do slot đang bảo trì.");
+        }
+        [Fact]
+        public async Task Handle_BookingWithConflictRequest_Qua_gio_ShouldReturnError()
+        {
+
+
+            var bookingId = 1; // Replace with the booking ID for testing
+            var checkInCommand = new CheckInCommand { BookingId = bookingId };
+
+            var existingBooking = new Domain.Entities.Booking
+            {
+                BookingId = bookingId,
+                Status = BookingStatus.Success.ToString(),
+                BookingDetails = new List<BookingDetails>
+                {
+                    new BookingDetails {BookingDetailsId = 1, BookingId = 1, TimeSlot = new TimeSlot{ TimeSlotId = 1, Status = TimeSlotStatus.Booked.ToString()} },
+                    new BookingDetails {BookingDetailsId = 2, BookingId = 1, TimeSlot = new TimeSlot{ TimeSlotId = 2, Status = TimeSlotStatus.Booked.ToString()} },
+                }
+                /* Other properties */
+            };
+
+            var existingConflictRequest = new ConflictRequest
+            {
+                BookingId = bookingId,
+                Message = ConflictRequestMessage.Qua_gio.ToString()
+                /* Other properties */
+            };
+
+            _bookingRepositoryMock.Setup(repo => repo.GetBookingDetailsByBookingIdMethod(bookingId)).ReturnsAsync(existingBooking);
+
+            _conflictRequestRepositoryMock.Setup(repo => repo.GetItemWithCondition(
+                It.IsAny<Expression<Func<ConflictRequest, bool>>>(), null, true)).ReturnsAsync(existingConflictRequest);
 
 
 
