@@ -35,5 +35,10 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         Task<IEnumerable<Booking>> GetAllBookingForAdminMethod(int pageNo, int pageSize);
         Task<IEnumerable<Booking>> GetAllBookingByParkingIdVer2Method(int parkingId, int pageNo, int pageSize);
         Task<IEnumerable<Booking>> GetAllBookingWithDuplicateVehicle(int userId, string licensePlate);
+        Task<bool> GetBookingStatusByParkingSlotId(int parkingSlotId);
+        Task<IEnumerable<Booking>> GetBookingsByBookingDetailId(List<BookingDetails> bookingDetails);
+        Task CancelBookedBookingWhenDisableParking(List<BookingDetails> bookings);
+
+        Task<List<Domain.Entities.User>> GetUsersByBookingId(List<BookingDetails> bookingDetails);
     }
 }

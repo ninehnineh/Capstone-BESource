@@ -410,9 +410,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 var newConflictRequest = new ConflictRequest
                 {
                     BookingId = (int)conflictBookingDetails.BookingId,
-                    Message = "Có request cần xử lý",
+                    Message = $"{ConflictRequestMessage.Qua_gio.ToString()} - Có chỗ đễ xe cần chuyển",
                     ParkingId = parkingId,
-                    Status = "Process",
+                    Status = ConflictRequestStatus.InProcess.ToString(),
                 };
 
                 _context.ConflictRequests.Add(newConflictRequest);
@@ -462,22 +462,21 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
 
                 var floors = parkingIncludeTimeSlots!.Floors!;
                 parkingIncludeTimeSlots.IsAvailable = false;
-                foreach (var floor in floors)
-                {
-                    var parkingSlots = floor!.ParkingSlots!;
-                    foreach (var parkingSlot in parkingSlots)
-                    {
-                        var timeSlots = parkingSlot.TimeSlots;
-                        parkingSlot.IsAvailable = false;
-                        foreach (var timeSlot in timeSlots)
-                        {
-                            if (timeSlot.StartTime.Date == disableDate.Date)
-                            {
-                                timeSlot.Status = TimeSlotStatus.Busy.ToString();
-                            }
-                        }
-                    }
-                }
+                // foreach (var floor in floors)
+                // {
+                //     var parkingSlots = floor!.ParkingSlots!;
+                //     foreach (var parkingSlot in parkingSlots)
+                //     {
+                //         var timeSlots = parkingSlot.TimeSlots;
+                //         foreach (var timeSlot in timeSlots)
+                //         {
+                //             if (timeSlot.StartTime.Date == disableDate.Date)
+                //             {
+                //                 timeSlot.Status = TimeSlotStatus.Busy.ToString();
+                //             }
+                //         }
+                //     }
+                // }
                 _context.SaveChanges();
             }
             catch (System.Exception ex)

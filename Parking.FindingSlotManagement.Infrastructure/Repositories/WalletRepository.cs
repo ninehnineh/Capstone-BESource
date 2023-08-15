@@ -30,7 +30,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             try
             {
                 var extityExist = _dbContext.Wallets.FirstOrDefault(x => x.UserId == userId);
-                if(extityExist != null)
+                if (extityExist != null)
                 {
                     return extityExist;
                 }
@@ -40,6 +40,20 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             {
 
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<Wallet> GetWalletById(int id)
+        {
+            try
+            {
+                var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(x => x.UserId == id);
+                return wallet;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("Error at GetWalletById: Message "+ ex.Message);
             }
         }
 
@@ -84,15 +98,15 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                     await _transactionRepository.CreateNewTransactionWithDeposit(entityToAdd2);
                     return "Thành công";
                 }
-                if(checkUserExistInWallet.Debt > 0)
+                if (checkUserExistInWallet.Debt > 0)
                 {
                     checkUserExistInWallet.Debt = wallet.Balance - checkUserExistInWallet.Debt;
-                    if(checkUserExistInWallet.Debt >= 0)
+                    if (checkUserExistInWallet.Debt >= 0)
                     {
                         checkUserExistInWallet.Balance = (decimal)checkUserExistInWallet.Debt;
                         checkUserExistInWallet.Debt = 0;
                     }
-                    else if(checkUserExistInWallet.Debt < 0)
+                    else if (checkUserExistInWallet.Debt < 0)
                     {
                         checkUserExistInWallet.Balance = 0;
                         checkUserExistInWallet.Debt = -(checkUserExistInWallet.Debt);

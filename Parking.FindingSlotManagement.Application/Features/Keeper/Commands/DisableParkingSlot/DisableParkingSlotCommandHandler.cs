@@ -20,14 +20,17 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots
         private readonly IConflictRequestRepository conflictRequestRepository;
         private readonly ITransactionRepository transactionRepository;
         private readonly IWalletRepository walletRepository;
+        private readonly IBookingRepository bookingRepository;
 
         public DisableParkingSlotCommandHandler(IParkingSlotRepository parkingSlotRepository, ITimeSlotRepository timeSlotRepository,
             IParkingRepository parkingRepository, IConflictRequestRepository conflictRequestRepository,
-            ITransactionRepository transactionRepository, IWalletRepository walletRepository)
+            ITransactionRepository transactionRepository, IWalletRepository walletRepository,
+            IBookingRepository bookingRepository)
         {
             this.conflictRequestRepository = conflictRequestRepository;
             this.transactionRepository = transactionRepository;
             this.walletRepository = walletRepository;
+            this.bookingRepository = bookingRepository;
             this.parkingSlotRepository = parkingSlotRepository;
             this.timeSlotRepository = timeSlotRepository;
             this.parkingRepository = parkingRepository;
@@ -40,12 +43,22 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots
                 var parkingSlotId = request.ParkingSlotId;
                 ArgumentNullException.ThrowIfNull(parkingSlotId);
 
+                var slotIsInCheckIn = await bookingRepository.GetBookingStatusByParkingSlotId(parkingSlotId);
+                if (slotIsInCheckIn)
+                {
+                    return new ServiceResponse<string>
+                    {
+                        Message = "Chỗ để xe đang được sử dụng, không thể bảo trì",
+                        StatusCode = 200,
+                    };
+                }
+
                 var bookedTimeSlots = await timeSlotRepository.GetBookedTimeSlotIncludeBookingDetails(parkingSlotId);
                 if (bookedTimeSlots == null)
                 {
-                    await parkingSlotRepository.DisableParkingSlotWhenAllTimeFree(parkingSlotId);
+                    // await parkingSlotRepository.DisableParkingSlotWhenAllTimeFree(parkingSlotId);
                     await timeSlotRepository.DisableTimeSlot(parkingSlotId);
-                }
+                }  
                 else if (bookedTimeSlots != null)
                 {
                     var parking = await parkingRepository.GetParking(parkingSlotId);
@@ -65,8 +78,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots
                         {
                             BookingId = result.BookingId,
                             ParkingId = parking.ParkingId,
-                            Status = "Process",
-                            Message = request.Reason,
+                            Status = ConflictRequestStatus.InProcess.ToString(),
+                            Message = $"{ConflictRequestMessage.Bao_tri.ToString()} - {request.Reason}",
                         };
                         await conflictRequestRepository.Insert(newConflictRequest);
                         // List<Expression<Func<Domain.Entities.Transaction, object>>> includes = new()
@@ -93,8 +106,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots
                         //     await transactionRepository.Save();
                         // }
                     }
-                    // Bắn message
-                    await parkingSlotRepository.DisableParkingSlotWhenAllTimeFree(parkingSlotId);
+                    // await parkingSlotRepository.DisableParkingSlotWhenAllTimeFree(parkingSlotId); 
                     await timeSlotRepository.DisableTimeSlot(parkingSlotId);
                 }
 
