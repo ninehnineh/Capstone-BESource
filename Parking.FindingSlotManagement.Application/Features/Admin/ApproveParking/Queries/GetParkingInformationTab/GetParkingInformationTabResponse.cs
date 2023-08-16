@@ -19,7 +19,12 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
         public int TotalFloor { get; set; }
         public int? CarSpot { get; set; }
         public int? SlotHasBooked { get; set; }
-        public List<string> ParkingPrices { get; set; }
+        public List<ListParkingPrices> ListParkingPrices { get; set; }
         public List<string> Images { get; set; }
+    }
+    public class ListParkingPrices
+    {
+        public int ParkingPriceId { get; set; }
+        public string? ParkingPriceName { get; set; }
     }
 }

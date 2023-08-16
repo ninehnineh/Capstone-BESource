@@ -580,6 +580,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
         {
             var booking = await _dbContext.Bookings
                                                 .Include(x => x.VehicleInfor)
+                                                .Include(x => x.BookingDetails)
+                                                    .ThenInclude(x => x.TimeSlot)
+                                                    .ThenInclude(x => x.Parkingslot)
+                                                    .ThenInclude(x => x.Floor)
+                                                    .ThenInclude(x => x.Parking)
                                                 .Where(x => x.UserId == userId && x.VehicleInfor.LicensePlate.Equals(licensePlate.ToString())
                                                 && !x.Status.Equals(BookingStatus.Done.ToString()) && !x.Status.Equals(BookingStatus.Cancel.ToString())).ToListAsync();
             if (!booking.Any())

@@ -75,6 +75,26 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             }
         }
 
+        public async Task<int> GetParkingSlotByParkingSlotId(int parkingSlotId)
+        {
+            try
+            {
+                var parkingId = await _dbContext.ParkingSlots
+                    .Include(x => x.Floor)
+                    .FirstOrDefaultAsync(x => x.ParkingSlotId == parkingSlotId);
+                if(parkingId == null)
+                {
+                    return 0;
+                }
+                return (int)parkingId.Floor.ParkingId;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<bool> isExists(ParkingSlotDTO parkingSlotDTO)
         {
             var slotNameExist = await _dbContext.ParkingSlots

@@ -100,6 +100,7 @@ using Parking.FindingSlotManagement.Application.Features.Admin.VnPay.VnPayManage
 using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.DisableParkingSlotByDate.Model;
 using Parking.FindingSlotManagement.Application.Features.Customer.Account.AccountManagement.Queries.GetBanCountByUserId;
 using Parking.FindingSlotManagement.Application.Features.Admin.Wallet.Queries.GetWalletForAdmin;
+using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetParkingInformationTab;
 
 namespace Parking.FindingSlotManagement.Application.Mapping
 {
@@ -247,6 +248,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<ParkingPrice, DisableOrEnableParkingPriceCommand>().ReverseMap();
             CreateMap<ParkingPrice, GetAllParkingPriceQueryResponse>().ReverseMap();
             CreateMap<ParkingPrice, ParkingPriceDto>().ReverseMap();
+            CreateMap<ParkingPrice, ListParkingPrices>().ReverseMap();
             #endregion
 
             #region FavoriteAddress Mapping
@@ -298,6 +300,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
                 .ForMember(dto => dto.FloorName, act => act.MapFrom(obj => obj.Floor.FloorName))
                 .ReverseMap();
             CreateMap<ParkingSlot, SlotDtoForAdmin>().ReverseMap();
+            
             #endregion
 
             #region Timeline Mapping
