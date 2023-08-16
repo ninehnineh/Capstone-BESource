@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hangfire;
 using MediatR;
+using Org.BouncyCastle.Math.EC.Rfc7748;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Domain.Entities;
 
@@ -48,12 +50,12 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                 ArgumentNullException.ThrowIfNull(parkingId);
                 ArgumentNullException.ThrowIfNull(disableDate);
 
-                if (disableDate.Date == nowUTCDate)
+                if (disableDate.AddHours(7).Date == nowUTCDate)
                 {
                     var parkingSlots = await parkingSlotRepository.GetParkingSlotsByParkingId(parkingId);
-
-                    var bookedTimeSlotsAtDisableDate = await timeSlotRepository.GetBookedTimeSlotsByDateTime(parkingSlots.ToList(), disableDate);
-                    if (bookedTimeSlotsAtDisableDate != null)
+                    var busySlot = await timeSlotRepository.GetBusyParkingSlotId(parkingSlots.ToList());
+                    var bookedTimeSlotsAtDisableDate = await timeSlotRepository.GetBookedTimeSlotsByDateTime(parkingSlots.ToList(), disableDate.AddHours(7));
+                    if (bookedTimeSlotsAtDisableDate.Count() != 0)
                     {
                         var tempbookingDetails = new List<BookingDetails>();
                         foreach (var item in bookedTimeSlotsAtDisableDate)
@@ -112,11 +114,40 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                             }
 
                             // await transactionRepository.ChangeStatusOriginalTransactionsByBookingDetail(tempbookingDetails.ToList(), reasonChangeTransactionStatus);
+
+                            if (busySlot != 0)
+                            {
+                                var parkingSlotId = busySlot;
+                                var nonBusySlot = parkingSlots.ToList().Where(x => x.ParkingSlotId != parkingSlotId);
+                                await timeSlotRepository.DisableTimeSlotByDisableDateTime(nonBusySlot.ToList(), disableDate.AddHours(7));
+                            }
+                            else
+                            {
+                                await timeSlotRepository.DisableTimeSlotByDisableDateTime(parkingSlots.ToList(), disableDate);
+                            }
+
                             await bookingRepository.CancelBookedBookingWhenDisableParking(tempbookingDetails.ToList());
-                            await timeSlotRepository.DisableTimeSlotByDisableDateTime(parkingSlots.ToList(), disableDate);
+                            await parkingRepository.DisableParkingById(parkingId);
                             // Bắn message chưa có token, lỗi, ko for típ dc nên comment
                             // await PushNotiForAllCustomer(tempbookingDetails, reasonChangeTransactionStatus);
                         }
+                    }
+                    else
+                    {
+                        // var parkingSlots = await parkingSlotRepository.GetParkingSlotsByParkingId(parkingId)d;
+                        if (busySlot != 0)
+                        {
+                            var parkingSlotId = busySlot;
+                            var nonBusySlot = parkingSlots.ToList().Where(x => x.ParkingSlotId != parkingSlotId);
+                            await timeSlotRepository.DisableTimeSlotByDisableDateTime(nonBusySlot.ToList(), disableDate.AddHours(7));
+                        }
+                        else
+                        {
+                            await timeSlotRepository.DisableTimeSlotByDisableDateTime(parkingSlots.ToList(), disableDate.AddHours(7));
+                        }
+
+                        
+                        await parkingRepository.DisableParkingById(parkingId);
                     }
 
                     return new ServiceResponse<string> 
@@ -129,7 +160,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
 
                 return new ServiceResponse<string>
                 {
-                    Message = $"Ngày tắt bãi không hợp lệ, không thể tắt bãi tại {disableDateFormated}",
+                    Message = $"Ngày không hợp lệ, không thể tắt bãi tại {disableDateFormated}",
                     StatusCode = 500,
                     Success = true,
                 };

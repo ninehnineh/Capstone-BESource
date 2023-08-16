@@ -17,6 +17,7 @@ using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Parkin
 using Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Queries.GetParkingById;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Commands.DisableParkingByDate;
 using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Queries.GetDisableParkingHistory;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Queries.GetSuccessedDisableParkingHistory;
 using Parking.FindingSlotManagement.Application.Models.Parking;
 using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using System.Net;
@@ -293,7 +294,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
             }
         }
 
-        [HttpGet("history-disable-parking")]
+        [HttpGet("scheduled-history-disable-parking")]
         public async Task<ActionResult<ServiceResponse<IEnumerable<Job>>>> GetDisableParking(int parkingId)
         {
             try
@@ -311,7 +312,25 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
             }
         }
 
-        [HttpPut("enable-disable-parking")]
+        [HttpGet("successed-history-disable-parking")]
+        public async Task<ActionResult<ServiceResponse<IEnumerable<Job>>>> GetSuccessedDisableParking(int parkingId)
+        {
+            try
+            {
+                var query = new GetSuccessedDisableParkingHistoryQuery() { ParkingId = parkingId };
+                var res = await _mediator.Send(query);
+
+                return StatusCode((int)res.StatusCode, res);
+
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
+        [HttpPut("enable-disable-parking-at-date")]
         public async Task<ActionResult<ServiceResponse<string>>> EnableDisableParking([FromBody] EnableParkingAtDateCommand command)
         {
             try
@@ -344,7 +363,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         }
 
         [HttpDelete("cancel-disable-scheduled-parking")]
-        public async Task<ActionResult<ServiceResponse<string>>> CancelDisableScheduledParking( [FromBody] CancelDisableScheduledParkingCommand command)
+        public async Task<ActionResult<ServiceResponse<string>>> CancelDisableScheduledParking([FromBody] CancelDisableScheduledParkingCommand command)
         {
             try
             {

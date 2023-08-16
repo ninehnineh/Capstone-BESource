@@ -22,5 +22,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         // Task<List<List<TimeSlot>>> GetBookedTimeSlotByParkingSlotId(List<ParkingSlot> parkingSlots, DateTime disableDate);
         Task DisableTimeSlotByDisableDateTime(List<ParkingSlot> parkingSlots, DateTime disableDate);
         Task<bool> IsExist(DateTime disableDate);
+        Task<int> GetBusyParkingSlotId(List<ParkingSlot> parkingSlotId);
     }
 }

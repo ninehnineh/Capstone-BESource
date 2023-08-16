@@ -16,5 +16,7 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         Task EnableParkingSlot(int parkingSlotId);
         Task<int> GetParkingSlotByParkingSlotId(int parkingSlotId);
         Task<IEnumerable<ParkingSlot>> GetParkingSlotsByParkingId(int parkingId);
+        Task<bool> IsNotAvailable(int parkingSlotId);
+        Task<bool> GetParkingByParkingSlotId(int parkingSlotId);
     }
 }

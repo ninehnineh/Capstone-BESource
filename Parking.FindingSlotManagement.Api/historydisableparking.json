@@ -1,0 +1,30 @@
+[
+  {
+    "ParkingId": 1,
+    "State": "Succeeded",
+    "DisableDate": "8/21/2023 12:00:00 AM",
+    "CreatedAt": "8/17/2023 3:51:18 AM",
+    "Reason": "string"
+  },
+  {
+    "ParkingId": 1,
+    "State": "Scheduled",
+    "DisableDate": "8/22/2023 12:00:00 AM",
+    "CreatedAt": "8/17/2023 3:51:38 AM",
+    "Reason": "string"
+  },
+  {
+    "ParkingId": 1,
+    "State": "Succeeded",
+    "DisableDate": "8/23/2023 12:00:00 AM",
+    "CreatedAt": "8/17/2023 4:30:34 AM",
+    "Reason": "string"
+  },
+  {
+    "ParkingId": 1,
+    "State": "Scheduled",
+    "DisableDate": "8/24/2023 12:00:00 AM",
+    "CreatedAt": "8/17/2023 4:32:37 AM",
+    "Reason": "string"
+  }
+]
