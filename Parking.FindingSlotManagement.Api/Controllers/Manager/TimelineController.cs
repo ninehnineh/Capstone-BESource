@@ -13,7 +13,7 @@ using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Manager
 {
-    [Authorize(Roles = "Manager")]
+    
     [Route("api/timeline-management")]
     [ApiController]
     public class TimelineController : ControllerBase
@@ -29,6 +29,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <summary>
         /// API For Manager
         /// </summary>
+        /// 
+        [Authorize(Roles = "Manager,Admin,Staff")]
         [HttpGet("{parkingPriceId}", Name = "GetListTimelineByParkingPriceId")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -58,6 +60,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remarks>
         /// SignalR: LoadTimelineInManager
         /// </remarks>
+        /// 
+        [Authorize(Roles = "Manager")]
         [HttpPost(Name = "CreateNewTimeline")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
@@ -92,6 +96,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remarks>
         /// SignalR: LoadTimelineInManager
         /// </remarks>
+        /// 
+        [Authorize(Roles = "Manager")]
         [HttpDelete("{timelineId}", Name = "DisableOrEnableTimeline")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -121,6 +127,8 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Manager
         /// <remarks>
         /// SignalR: LoadTimelineInManager
         /// </remarks>
+        /// 
+        [Authorize(Roles = "Manager")]
         [HttpPut("{timelineId}", Name = "UpdateTimeline")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
