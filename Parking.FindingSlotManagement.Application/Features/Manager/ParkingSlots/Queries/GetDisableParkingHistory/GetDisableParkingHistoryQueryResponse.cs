@@ -7,9 +7,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlot
 {
     public class GetDisableParkingHistoryQueryResponse
     {
+        public int ParkingId { get; set; }
         public string State { get; set; }
         public string DisableDate { get; set; }
         public string CreatedAt { get; set; }
-
+        public string Reason { get; set; }
     }
 }
