@@ -192,6 +192,95 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                             StatusCode = 400
                         };
                     }
+                    else
+                    {
+                        if (checkInTime < booking.StartTime)
+                        {
+                            var totalHoursEarly = Math.Ceiling((booking.StartTime - checkInTime).TotalHours);
+                            if (totalHoursEarly > 1)
+                            {
+                                return new ServiceResponse<string>
+                                {
+                                    Message = "Số tiếng vào sớm chỉ có thể nhỏ hơn 1",
+                                    StatusCode = 400,
+                                    Success = false
+                                };
+                            }
+
+                            var getListPreviousSlot = await _timeSlotRepository.GetAllItemWithCondition(x => booking.BookingDetails.FirstOrDefault().TimeSlot.ParkingSlotId == x.ParkingSlotId && roundedTime == x.StartTime);
+                            var checkBooked = false;
+                            foreach (var item in getListPreviousSlot)
+                            {
+                                if (item.Status.Equals(TimeSlotStatus.Booked.ToString()))
+                                {
+                                    checkBooked = true;
+                                }
+                            }
+                            if (checkBooked)
+                            {
+                                return new ServiceResponse<string>
+                                {
+                                    Message = "Không thể check-in vào sớm. Tại vì slot vẫn đang có người đặt.",
+                                    StatusCode = 400,
+                                    Success = false
+                                };
+                            }
+                            foreach (var item in getListPreviousSlot)
+                            {
+                                BookingDetails entity = new()
+                                {
+                                    BookingId = booking.BookingId,
+                                    TimeSlotId = item.TimeSlotId
+                                };
+                                await _bookingDetailsRepository.Insert(entity);
+                                var changeTimeSlotToBooked = await _timeSlotRepository.GetById(item.TimeSlotId);
+                                changeTimeSlotToBooked.Status = TimeSlotStatus.Booked.ToString();
+                                await _timeSlotRepository.Save();
+                            }
+                        }
+                        if (booking.StartTime > booking.EndTime)
+                            booking.EndTime += TimeSpan.FromHours(24);
+
+                        booking.Status = BookingStatus.Check_In.ToString();
+
+                        booking.CheckinTime = checkInTime;
+
+                        await _bookingRepository.Save();
+
+                        var titleCustomer = _configuration.GetSection("MessageTitle_Customer")
+                            .GetSection("Checkin").Value;
+                        var bodyCustomer = _configuration.GetSection("MessageBody_Customer")
+                            .GetSection("Checkin").Value;
+                        var userDiviceToken = booking.User!.Devicetoken;
+
+                        if (userDiviceToken == null)
+                        {
+                            return new ServiceResponse<string>
+                            {
+                                Message = "Thành công",
+                                StatusCode = 201,
+                                Success = true,
+                            };
+                        }
+                        else
+                        {
+                            var pushNotificationMobile = new PushNotificationMobileModel
+                            {
+                                Title = titleCustomer,
+                                Message = bodyCustomer,
+                                TokenMobile = userDiviceToken,
+                            };
+
+                            await _fireBaseMessageServices
+                                .SendNotificationToMobileAsync(pushNotificationMobile);
+                        }
+                        return new ServiceResponse<string>
+                        {
+                            Message = "Thành công",
+                            StatusCode = 201,
+                            Success = true,
+                        };
+                    }
                 }
                 else
                 {
