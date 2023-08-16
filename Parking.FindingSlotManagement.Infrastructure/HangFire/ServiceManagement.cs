@@ -86,23 +86,45 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 }
                 else if (!guestArrived)
                 {
-                    bookedBooking.Status = BookingStatus.Cancel.ToString();
-                    bookedBooking.Transactions.First().Status = BookingPaymentStatus.Huy.ToString();
-                    bookedBooking.Transactions.First().Description = "Trễ quá giờ cho phép";
-
-                    foreach (var bookingDetail in bookedBooking.BookingDetails)
+                    if(bookedBooking.Transactions.FirstOrDefault().PaymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc.ToString()))
                     {
-                        bookingDetail.TimeSlot.Status = TimeSlotStatus.Free.ToString();
-                    }
+                        bookedBooking.Status = BookingStatus.Cancel.ToString();
+                        bookedBooking.Transactions.First().Status = BookingPaymentStatus.Huy.ToString();
+                        bookedBooking.Transactions.First().Description = "Trễ quá giờ cho phép";
 
                     // bắn message, đơn của mày đã bị hủy + lý do
                     PushNotiToCustomerWhenOverLateAllowedTime(bookedBooking);
                     bookedBooking.User.BanCount += 1;
                     if (bookedBooking.User.BanCount >= 2)
-                    {
-                        bookedBooking.User.IsActive = false;
+                        foreach (var bookingDetail in bookedBooking.BookingDetails)
+                        {
+                            bookingDetail.TimeSlot.Status = TimeSlotStatus.Free.ToString();
+                        }
+
+                        // bắn message, đơn của mày đã bị hủy + lý do
+                        PushNotiToCustomerWhenOverLateAllowedTime(bookedBooking);
+                        _context.SaveChanges();
                     }
-                    _context.SaveChanges();
+                    else
+                    {
+                        bookedBooking.Status = BookingStatus.Cancel.ToString();
+                        bookedBooking.Transactions.First().Status = BookingPaymentStatus.Huy.ToString();
+                        bookedBooking.Transactions.First().Description = "Trễ quá giờ cho phép";
+
+                        foreach (var bookingDetail in bookedBooking.BookingDetails)
+                        {
+                            bookingDetail.TimeSlot.Status = TimeSlotStatus.Free.ToString();
+                        }
+
+                        // bắn message, đơn của mày đã bị hủy + lý do
+                        PushNotiToCustomerWhenOverLateAllowedTime(bookedBooking);
+                        bookedBooking.User.BanCount += 1;
+                        if (bookedBooking.User.BanCount >= 2)
+                        {
+                            bookedBooking.User.IsActive = false;
+                        }
+                        _context.SaveChanges();
+                    }
                 }
                 else
                 {
