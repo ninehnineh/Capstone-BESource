@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Parking.FindingSlotManagement.Application.Features.Manager.Timeline.TimelineManagement.Queries.GetListTimelineByParkingPriceId
 {
-    public class GetListTimelineByParkingPriceIdQuery : IRequest<ServiceResponse<IEnumerable<GetListTimelineByParkingPriceIdResponse>>>
+    public class GetListTimelineByParkingPriceIdQuery : IRequest<ServiceResponse<GetListTimelineByParkingPriceIdResponse>>
     {
         public int PageNo { get; set; }
         public int PageSize { get; set; }

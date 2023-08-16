@@ -1,4 +1,4 @@
-﻿using Parking.FindingSlotManagement.Application.Models.ParkingSlot;
+using Parking.FindingSlotManagement.Application.Models.ParkingSlot;
 using Parking.FindingSlotManagement.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -14,6 +14,7 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         Task DisableParkingSlotWhenAllTimeFree(int parkingSlotId);
         Task DisableParkingSlotWhenSomeTimeBooked(int parkingSlotId);
         Task EnableParkingSlot(int parkingSlotId);
+        Task<int> GetParkingSlotByParkingSlotId(int parkingSlotId);
         Task<IEnumerable<ParkingSlot>> GetParkingSlotsByParkingId(int parkingId);
         Task<bool> IsNotAvailable(int parkingSlotId);
         Task<bool> GetParkingByParkingSlotId(int parkingSlotId);

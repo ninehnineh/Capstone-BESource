@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Exceptions;
 using Parking.FindingSlotManagement.Application.Models.ParkingSlot;
@@ -97,6 +97,27 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 throw new Exception($"Error at GetFloorByParkingSlotId: Message {ex.Message}");
             }
         }
+
+        public async Task<int> GetParkingSlotByParkingSlotId(int parkingSlotId)
+        {
+            try
+            {
+                var parkingId = await _dbContext.ParkingSlots
+                    .Include(x => x.Floor)
+                    .FirstOrDefaultAsync(x => x.ParkingSlotId == parkingSlotId);
+                if (parkingId == null)
+                {
+                    return 0;
+                }
+                return (int)parkingId.Floor.ParkingId;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+        }
+
 
         public async Task<IEnumerable<ParkingSlot>> GetParkingSlotsByParkingId(int parkingId)
         {
