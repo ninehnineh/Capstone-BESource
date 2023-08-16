@@ -62,7 +62,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                     .Include(x => x.TimeSlots)
                     .FirstOrDefaultAsync(x => x.ParkingSlotId == parkingSlotId);
 
-                disableParkingSlot.IsAvailable = true;
                 var timeSlot = disableParkingSlot.TimeSlots;
                 foreach (var time in timeSlot)
                 {

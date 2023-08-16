@@ -84,11 +84,12 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 
                 foreach (var timeSlot in bookedTimeSlot)
                 {
-                    list.UnionWith(timeSlot.BookingDetails!.Select(x => new DisableSlotResult{ 
-                            BookingId = x.BookingId!.Value,
-                            Wallet = x.Booking!.User!.Wallet!,
-                            User = x.Booking.User 
-                        }));
+                    list.UnionWith(timeSlot.BookingDetails!.Select(x => new DisableSlotResult
+                    {
+                        BookingId = x.BookingId!.Value,
+                        Wallet = x.Booking!.User!.Wallet!,
+                        User = x.Booking.User
+                    }));
                 }
 
                 return list.ToList();
@@ -121,6 +122,30 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             }
         }
 
+        public async Task DisableTimeSlotByDisableDateTime(List<ParkingSlot> parkingSlots, DateTime disableDate)
+        {
+            try
+            {
+                foreach (var slot in parkingSlots)
+                {
+                    var disableTimeSlots = await _dbContext.TimeSlots
+                        .Where(x => x.ParkingSlotId == slot.ParkingSlotId &&
+                                    x.StartTime.Hour > disableDate.Hour &&
+                                    x.StartTime.Date == disableDate.Date)
+                        .ToListAsync();
+
+                    disableTimeSlots.ForEach(x => x.Status = TimeSlotStatus.Busy.ToString());
+                }
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (System.Exception ex)
+            {
+
+                throw new Exception($"Error at DisableTimeSlotByDisableDate: Message {ex.Message}");
+            }
+        }
+
         public async Task<IEnumerable<List<TimeSlot>>> GetBookedTimeSlotsByDateNew(List<ParkingSlot> parkingSlotId, DateTime date)
         {
             try
@@ -135,7 +160,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                                     x.Status.Equals(TimeSlotStatus.Booked.ToString()))
                         .ToListAsync();
 
-                    result.Add(bookedTimeSlots);
+                    if (bookedTimeSlots.Count != 0)
+                        result.Add(bookedTimeSlots);
                 }
 
                 return result;
@@ -147,27 +173,50 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
         }
 
 
-        public async Task<IEnumerable<TimeSlot>> GetBookedTimeSlotsByDate(List<ParkingSlot> parkingSlotId, DateTime date)
+        public async Task<IEnumerable<List<TimeSlot>>> GetBookedTimeSlotsByDateTime(List<ParkingSlot> parkingSlotId, DateTime date)
         {
             try
             {
-                List<TimeSlot> bookedTimeSlots = new List<TimeSlot>();
+                List<List<TimeSlot>> result = new List<List<TimeSlot>>();
 
                 foreach (var slot in parkingSlotId)
                 {
-                    bookedTimeSlots = await _dbContext.TimeSlots
+                    var bookedTimeSlots = await _dbContext.TimeSlots
                        .Where(x => x.ParkingSlotId == slot.ParkingSlotId &&
-                                   x.StartTime.Date == date &&
+                                   x.StartTime.Hour > date.Hour &&
+                                   x.StartTime.Date == date.Date &&
                                    x.Status.Equals(TimeSlotStatus.Booked.ToString()))
                        .ToListAsync();
 
+                    if (bookedTimeSlots.Count != 0)
+                        result.Add(bookedTimeSlots);
                 }
 
-                return bookedTimeSlots;
+                return result;
             }
             catch (System.Exception ex)
             {
                 throw new Exception($"Error at GetBookedTimeSlotsByDate: Message {ex.Message}");
+            }
+        }
+
+        public async Task<bool> IsExist(DateTime disableDate)
+        {
+            try
+            {
+                var result = false;
+
+                var timeslot = await _dbContext.TimeSlots
+                    .FirstOrDefaultAsync(x => x.StartTime.Date == disableDate);
+
+                if (timeslot != null)
+                    result = true;
+
+                return result;
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at IsExist: Message {ex.Message}");
             }
         }
 
@@ -185,7 +234,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
         //                             x.Status.Equals(TimeSlotStatus.Booked.ToString()) &&
         //                             x.CreatedDate.Date == disableDate)      
         //                 .ToListAsync();
-                    
+
         //             result.Add(timeSlots);
         //         }
 

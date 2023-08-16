@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Domain.Entities;
+using Parking.FindingSlotManagement.Domain.Enum;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using System;
 using System.Collections.Generic;
@@ -50,7 +51,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 foreach (var timeSlot in timeSlots)
                 {
                     var bookedBookingDetails = await _dbContext.BookingDetails
-                        .FirstOrDefaultAsync(x => x.TimeSlotId == timeSlot!.TimeSlotId);
+                        .Include(x => x.Booking)
+                        .FirstOrDefaultAsync(x => x.TimeSlotId == timeSlot!.TimeSlotId && x.Booking.Status.Equals(BookingStatus.Success.ToString()));
 
                     bookingDetails.Add(bookedBookingDetails!);
                 };                

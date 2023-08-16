@@ -85,7 +85,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             }
         }
 
-        public async Task ChangeStatusTransactionsByBookingDetail(List<BookingDetails> bookingDetails, string reason)
+        public async Task ChangeStatusOriginalTransactionsByBookingDetail(List<BookingDetails> bookingDetails, string reason)
         {
             try
             {
