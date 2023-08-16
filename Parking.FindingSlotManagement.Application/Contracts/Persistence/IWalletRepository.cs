@@ -11,5 +11,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
     {
         Task<string> UpdateMoneyInWallet(Wallet wallet, string? status);
         Wallet GetWallet(int userId);
+        Task<Wallet> GetWalletById(int id);
     }
 }

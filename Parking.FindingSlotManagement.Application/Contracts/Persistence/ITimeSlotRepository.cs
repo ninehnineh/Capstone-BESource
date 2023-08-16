@@ -13,11 +13,14 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
     {
         Task<List<TimeSlot>> GetAllTimeSlotsBooking(DateTime startTimeBooking,
             DateTime endTimeBooking, int bookingSlotId);
-            
         Task<string> AddRangeTimeSlot(List<TimeSlot> lstTs);
-
         Task DisableTimeSlot(int parkingSlotId);
         Task<List<DisableSlotResult>> GetBookedTimeSlotIncludeBookingDetails(int parkingSlotId);
-
+        Task DisableTimeSlotByDisableDate(List<ParkingSlot> parkingSlotId, DateTime disableDate);
+        Task<IEnumerable<List<TimeSlot>>> GetBookedTimeSlotsByDateNew(List<ParkingSlot> parkingSlotId, DateTime date);
+        Task<IEnumerable<List<TimeSlot>>> GetBookedTimeSlotsByDateTime(List<ParkingSlot> parkingSlotId, DateTime date);
+        // Task<List<List<TimeSlot>>> GetBookedTimeSlotByParkingSlotId(List<ParkingSlot> parkingSlots, DateTime disableDate);
+        Task DisableTimeSlotByDisableDateTime(List<ParkingSlot> parkingSlots, DateTime disableDate);
+        Task<bool> IsExist(DateTime disableDate);
     }
 }

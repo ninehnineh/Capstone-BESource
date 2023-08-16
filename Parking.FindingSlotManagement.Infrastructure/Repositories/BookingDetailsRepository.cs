@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Domain.Entities;
+using Parking.FindingSlotManagement.Domain.Enum;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using System;
 using System.Collections.Generic;
@@ -34,10 +35,34 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 
         }
 
-                public async Task DeleteRange(List<BookingDetails> bookingDetails)
+        public async Task DeleteRange(List<BookingDetails> bookingDetails)
         {
             _dbContext.RemoveRange(bookingDetails);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<BookingDetails>> GetBookingDetailsByTimeSlotId(List<TimeSlot> timeSlots)
+        {
+            try
+            {
+                
+                List<BookingDetails> bookingDetails = new List<BookingDetails>();
+
+                foreach (var timeSlot in timeSlots)
+                {
+                    var bookedBookingDetails = await _dbContext.BookingDetails
+                        .Include(x => x.Booking)
+                        .FirstOrDefaultAsync(x => x.TimeSlotId == timeSlot!.TimeSlotId && x.Booking.Status.Equals(BookingStatus.Success.ToString()));
+
+                    bookingDetails.Add(bookedBookingDetails!);
+                };                
+
+                return bookingDetails;
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at GetBookingDetailsByTimeSlotId: Message {ex.Message}");
+            }
         }
 
         public async Task<IEnumerable<BookingDetails>> GetParkingSlotIdByBookingDetail(int bookingId)
@@ -45,7 +70,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             var booking = await _dbContext.BookingDetails
                                                 .Include(x => x.TimeSlot)
                                                 .Where(x => x.BookingId == bookingId).ToListAsync();
-            if(!booking.Any())
+            if (!booking.Any())
             {
                 return null;
             }

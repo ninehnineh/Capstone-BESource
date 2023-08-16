@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.DisableParkingSlotByDate.Model;
 using Parking.FindingSlotManagement.Application.Models.Parking;
+using Parking.FindingSlotManagement.Domain.Entities;
 
 namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
 {
@@ -14,5 +15,7 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         Task<Domain.Entities.Parking> GetParkingById(int parkingId);
         Task EnableDisableParkingById(int parkingId, DateTime disableDate);
         Task<bool> GetDisableParking(int parkingId, DateTime disableDate);
+        Task<int> GetManagerIdByParkingId(int parkingId);
+
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Models.ParkingSlot;
 using Parking.FindingSlotManagement.Domain.Entities;
@@ -20,6 +20,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
         {
             _dbContext = dbContext;
         }
+
 
         public async Task DisableParkingSlotWhenAllTimeFree(int parkingSlotId)
         {
@@ -43,12 +44,12 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 var parkingSlot = await _dbContext.ParkingSlots
                     .Include(x => x.TimeSlots)
                     .FirstOrDefaultAsync(x => x.ParkingSlotId == parkingSlotId);
-                
+
                 var bookedTimeSlots = parkingSlot.TimeSlots.Where(x => x.Status == TimeSlotStatus.Booked.ToString());
             }
             catch (System.Exception ex)
             {
-                
+
                 throw new Exception($"Error at DisableParkingSlotWhenSomeTimeBooked: Message {ex.Message}");
             }
         }
@@ -61,8 +62,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                     .Include(x => x.TimeSlots)
                     .FirstOrDefaultAsync(x => x.ParkingSlotId == parkingSlotId);
 
-                disableParkingSlot.IsAvailable = true;
-                var timeSlot =  disableParkingSlot.TimeSlots;
+                var timeSlot = disableParkingSlot.TimeSlots;
                 foreach (var time in timeSlot)
                 {
                     time.Status = TimeSlotStatus.Free.ToString();
@@ -74,6 +74,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 throw new Exception($"Error at EnableParkingSlot: Message {ex.Message}");
             }
         }
+
 
         public async Task<int> GetParkingSlotByParkingSlotId(int parkingSlotId)
         {
@@ -93,6 +94,23 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 
                 throw new Exception(ex.Message);
             }
+
+
+        public async Task<IEnumerable<ParkingSlot>> GetParkingSlotsByParkingId(int parkingId)
+        {
+            try
+            {
+                var parkingSlots = await _dbContext.ParkingSlots
+                    .Include(x => x.Floor).ThenInclude(x => x!.Parking)
+                    .Where(x => x.Floor!.ParkingId == parkingId)
+                    .ToListAsync();
+
+                return parkingSlots;
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at EnableParkingSlot: Message {ex.Message}");
+            }
         }
 
         public async Task<bool> isExists(ParkingSlotDTO parkingSlotDTO)
@@ -106,7 +124,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             return slotNameExist;
         }
 
-        
+
         // public async Task<List<Domain.Entities.ParkingSlot>> GetParkingSlotsByParkingId(int parkingId)
         // {
         //     try
@@ -126,11 +144,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
         // {
         //     try
         //     {
-                
+
         //     }
         //     catch (System.Exception ex)
         //     {
-                
+
         //         throw new Exception($"Error at DisableParkingSlotByDate: Message {ex.Message}");
         //     }
         // }
