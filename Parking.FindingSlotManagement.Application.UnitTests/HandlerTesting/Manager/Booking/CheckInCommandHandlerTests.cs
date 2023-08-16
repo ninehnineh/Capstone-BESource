@@ -107,7 +107,8 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             var existingConflictRequest = new ConflictRequest
             {
                 BookingId = bookingId,
-                Message = ConflictRequestMessage.Bao_tri.ToString()
+                Message = ConflictRequestMessage.Bao_tri.ToString(),
+                Status = ConflictRequestStatus.InProcess.ToString(),
                 /* Other properties */
             };
 
@@ -150,7 +151,8 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             var existingConflictRequest = new ConflictRequest
             {
                 BookingId = bookingId,
-                Message = ConflictRequestMessage.Qua_gio.ToString()
+                Message = ConflictRequestMessage.Qua_gio.ToString(),
+                Status = ConflictRequestStatus.InProcess.ToString(),
                 /* Other properties */
             };
 

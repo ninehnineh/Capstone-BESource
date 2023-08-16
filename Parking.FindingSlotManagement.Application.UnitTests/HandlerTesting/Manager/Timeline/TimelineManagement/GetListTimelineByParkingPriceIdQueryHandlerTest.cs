@@ -33,18 +33,23 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
                 PageSize = 10
             };
 
-            var TimelineList = new List<Domain.Entities.TimeLine>
+            var parkingPriceListExist = new List<Domain.Entities.ParkingPrice>
             {
-                new Domain.Entities.TimeLine
+                new Domain.Entities.ParkingPrice
                 {
                     ParkingPriceId = 1,
-                    TimeLineId = 1
+                    TimeLines = new List<Domain.Entities.TimeLine>
+                    {
+                        new Domain.Entities.TimeLine{ TimeLineId = 1, ParkingPriceId = 1},
+                        new Domain.Entities.TimeLine{ TimeLineId = 2, ParkingPriceId = 1}
+                    }
                 },
 
             };
             var parkingPriceExist = new Domain.Entities.ParkingPrice { ParkingPriceId = 1 };
             _parkingPriceRepositoryMock.Setup(x => x.GetById(request.ParkingPriceId)).ReturnsAsync(parkingPriceExist);
-            _timelineRepositoryMock.Setup(x => x.GetAllItemWithPagination(It.IsAny<Expression<Func<Domain.Entities.TimeLine, bool>>>(), null, x => x.TimeLineId, true, request.PageNo, request.PageSize)).ReturnsAsync(TimelineList);
+            _parkingPriceRepositoryMock.Setup(x => x.GetAllItemWithPagination(It.IsAny<Expression<Func<Domain.Entities.ParkingPrice, bool>>>(), It.IsAny<List<Expression<Func<Domain.Entities.ParkingPrice, object>>>>(), null, true, request.PageNo, request.PageSize)).ReturnsAsync(parkingPriceListExist);
+
 
             // Act
             var result = await _handler.Handle(request, CancellationToken.None);
