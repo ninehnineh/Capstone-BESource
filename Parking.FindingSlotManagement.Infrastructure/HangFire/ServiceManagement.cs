@@ -29,18 +29,39 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
         private readonly IFireBaseMessageServices _fireBaseMessageServices;
         private readonly IEmailService _emailService;
         private readonly IHangfireRepository hangfireRepository;
+        private readonly IParkingSlotRepository parkingSlotRepository;
+        private readonly ITimeSlotRepository timeSlotRepository;
+        private readonly ITransactionRepository transactionRepository;
+        private readonly IParkingRepository parkingRepository;
+        private readonly IWalletRepository walletRepository;
+        private readonly IBookingDetailsRepository bookingDetailsRepository;
+        private readonly IBookingRepository bookingRepository;
 
         public ServiceManagement(ParkZDbContext context,
             ILogger<ServiceManagement> logger,
             IFireBaseMessageServices fireBaseMessageServices,
             IEmailService emailService,
-            IHangfireRepository hangfireRepository)
+            IHangfireRepository hangfireRepository,
+            IParkingSlotRepository parkingSlotRepository,
+            ITimeSlotRepository timeSlotRepository,
+            ITransactionRepository transactionRepository,
+            IParkingRepository parkingRepository,
+            IWalletRepository walletRepository,
+            IBookingDetailsRepository bookingDetailsRepository,
+            IBookingRepository bookingRepository)
         {
             _context = context;
             _logger = logger;
             _fireBaseMessageServices = fireBaseMessageServices;
             _emailService = emailService;
             this.hangfireRepository = hangfireRepository;
+            this.parkingSlotRepository = parkingSlotRepository;
+            this.timeSlotRepository = timeSlotRepository;
+            this.transactionRepository = transactionRepository;
+            this.parkingRepository = parkingRepository;
+            this.walletRepository = walletRepository;
+            this.bookingDetailsRepository = bookingDetailsRepository;
+            this.bookingRepository = bookingRepository;
         }
 
 
@@ -77,7 +98,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     // bắn message, đơn của mày đã bị hủy + lý do
                     PushNotiToCustomerWhenOverLateAllowedTime(bookedBooking);
                     bookedBooking.User.BanCount += 1;
-                    if(bookedBooking.User.BanCount >= 2)
+                    if (bookedBooking.User.BanCount >= 2)
                     {
                         bookedBooking.User.IsActive = false;
                     }
@@ -452,32 +473,84 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             }
         }
 
-        public void DisableParkingByDate(int parkingId, DateTime disableDate)
+        public async Task DisableParkingByDate(int parkingId, DateTime disableDate, string reason)
         {
             try
             {
-                var parkingIncludeTimeSlots = _context.Parkings
+                var parkingIncludeTimeSlots = await _context.Parkings
                     .Include(x => x.Floors)!.ThenInclude(x => x.ParkingSlots)!.ThenInclude(x => x.TimeSlots)
-                    .FirstOrDefault(x => x.ParkingId == parkingId);
+                    .FirstOrDefaultAsync(x => x.ParkingId == parkingId);
 
                 var floors = parkingIncludeTimeSlots!.Floors!;
                 parkingIncludeTimeSlots.IsAvailable = false;
-                // foreach (var floor in floors)
-                // {
-                //     var parkingSlots = floor!.ParkingSlots!;
-                //     foreach (var parkingSlot in parkingSlots)
-                //     {
-                //         var timeSlots = parkingSlot.TimeSlots;
-                //         foreach (var timeSlot in timeSlots)
-                //         {
-                //             if (timeSlot.StartTime.Date == disableDate.Date)
-                //             {
-                //                 timeSlot.Status = TimeSlotStatus.Busy.ToString();
-                //             }
-                //         }
-                //     }
-                // }
-                _context.SaveChanges();
+
+                var parkingSlots = await parkingSlotRepository.GetParkingSlotsByParkingId(parkingId);
+                var bookedTimeSlotsAtDisableDate = await timeSlotRepository.GetBookedTimeSlotsByDateNew(parkingSlots.ToList(), disableDate);
+                if (bookedTimeSlotsAtDisableDate != null)
+                {
+                    var tempbookingDetails = new List<BookingDetails>();
+                    foreach (var item in bookedTimeSlotsAtDisableDate)
+                    {
+
+                        var bookingDetails = await bookingDetailsRepository.GetBookingDetailsByTimeSlotId(item.ToList());
+
+                        foreach (var bookingDetail in bookingDetails)
+                        {
+                            if (!tempbookingDetails.Any(x => x.BookingId == bookingDetail.BookingId))
+                            {
+                                tempbookingDetails.Add(bookingDetail);
+                            }
+                        }
+
+                        var reasonChangeTransactionStatus = reason;
+
+                        var prePaidTransactions = await transactionRepository.GetPrePaidTransactions(tempbookingDetails.ToList());
+                        foreach (var prePaidTransaction in prePaidTransactions)
+                        {
+                            var paidMoney = prePaidTransaction.Price;
+                            var customerWallet = prePaidTransaction.Wallet!;
+                            var parkingManagerId = await parkingRepository.GetManagerIdByParkingId(parkingId);
+                            var managerWallet = await walletRepository.GetWalletById(parkingManagerId);
+
+                            customerWallet.Balance += paidMoney;
+                            managerWallet.Balance -= paidMoney;
+
+                            Transaction billTrans = new Transaction()
+                            {
+                                BookingId = prePaidTransaction.BookingId,
+                                CreatedDate = DateTime.UtcNow.AddHours(7),
+                                Description = "Hoàn tiền",
+                                Price = paidMoney,
+                                WalletId = customerWallet.WalletId,
+                                PaymentMethod = prePaidTransaction.PaymentMethod.ToString(),
+                                Status = prePaidTransaction.Status.ToString()
+                            };
+
+
+                            Transaction billTransManager = new Transaction()
+                            {
+                                BookingId = prePaidTransaction.BookingId,
+                                CreatedDate = DateTime.UtcNow.AddHours(7),
+                                Description = "Hoàn tiền cho khách hàng",
+                                Price = paidMoney,
+                                WalletId = managerWallet.WalletId,
+                                PaymentMethod = prePaidTransaction.PaymentMethod.ToString(),
+                                Status = prePaidTransaction.Status.ToString()
+                            };
+
+                            await transactionRepository.Insert(billTrans);
+                            await transactionRepository.Insert(billTransManager);
+
+                            await walletRepository.Save();
+                        }
+
+                        // await transactionRepository.ChangeStatusOriginalTransactionsByBookingDetail(tempbookingDetails.ToList(), reasonChangeTransactionStatus);
+                        await bookingRepository.CancelBookedBookingWhenDisableParking(tempbookingDetails.ToList());
+                        await timeSlotRepository.DisableTimeSlotByDisableDate(parkingSlots.ToList(), disableDate);
+                        // Bắn message chưa có token, lỗi, ko for típ dc nên comment
+                        // await PushNotiForAllCustomer(tempbookingDetails, reasonChangeTransactionStatus);
+                    }
+                }
             }
             catch (System.Exception ex)
             {

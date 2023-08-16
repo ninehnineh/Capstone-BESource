@@ -47,7 +47,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                     foreach (var parkingSlot in parkingSlots)
                     {
                         var timeSlots = parkingSlot.TimeSlots;
-                        parkingSlot.IsAvailable = true;
                         foreach (var timeSlot in timeSlots)
                         {
                             if (timeSlot.StartTime.Date == disableDate.Date)
