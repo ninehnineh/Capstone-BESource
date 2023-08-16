@@ -162,15 +162,36 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         };
                     }
                     var checkDuplicateLicsene = await _bookingRepository.GetAllBookingWithDuplicateVehicle(request.BookingDto.UserId, vehicleExist.LicensePlate);
-
-                    if (checkDuplicateLicsene != null)
+                    var checkParking = await _parkingSlotRepository.GetParkingSlotByParkingSlotId(request.BookingDto.ParkingSlotId);
+                    if(checkParking == null)
                     {
                         return new ServiceResponse<int>
                         {
-                            Message = "Biển số xe bị trùng với một đơn đã được đặt.",
+                            Message = "Không tìm thấy bãi.",
                             Success = false,
-                            StatusCode = 400
+                            StatusCode = 404
                         };
+                    }
+                    if (checkDuplicateLicsene != null)
+                    {
+                        var isCheck = false;
+                        foreach (var item in checkDuplicateLicsene)
+                        {
+                            if(item.StartTime > request.BookingDto.StartTime && item.EndTime > request.BookingDto.EndTime && checkParking == item.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.ParkingId)
+                            {
+                                isCheck = true;
+                            }
+                        }
+                        if(isCheck)
+                        {
+                            return new ServiceResponse<int>
+                            {
+                                Message = "Đơn của bạn đã trùng bãi xe và biển số. Vui lòng đặt ở bãi xe khác!!!",
+                                Success = false,
+                                StatusCode = 400
+                            };
+                        }
+                        
                     }
 
                     // shecudle
