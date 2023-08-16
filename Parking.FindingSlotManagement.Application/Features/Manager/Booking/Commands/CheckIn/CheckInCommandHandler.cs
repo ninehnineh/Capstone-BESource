@@ -174,7 +174,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                             Success = true,
                         };
                     }
-                    if(conflictRequest.Message.Contains(ConflictRequestMessage.Qua_gio.ToString()))
+                    if(conflictRequest.Message.Contains(ConflictRequestMessage.Qua_gio.ToString()) && conflictRequest.Status.Equals(ConflictRequestStatus.InProcess.ToString()))
                     {
                         return new ServiceResponse<string>
                         {
@@ -183,7 +183,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                             StatusCode = 400
                         };
                     }
-                    else if(conflictRequest.Message.Contains(ConflictRequestMessage.Bao_tri.ToString()))
+                    else if(conflictRequest.Message.Contains(ConflictRequestMessage.Bao_tri.ToString()) && conflictRequest.Status.Equals(ConflictRequestStatus.InProcess.ToString()))
                     {
                         return new ServiceResponse<string>
                         {
