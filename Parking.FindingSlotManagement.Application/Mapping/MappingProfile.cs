@@ -249,6 +249,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
             CreateMap<ParkingPrice, GetAllParkingPriceQueryResponse>().ReverseMap();
             CreateMap<ParkingPrice, ParkingPriceDto>().ReverseMap();
             CreateMap<ParkingPrice, ListParkingPrices>().ReverseMap();
+            CreateMap<ParkingPrice, ParkingPriceRes>().ReverseMap();
             #endregion
 
             #region FavoriteAddress Mapping
@@ -305,7 +306,7 @@ namespace Parking.FindingSlotManagement.Application.Mapping
 
             #region Timeline Mapping
             CreateMap<TimeLine, CreateNewTimelineCommandMapper>().ReverseMap();
-            CreateMap<TimeLine, GetListTimelineByParkingPriceIdResponse>().ReverseMap();
+            CreateMap<TimeLine, TimeLineRes>().ReverseMap();
             #endregion
 
             #region Booking Mapping

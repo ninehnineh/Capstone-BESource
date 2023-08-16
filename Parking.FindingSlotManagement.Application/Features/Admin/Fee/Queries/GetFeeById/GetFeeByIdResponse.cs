@@ -12,5 +12,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.Fee.Queries.G
         public string? BusinessType { get; set; }
         public decimal Price { get; set; }
         public string? Name { get; set; }
+        public string NumberOfParking { get; set; }
     }
 }
