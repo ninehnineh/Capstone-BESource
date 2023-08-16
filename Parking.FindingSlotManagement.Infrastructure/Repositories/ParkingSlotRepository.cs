@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Exceptions;
 using Parking.FindingSlotManagement.Application.Models.ParkingSlot;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Domain.Enum;
@@ -75,7 +76,27 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             }
         }
 
+        public async Task<bool> GetParkingByParkingSlotId(int parkingSlotId)
+        {
+            try
+            {
+                var parkingSlot = await _dbContext.ParkingSlots
+                    .Include(x => x.Floor)
+                    .ThenInclude(x => x.Parking)
+                    .FirstOrDefaultAsync(x => x.ParkingSlotId == parkingSlotId);
 
+                if (parkingSlot == null)
+                    throw new NotFoundException("parkingSlotId", parkingSlot);
+                
+                var result = parkingSlot.Floor.Parking.IsAvailable;
+                
+                return result.Value;
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at GetFloorByParkingSlotId: Message {ex.Message}");
+            }
+        }
 
         public async Task<IEnumerable<ParkingSlot>> GetParkingSlotsByParkingId(int parkingId)
         {
@@ -105,7 +126,28 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             return slotNameExist;
         }
 
+        public async Task<bool> IsNotAvailable(int parkingSlotId)
+        {
+            try
+            {
+                // var parking = await _dbContext.ParkingSlots
+                //     .Include(x => x.Floor)
+                //     .ThenInclude(x => x.Parking)
+                //     .FirstOrDefaultAsync(x => x.Floor)
 
+
+                // if (parking == null)
+                //     throw new NotFoundException("parking", "parkingId");
+
+                // parking.IsAvailable = false;
+
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at DisableParkingById: Message {ex.Message}");
+            }
+        }
         // public async Task<List<Domain.Entities.ParkingSlot>> GetParkingSlotsByParkingId(int parkingId)
         // {
         //     try

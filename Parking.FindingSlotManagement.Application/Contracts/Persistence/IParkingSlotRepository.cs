@@ -15,5 +15,7 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         Task DisableParkingSlotWhenSomeTimeBooked(int parkingSlotId);
         Task EnableParkingSlot(int parkingSlotId);
         Task<IEnumerable<ParkingSlot>> GetParkingSlotsByParkingId(int parkingId);
+        Task<bool> IsNotAvailable(int parkingSlotId);
+        Task<bool> GetParkingByParkingSlotId(int parkingSlotId);
     }
 }

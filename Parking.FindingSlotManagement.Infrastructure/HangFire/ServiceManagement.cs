@@ -495,6 +495,16 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             }
         }
 
+        public async Task DisableParkingAtDate(int parkingId)
+        {
+            var parkingIncludeTimeSlots = await _context.Parkings
+                .Include(x => x.Floors)!.ThenInclude(x => x.ParkingSlots)!.ThenInclude(x => x.TimeSlots)
+                .FirstOrDefaultAsync(x => x.ParkingId == parkingId);
+
+            var floors = parkingIncludeTimeSlots!.Floors!;
+            parkingIncludeTimeSlots.IsAvailable = false;
+        }
+
         public async Task DisableParkingByDate(int parkingId, DateTime disableDate, string reason)
         {
             try

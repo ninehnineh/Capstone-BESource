@@ -9,5 +9,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlot
     public class GetDisableParkingHistoryQuery : IRequest<ServiceResponse<IEnumerable<GetDisableParkingHistoryQueryResponse>>>
     {
         public int ParkingId { get; set; }
+        public string State { get; set; }
     }
 }

@@ -107,7 +107,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 foreach (var slot in parkingSlots)
                 {
                     var disableTimeSlots = await _dbContext.TimeSlots
-                        .Where(x => x.ParkingSlotId == slot.ParkingSlotId && x.StartTime.Date == disableDate)
+                        .Where(x => x.ParkingSlotId == slot.ParkingSlotId && x.StartTime.Date == disableDate.Date)
                         .ToListAsync();
 
                     disableTimeSlots.ForEach(x => x.Status = TimeSlotStatus.Busy.ToString());
@@ -200,6 +200,29 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             }
         }
 
+
+        public async Task<int> GetBusyParkingSlotId(List<ParkingSlot> parkingSlotId)
+        {
+            try
+            {
+                var slotBaoTri = 0;
+                foreach (var slot in parkingSlotId)
+                {
+                    var bookedTimeSlots = await _dbContext.TimeSlots
+                       .Where(x => x.ParkingSlotId == slot.ParkingSlotId  &&
+                                   x.Status.Equals(TimeSlotStatus.Busy.ToString()))
+                       .ToListAsync();
+
+                    if (bookedTimeSlots.Count != 0)
+                        slotBaoTri = slot.ParkingSlotId;
+                }
+                return slotBaoTri;
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at GetBookedTimeSlotsByDate: Message {ex.Message}");
+            }
+        }
         public async Task<bool> IsExist(DateTime disableDate)
         {
             try

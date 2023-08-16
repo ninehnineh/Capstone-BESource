@@ -1,4 +1,5 @@
-﻿using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+﻿using Microsoft.EntityFrameworkCore;
+using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Domain.Entities;
 using Parking.FindingSlotManagement.Infrastructure.Persistences;
 using System;
@@ -11,8 +12,10 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 {
     public class FloorRepository : GenericRepository<Floor>, IFloorRepository
     {
+
         public FloorRepository(ParkZDbContext dbContext) : base(dbContext)
         {
         }
+
     }
 }
