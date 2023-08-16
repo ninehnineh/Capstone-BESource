@@ -177,7 +177,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         var isCheck = false;
                         foreach (var item in checkDuplicateLicsene)
                         {
-                            if(item.StartTime > request.BookingDto.StartTime && item.EndTime > request.BookingDto.EndTime && checkParking == item.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.ParkingId)
+                            if(item.StartTime >= request.BookingDto.StartTime && item.EndTime >= request.BookingDto.EndTime && checkParking == item.BookingDetails.FirstOrDefault().TimeSlot.Parkingslot.Floor.ParkingId)
                             {
                                 isCheck = true;
                             }
