@@ -43,6 +43,17 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.ParkingSlots
                 var parkingSlotId = request.ParkingSlotId;
                 ArgumentNullException.ThrowIfNull(parkingSlotId);
 
+                var parkingIsAvailable = await parkingSlotRepository.GetParkingByParkingSlotId(parkingSlotId);
+                if (!parkingIsAvailable)
+                {
+                    return new ServiceResponse<string>
+                    {
+                        Message = "Bãi xe đang không hoạt động, không để bảo trì chỗ đỗ xe",
+                        Success = true,
+                        StatusCode = 200,
+                    };
+                }
+
                 var slotIsInCheckIn = await bookingRepository.GetBookingStatusByParkingSlotId(parkingSlotId);
                 if (slotIsInCheckIn)
                 {
