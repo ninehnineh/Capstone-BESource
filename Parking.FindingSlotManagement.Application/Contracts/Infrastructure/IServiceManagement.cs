@@ -19,5 +19,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Infrastructure
         void ChargeMoneyFor1MonthUsingSystem(Fee fee, int bussinesId, int billId, User user);
         void CheckIfBookingIsLateOrNot(int bookingId, int parkingId, List<string> Token, User ManagerOfParking);
         Task DisableParkingByDate(int parkingId, DateTime disableDate, string reason);
+        Task DisableParkingAtDate(int parkingId);
     }
 }

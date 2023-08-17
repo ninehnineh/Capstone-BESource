@@ -16,6 +16,7 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
         Task EnableDisableParkingById(int parkingId, DateTime disableDate);
         Task<bool> GetDisableParking(int parkingId, DateTime disableDate);
         Task<int> GetManagerIdByParkingId(int parkingId);
+        Task DisableParkingById(int parkingId);
 
     }
 }

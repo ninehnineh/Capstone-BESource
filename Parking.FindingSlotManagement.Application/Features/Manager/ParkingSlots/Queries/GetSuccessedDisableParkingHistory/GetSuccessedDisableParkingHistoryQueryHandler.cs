@@ -3,25 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Domain.Enum;
 
-namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Queries.GetDisableParkingHistory
+namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Queries.GetSuccessedDisableParkingHistory
 {
-    public class GetDisableParkingHistoryQueryHandler : IRequestHandler<GetDisableParkingHistoryQuery, ServiceResponse<IEnumerable<GetDisableParkingHistoryQueryResponse>>>
+    public class GetSuccessedDisableParkingHistoryQueryHandler : IRequestHandler<GetSuccessedDisableParkingHistoryQuery, ServiceResponse<IEnumerable<GetSuccessedDisableParkingHistoryQueryResponse>>>
     {
 
-        public GetDisableParkingHistoryQueryHandler()
+        public GetSuccessedDisableParkingHistoryQueryHandler()
         {
+
         }
-        public async Task<ServiceResponse<IEnumerable<GetDisableParkingHistoryQueryResponse>>> Handle(GetDisableParkingHistoryQuery request, CancellationToken cancellationToken)
+        public async Task<ServiceResponse<IEnumerable<GetSuccessedDisableParkingHistoryQueryResponse>>> Handle(GetSuccessedDisableParkingHistoryQuery request, CancellationToken cancellationToken)
         {
             try
             {
                 var parkingId = request.ParkingId;
-                List<GetDisableParkingHistoryQueryResponse> result = new();
+                List<GetSuccessedDisableParkingHistoryQueryResponse> result = new();
 
                 // var histories = await hangfireRepository.GetHistoryDisableParking(parkingId);
                 // var response = new List<GetDisableParkingHistoryQueryResponse>();
@@ -51,7 +50,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlot
                 string file1 = "historydisableparking.json";
                 if (!File.Exists(file1))
                 {
-                    return new ServiceResponse<IEnumerable<GetDisableParkingHistoryQueryResponse>>
+                    return new ServiceResponse<IEnumerable<GetSuccessedDisableParkingHistoryQueryResponse>>
                     {
                         Message = "Tệp không tồn tại",
                         StatusCode = 200,
@@ -61,24 +60,24 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlot
                 else
                 {
                     string jsonFromFile = File.ReadAllText("historydisableparking.json");
-                    var scheduledParkingHistoryStatus = ParkingHistoryStatus.Scheduled.ToString();
+                    var succeededParkingHistoryStatus = ParkingHistoryStatus.Succeeded.ToString();
                     JArray array = JArray.Parse(jsonFromFile);
 
                     List<JToken> parkings = array.Where(x => x["ParkingId"].Value<int>() == parkingId &&
-                                                             x["State"].Value<string>().Equals(scheduledParkingHistoryStatus))
+                                                             x["State"].Value<string>().Equals(succeededParkingHistoryStatus))
                                                              .ToList();
 
                     if (parkings.Count() != 0)
                     {
                         foreach (JToken token in parkings)
                         {
-                            GetDisableParkingHistoryQueryResponse a = token.ToObject<GetDisableParkingHistoryQueryResponse>();
+                            GetSuccessedDisableParkingHistoryQueryResponse a = token.ToObject<GetSuccessedDisableParkingHistoryQueryResponse>();
                             result.Add(a);
                         }
                     }
                     else
                     {
-                        return new ServiceResponse<IEnumerable<GetDisableParkingHistoryQueryResponse>>
+                        return new ServiceResponse<IEnumerable<GetSuccessedDisableParkingHistoryQueryResponse>>
                         {
                             Message = "Không có dữ liệu",
                             StatusCode = 200,
@@ -87,7 +86,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlot
                     }
                 }
 
-                return new ServiceResponse<IEnumerable<GetDisableParkingHistoryQueryResponse>>
+                return new ServiceResponse<IEnumerable<GetSuccessedDisableParkingHistoryQueryResponse>>
                 {
                     Data = result,
                     Message = "Thành công",
@@ -97,9 +96,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlot
             }
             catch (System.Exception ex)
             {
-                throw new Exception($"Error at GetDisableParkingHistoryQueryHandler: Message {ex.Message}");
+                throw new Exception($"Error at GetSuccessedDisableParkingHistoryQueryHandler: Message {ex.Message}");
             }
-
         }
     }
 }

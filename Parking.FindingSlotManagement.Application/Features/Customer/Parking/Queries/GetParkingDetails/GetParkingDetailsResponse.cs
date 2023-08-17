@@ -52,6 +52,9 @@ public class ParkingPriceDto
     public virtual TrafficDto? Traffic { get; set; }
     public float? ExtraTimeStep { get; set; }
     public IEnumerable<TimeLineDto> TimeLines { get; set; }
+    public decimal? PenaltyPrice { get; set; }
+    public float? PenaltyPriceStepTime { get; set; }
+
 }
 
 public class TimeLineDto

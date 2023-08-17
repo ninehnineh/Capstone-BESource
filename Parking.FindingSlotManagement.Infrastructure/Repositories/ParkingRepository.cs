@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Exceptions;
 using Parking.FindingSlotManagement.Application.Features.Keeper.Commands.DisableParkingSlotByDate.Model;
 using Parking.FindingSlotManagement.Application.Models.Parking;
 using Parking.FindingSlotManagement.Domain.Entities;
@@ -102,7 +103,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             }
             catch (System.Exception ex)
             {
-
                 throw new Exception($"Error at GetParkingById: Message {ex.Message}");
             }
         }
@@ -118,7 +118,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 //             "WHERE JSON_VALUE(HangFire.Job.InvocationData, '$.m') = @MethodName AND JSON_VALUE(HangFire.Job.Arguments, '$[0]') = @ParkingId AND HangFire.Job.Arguments LIKE '%' + @DisableDate + '%'";
                 var query = "SELECT * " +
                             "FROM HangFire.Job " +
-                            "WHERE JSON_VALUE(HangFire.Job.InvocationData, '$.m') = @MethodName AND JSON_VALUE(HangFire.Job.Arguments, '$[0]') = @ParkingId AND JSON_VALUE(HangFire.Job.Arguments, '$[1]') LIKE '%' + @DisableDate + '%'"; 
+                            "WHERE JSON_VALUE(HangFire.Job.InvocationData, '$.m') = @MethodName AND JSON_VALUE(HangFire.Job.Arguments, '$[0]') = @ParkingId AND JSON_VALUE(HangFire.Job.Arguments, '$[1]') LIKE '%' + @DisableDate + '%'";
                 using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
@@ -151,7 +151,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 var parking = await dbContext.Parkings
                     .Include(x => x.BusinessProfile)
                     .FirstOrDefaultAsync(x => x.ParkingId == parkingId);
-                
+
                 var managerId = parking!.BusinessProfile.UserId;
 
                 return managerId.Value;
@@ -161,5 +161,26 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 throw new Exception($"Error at GetManagerIdByParkingId: Message {ex.Message}");
             }
         }
+
+        public async Task DisableParkingById(int parkingId)
+        {
+            try
+            {
+                var parking = await dbContext.Parkings
+                    .FindAsync(parkingId);
+
+                if (parking == null)
+                    throw new NotFoundException("parking", "parkingId");
+
+                parking.IsAvailable = false;
+                
+                await dbContext.SaveChangesAsync();
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Error at DisableParkingById: Message {ex.Message}");
+            }
+        }
+
     }
 }

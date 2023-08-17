@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 
 namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.EnableParking
@@ -21,23 +23,51 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
             try
             {
                 var parkingId = request.ParkingId;
-                var disableDate = request.DisableDate.Date;
+                var disableDate = request.DisableDate.Date.ToString("MM/dd/yyyy");
 
                 ArgumentNullException.ThrowIfNull(parkingId);
                 ArgumentNullException.ThrowIfNull(disableDate);
 
-                var hasRow = await parkingRepository.GetDisableParking(parkingId, disableDate);
-                if (!hasRow)
+                // var hasRow = await parkingRepository.GetDisableParking(parkingId, disableDate);
+                // if (!hasRow)
+                // {
+                //     return new ServiceResponse<string>
+                //     {
+                //         Message = "Không có thông tin dữ liệu",
+                //     };
+                // }
+                // else if (hasRow)
+                // {
+                //     await parkingRepository.EnableDisableParkingById(parkingId, disableDate);
+                //     // await hangfireRepository.DeleteJob("DisableParkingByDate", parkingId, disableDate);
+                // }
+
+                string file1 = "historydisableparking.json";
+                if (!File.Exists(file1))
                 {
                     return new ServiceResponse<string>
                     {
-                        Message = "Không có thông tin dữ liệu",
+                        Message = "Tệp không tồn tại",
+                        StatusCode = 200,
+                        Success = true,
                     };
                 }
-                else if (hasRow)
+                else
                 {
-                    await parkingRepository.EnableDisableParkingById(parkingId, disableDate);
-                    // await hangfireRepository.DeleteJob("DisableParkingByDate", parkingId, disableDate);
+                    string jsonFromFile = File.ReadAllText("historydisableparking.json");
+                    JArray array = JArray.Parse(jsonFromFile);
+                    // List<JToken> parkings = array.Where(x => x["ParkingId"].Value<int>() == parkingId).ToList();
+                    foreach (JToken token in array)
+                    {
+                        if (token["ParkingId"].Value<int>() == 1 && token["DisableDate"].Value<DateTime>().Date == DateTime.Parse(disableDate))
+                        {
+                            token["State"] = "Succeeded";
+                        }
+                    }
+
+                    string updatedJson = JsonConvert.SerializeObject(array, Formatting.Indented);
+                    File.WriteAllText("historydisableparking.json", updatedJson);
+
                 }
 
                 return new ServiceResponse<string>

@@ -61,7 +61,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Commands.Di
 
                 ArgumentNullException.ThrowIfNull(parkingId);
                 ArgumentNullException.ThrowIfNull(disableDate);
-                // nhớ set rule cho disableDate, có cho phép đặt lịch disable 1 tháng hay 1 tuần hay 1 năm 
 
                 if (disableDate >= nowUTCDate.AddDays(30))
                 {
@@ -91,116 +90,115 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Commands.Di
                     var timeToCallJob = disableDateTime - nowUTCDate.AddHours(7);
                     var jobId = BackgroundJob.Schedule<IServiceManagement>(x => x.DisableParkingByDate(parkingId, disableDate, reason), timeToCallJob);
 
-                    // List<GetDisableParkingHistoryQueryResponse> histories = new List<GetDisableParkingHistoryQueryResponse>();
-                    // var newhistoryDisableParking = new GetDisableParkingHistoryQueryResponse
-                    // {
-                    //     ParkingId = parkingId,
-                    //     CreatedAt = DateTime.UtcNow.AddHours(7),
-                    //     DisableDate = disableDate,
-                    //     Reason = reason,
-                    //     State = "Scheduled"
-                    // };
-                    // histories.Add(newhistoryDisableParking);
-                    // string file1 = "historydisableparking.json";
-                    // if (!File.Exists(file1))
-                    // {
-                    //     string json = JsonConvert.SerializeObject(histories);
-                    //     File.WriteAllText(file1, json);
-                    // }
-                    // else
-                    // {
-                    //     string jsonFromFile = File.ReadAllText("historydisableparking.json");
-                    //     List<GetDisableParkingHistoryQueryResponse> disableParkingHistory = JsonConvert.DeserializeObject<List<GetDisableParkingHistoryQueryResponse>>(jsonFromFile);
-                    //     disableParkingHistory.Add(newhistoryDisableParking);
-
-                    //     File.WriteAllText("historydisableparking.json", JsonConvert.SerializeObject(disableParkingHistory));
-                    // }
-
-                    return new ServiceResponse<string>
+                    List<GetDisableParkingHistoryQueryResponse> histories = new List<GetDisableParkingHistoryQueryResponse>();
+                    var newhistoryDisableParking = new GetDisableParkingHistoryQueryResponse
                     {
-                        Message = "Thành công",
-                        Data = jobId,
-                        Success = true,
-                        StatusCode = 201
+                        ParkingId = parkingId,
+                        CreatedAt = DateTime.UtcNow.AddHours(7).ToString(),
+                        DisableDate = disableDate.ToString(),
+                        Reason = reason,
+                        State = ParkingHistoryStatus.Scheduled.ToString(),
                     };
-                }
-                var parkingSlots = await parkingSlotRepository.GetParkingSlotsByParkingId(parkingId);
-                var bookedTimeSlotsAtDisableDate = await timeSlotRepository.GetBookedTimeSlotsByDateNew(parkingSlots.ToList(), disableDate);
-                if (bookedTimeSlotsAtDisableDate.Count() != 0)
-                {
-                    var tempbookingDetails = new List<BookingDetails>();
-                    foreach (var item in bookedTimeSlotsAtDisableDate)
+                    histories.Add(newhistoryDisableParking);
+                    string file1 = "historydisableparking.json";
+                    if (!File.Exists(file1))
                     {
+                        string json = JsonConvert.SerializeObject(histories, Formatting.Indented);
+                        File.WriteAllText(file1, json);
+                    }
+                    else
+                    {
+                        string jsonFromFile = File.ReadAllText("historydisableparking.json");
+                        List<GetDisableParkingHistoryQueryResponse> disableParkingHistory = JsonConvert.DeserializeObject<List<GetDisableParkingHistoryQueryResponse>>(jsonFromFile);
+                        disableParkingHistory.Add(newhistoryDisableParking);
 
-                        var bookingDetails = await bookingDetailsRepository.GetBookingDetailsByTimeSlotId(item.ToList());
-
-                        foreach (var bookingDetail in bookingDetails)
-                        {
-                            if (!tempbookingDetails.Any(x => x.BookingId == bookingDetail.BookingId))
-                            {
-                                tempbookingDetails.Add(bookingDetail);
-                            }
-                        }
-
-                        var reasonChangeTransactionStatus = reason;
-
-                        var prePaidTransactions = await transactionRepository.GetPrePaidTransactions(tempbookingDetails.ToList());
-                        foreach (var prePaidTransaction in prePaidTransactions)
-                        {
-                            var paidMoney = prePaidTransaction.Price;
-                            var customerWallet = prePaidTransaction.Wallet!;
-                            var parkingManagerId = await parkingRepository.GetManagerIdByParkingId(parkingId);
-                            var managerWallet = await walletRepository.GetWalletById(parkingManagerId);
-
-                            customerWallet.Balance += paidMoney;
-                            managerWallet.Balance -= paidMoney;
-
-                            Transaction billTrans = new Transaction()
-                            {
-                                BookingId = prePaidTransaction.BookingId,
-                                CreatedDate = DateTime.UtcNow.AddHours(7),
-                                Description = "Hoàn tiền",
-                                Price = paidMoney,
-                                WalletId = customerWallet.WalletId,
-                                PaymentMethod = prePaidTransaction.PaymentMethod.ToString(),
-                                Status = prePaidTransaction.Status.ToString()
-                            };
-
-
-                            Transaction billTransManager = new Transaction()
-                            {
-                                BookingId = prePaidTransaction.BookingId,
-                                CreatedDate = DateTime.UtcNow.AddHours(7),
-                                Description = "Hoàn tiền cho khách hàng",
-                                Price = paidMoney,
-                                WalletId = managerWallet.WalletId,
-                                PaymentMethod = prePaidTransaction.PaymentMethod.ToString(),
-                                Status = prePaidTransaction.Status.ToString()
-                            };
-
-                            await transactionRepository.Insert(billTrans);
-                            await transactionRepository.Insert(billTransManager);
-
-                            await walletRepository.Save();
-                        }
-
-                        // await transactionRepository.ChangeStatusOriginalTransactionsByBookingDetail(tempbookingDetails.ToList(), reasonChangeTransactionStatus);
-                        await bookingRepository.CancelBookedBookingWhenDisableParking(tempbookingDetails.ToList());
-                        await timeSlotRepository.DisableTimeSlotByDisableDate(parkingSlots.ToList(), disableDate);
-
-                        // new GetDisableParkingHistoryQueryResponse { State = state, DisableDate = disableDate, CreatedAt = createdAt }
-
-
-                        // Bắn message chưa có token, lỗi, ko for típ dc nên comment
-                        // await PushNotiForAllCustomer(tempbookingDetails, reasonChangeTransactionStatus);
+                        File.WriteAllText("historydisableparking.json", JsonConvert.SerializeObject(disableParkingHistory, Formatting.Indented));
                     }
                 }
                 else
-                {
-                    // var parkingSlots = await parkingSlotRepository.GetParkingSlotsByParkingId(parkingId);
-                    // cancel booking
-                    await timeSlotRepository.DisableTimeSlotByDisableDate(parkingSlots.ToList(), disableDate);
+                {   
+                    var timeToCallJob = disableDateTime - nowUTCDate.AddHours(7);
+                    var jobId = BackgroundJob.Schedule<IServiceManagement>(x => x.DisableParkingAtDate(parkingId), timeToCallJob);
+
+                    var parkingSlots = await parkingSlotRepository.GetParkingSlotsByParkingId(parkingId);
+                    var bookedTimeSlotsAtDisableDate = await timeSlotRepository.GetBookedTimeSlotsByDateNew(parkingSlots.ToList(), disableDate);
+                    if (bookedTimeSlotsAtDisableDate.Count() != 0)
+                    {
+                        var tempbookingDetails = new List<BookingDetails>();
+                        foreach (var item in bookedTimeSlotsAtDisableDate)
+                        {
+
+                            var bookingDetails = await bookingDetailsRepository.GetBookingDetailsByTimeSlotId(item.ToList());
+
+                            foreach (var bookingDetail in bookingDetails)
+                            {
+                                if (!tempbookingDetails.Any(x => x.BookingId == bookingDetail.BookingId))
+                                {
+                                    tempbookingDetails.Add(bookingDetail);
+                                }
+                            }
+
+                            var reasonChangeTransactionStatus = reason;
+
+                            var prePaidTransactions = await transactionRepository.GetPrePaidTransactions(tempbookingDetails.ToList());
+                            foreach (var prePaidTransaction in prePaidTransactions)
+                            {
+                                var paidMoney = prePaidTransaction.Price;
+                                var customerWallet = prePaidTransaction.Wallet!;
+                                var parkingManagerId = await parkingRepository.GetManagerIdByParkingId(parkingId);
+                                var managerWallet = await walletRepository.GetWalletById(parkingManagerId);
+
+                                customerWallet.Balance += paidMoney;
+                                managerWallet.Balance -= paidMoney;
+
+                                Transaction billTrans = new Transaction()
+                                {
+                                    BookingId = prePaidTransaction.BookingId,
+                                    CreatedDate = DateTime.UtcNow.AddHours(7),
+                                    Description = "Hoàn tiền",
+                                    Price = paidMoney,
+                                    WalletId = customerWallet.WalletId,
+                                    PaymentMethod = prePaidTransaction.PaymentMethod.ToString(),
+                                    Status = prePaidTransaction.Status.ToString()
+                                };
+
+
+                                Transaction billTransManager = new Transaction()
+                                {
+                                    BookingId = prePaidTransaction.BookingId,
+                                    CreatedDate = DateTime.UtcNow.AddHours(7),
+                                    Description = "Hoàn tiền cho khách hàng",
+                                    Price = paidMoney,
+                                    WalletId = managerWallet.WalletId,
+                                    PaymentMethod = prePaidTransaction.PaymentMethod.ToString(),
+                                    Status = prePaidTransaction.Status.ToString()
+                                };
+
+                                await transactionRepository.Insert(billTrans);
+                                await transactionRepository.Insert(billTransManager);
+
+                                await walletRepository.Save();
+                            }
+
+                            // await transactionRepository.ChangeStatusOriginalTransactionsByBookingDetail(tempbookingDetails.ToList(), reasonChangeTransactionStatus);
+                            await bookingRepository.CancelBookedBookingWhenDisableParking(tempbookingDetails.ToList());
+                            await timeSlotRepository.DisableTimeSlotByDisableDate(parkingSlots.ToList(), disableDate);
+
+                            // new GetDisableParkingHistoryQueryResponse { State = state, DisableDate = disableDate, CreatedAt = createdAt }
+
+                            // Bắn message chưa có token, lỗi, ko for típ dc nên comment
+                            // await PushNotiForAllCustomer(tempbookingDetails, reasonChangeTransactionStatus);
+                        }
+                    }
+                    else
+                    {
+                        // var parkingSlots = await parkingSlotRepository.GetParkingSlotsByParkingId(parkingId);
+                        // cancel booking
+                        BackgroundJob.Schedule<IServiceManagement>(x => x.DisableParkingAtDate(parkingId), timeToCallJob);
+                        await timeSlotRepository.DisableTimeSlotByDisableDate(parkingSlots.ToList(), disableDate);
+                    }
                 }
+
 
                 // var historyDisableParking = new GetDisableParkingHistoryQueryResponse
                 // {
@@ -225,7 +223,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Commands.Di
 
                 //     File.WriteAllText("historydisableparking.json", JsonConvert.SerializeObject(historyDisableParking));
                 // }
-
 
                 return new ServiceResponse<string>
                 {
