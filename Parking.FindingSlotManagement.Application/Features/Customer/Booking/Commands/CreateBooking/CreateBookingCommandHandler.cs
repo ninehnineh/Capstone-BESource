@@ -186,7 +186,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         {
                             return new ServiceResponse<int>
                             {
-                                Message = "Đơn của bạn đã trùng bãi xe và biển số. Vui lòng đặt ở bãi xe khác!!!",
+                                Message = "Trùng bãi hoặc biển số. Vui lòng đổi bãi/biển số!",
                                 Success = false,
                                 StatusCode = 400
                             };
