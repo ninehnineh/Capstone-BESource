@@ -98,7 +98,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                     paymentMethod.Equals(PaymentMethod.thanh_toan_online.ToString()))
                 {
 
-                    if (booking.User.Wallet.Balance < booking.TotalPrice)
+                    if (booking.User.Wallet.Balance < moneyCustomerMustPayAfterCheckOut)
                     {
                         return new ServiceResponse<string>
                         {
