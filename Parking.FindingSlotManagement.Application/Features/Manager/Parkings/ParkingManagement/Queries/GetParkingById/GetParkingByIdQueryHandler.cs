@@ -42,7 +42,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                         Success = true
                     };
                 }
-                if(parkingExist.IsActive == false)
+                /*if(parkingExist.IsActive == false)
                 {
                     return new ServiceResponse<GetParkingByIdResponse>
                     {
@@ -50,7 +50,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                         StatusCode = 400,
                         Success = true
                     };
-                }
+                }*/
                 var _mapper = config.CreateMapper();
                 var parkingEntity = _mapper.Map<ParkingEntity>(parkingExist);
 

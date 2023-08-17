@@ -83,7 +83,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 var parkingId = await _dbContext.ParkingSlots
                     .Include(x => x.Floor)
                     .FirstOrDefaultAsync(x => x.ParkingSlotId == parkingSlotId);
-                if(parkingId == null)
+                if (parkingId == null)
                 {
                     return 0;
                 }
@@ -94,6 +94,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
 
                 throw new Exception(ex.Message);
             }
+        }
 
 
         public async Task<IEnumerable<ParkingSlot>> GetParkingSlotsByParkingId(int parkingId)
