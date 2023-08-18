@@ -150,37 +150,42 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                     // vào đúng giờ, ra tre
                     else if (checkOutTime > endTimeBooking && checkinTime >= startTimeBooking)
                     {
-                        var actualPriceLate = 0M;
-                        if (penaltyPriceStepTime == 0)
+                        // tính tiền ra trễ
+                        if (checkOutTime - endTimeBooking > TimeSpan.FromMinutes(15))
                         {
-                            actualPriceLate += (decimal)penaltyPrice;
-                        }
-                        else
-                        {
-                            if ((checkOutTime - endTimeBooking) <= TimeSpan.FromHours((double)penaltyPriceStepTime))
+                            var actualPriceLate = 0M;
+                            if (penaltyPriceStepTime == 0)
                             {
                                 actualPriceLate += (decimal)penaltyPrice;
                             }
                             else
                             {
-                                actualPriceLate += (decimal)penaltyPrice;
-                                var penaltyTime = checkOutTime - endTimeBooking;
-                                var step = penaltyTime.Hours / (int)penaltyPriceStepTime;
-                                actualPriceLate += (step * (decimal)penaltyPrice);
+                                if ((checkOutTime - endTimeBooking) <= TimeSpan.FromHours((double)penaltyPriceStepTime))
+                                {
+                                    actualPriceLate += (decimal)penaltyPrice;
+                                }
+                                else
+                                {
+                                    actualPriceLate += (decimal)penaltyPrice;
+                                    var penaltyTime = checkOutTime - endTimeBooking;
+                                    var step = penaltyTime.Hours / (int)penaltyPriceStepTime;
+                                    actualPriceLate += (step * (decimal)penaltyPrice);
+                                }
                             }
+
+                            Transaction bp = new Transaction
+                            {
+                                Price = actualPriceLate,
+                                Status = Domain.Enum.BookingPaymentStatus.Chua_thanh_toan.ToString(),
+                                PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(),
+                                Description = "Phí phạt ra bãi trễ",
+                                BookingId = booking.BookingId,
+                                CreatedDate = DateTime.UtcNow.AddHours(7),
+                            };
+
+                            await _transactionRepository.Insert(bp);
                         }
 
-                        Transaction bp = new Transaction
-                        {
-                            Price = actualPriceLate,
-                            Status = Domain.Enum.BookingPaymentStatus.Chua_thanh_toan.ToString(),
-                            PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(),
-                            Description = "Phí phạt ra bãi trễ",
-                            BookingId = booking.BookingId,
-                            CreatedDate = DateTime.UtcNow.AddHours(7),
-                        };
-
-                        await _transactionRepository.Insert(bp);
 
                         foreach (var item in booking.Transactions)
                         {
@@ -202,7 +207,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                             foreach (var item in timeLines)
                             {
                                 if (item.StartTime <= TimeSpan.FromHours(checkinTime.Value.Hour) &&
-                                    TimeSpan.FromHours(checkinTime.Value.Hour) <= item.EndTime)
+                                    TimeSpan.FromHours(checkinTime.Value.Hour) < item.EndTime)
                                 {
                                     money += (decimal)item.ExtraFee * earlyTimeHour;
                                 }
@@ -248,7 +253,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
                             foreach (var item in timeLines)
                             {
                                 if (item.StartTime <= TimeSpan.FromHours(checkinTime.Value.Hour) &&
-                                    TimeSpan.FromHours(checkinTime.Value.Hour) <= item.EndTime)
+                                    TimeSpan.FromHours(checkinTime.Value.Hour) < item.EndTime)
                                 {
                                     money += (decimal)item.ExtraFee * earlyTimeHour;
                                 }
@@ -275,37 +280,41 @@ namespace Parking.FindingSlotManagement.Application.Features.Keeper.Commands.Boo
 
                         }
 
-                        var actualPriceLate = 0M;
-                        if (penaltyPriceStepTime == 0)
+                        // tính tiền ra trễ
+                        if (checkOutTime - endTimeBooking > TimeSpan.FromMinutes(15))
                         {
-                            actualPriceLate += (decimal)penaltyPrice;
-                        }
-                        else
-                        {
-                            if ((checkOutTime - endTimeBooking) <= TimeSpan.FromHours((double)penaltyPriceStepTime))
+                            var actualPriceLate = 0M;
+                            if (penaltyPriceStepTime == 0)
                             {
                                 actualPriceLate += (decimal)penaltyPrice;
                             }
                             else
                             {
-                                actualPriceLate += (decimal)penaltyPrice;
-                                var penaltyTime = checkOutTime - endTimeBooking;
-                                var step = penaltyTime.Hours / (int)penaltyPriceStepTime;
-                                actualPriceLate += (step * (decimal)penaltyPrice);
+                                if ((checkOutTime - endTimeBooking) <= TimeSpan.FromHours((double)penaltyPriceStepTime))
+                                {
+                                    actualPriceLate += (decimal)penaltyPrice;
+                                }
+                                else
+                                {
+                                    actualPriceLate += (decimal)penaltyPrice;
+                                    var penaltyTime = checkOutTime - endTimeBooking;
+                                    var step = penaltyTime.Hours / (int)penaltyPriceStepTime;
+                                    actualPriceLate += (step * (decimal)penaltyPrice);
+                                }
                             }
+
+                            Transaction bp1 = new Transaction
+                            {
+                                Price = actualPriceLate,
+                                Status = Domain.Enum.BookingPaymentStatus.Chua_thanh_toan.ToString(),
+                                PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(),
+                                Description = "Phí phạt ra bãi trễ",
+                                BookingId = booking.BookingId,
+                                CreatedDate = DateTime.UtcNow.AddHours(7),
+                            };
+
+                            await _transactionRepository.Insert(bp1);
                         }
-
-                        Transaction bp1 = new Transaction
-                        {
-                            Price = actualPriceLate,
-                            Status = Domain.Enum.BookingPaymentStatus.Chua_thanh_toan.ToString(),
-                            PaymentMethod = Domain.Enum.PaymentMethod.tra_sau.ToString(),
-                            Description = "Phí phạt ra bãi trễ",
-                            BookingId = booking.BookingId,
-                            CreatedDate = DateTime.UtcNow.AddHours(7),
-                        };
-
-                        await _transactionRepository.Insert(bp1);
 
                         foreach (var item in booking.Transactions)
                         {
