@@ -178,8 +178,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Commands.Di
                 var newhistoryDisableParking = new GetDisableParkingHistoryQueryResponse
                 {
                     ParkingId = parkingId,
-                    CreatedAt = DateTime.UtcNow.AddHours(7).ToString(),
-                    DisableDate = disableDate.AddHours(7).ToString(),
+                    CreatedAt = DateTime.UtcNow.AddHours(7).ToString("dd/MM/yyyy"),
+                    DisableDate = disableDate.ToString("dd/MM/yyyy"),
                     Reason = reason,
                     State = ParkingHistoryStatus.Scheduled.ToString(),
                 };

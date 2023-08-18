@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using MediatR;
+using Newtonsoft.Json;
 using Org.BouncyCastle.Math.EC.Rfc7748;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Domain.Entities;
+using Parking.FindingSlotManagement.Domain.Enum;
 
 namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Commands.DisableParkingAtCurrentTime
 {
@@ -78,36 +80,39 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                             {
                                 var paidMoney = prePaidTransaction.Price;
                                 var customerWallet = prePaidTransaction.Wallet!;
+                                var customerWalletId = prePaidTransaction.Wallet!.WalletId;
                                 var parkingManagerId = await parkingRepository.GetManagerIdByParkingId(parkingId);
                                 var managerWallet = await walletRepository.GetWalletById(parkingManagerId);
+                                var managerWalletId = managerWallet.WalletId;
+                                var prePaidBookingId = prePaidTransaction.BookingId;
 
                                 customerWallet.Balance += paidMoney;
                                 managerWallet.Balance -= paidMoney;
 
                                 Transaction billTrans = new Transaction()
                                 {
-                                    BookingId = prePaidTransaction.BookingId,
+                                    BookingId = prePaidBookingId,
                                     CreatedDate = DateTime.UtcNow.AddHours(7),
                                     Description = "Hoàn tiền",
                                     Price = paidMoney,
-                                    WalletId = customerWallet.WalletId,
-                                    PaymentMethod = prePaidTransaction.PaymentMethod.ToString(),
-                                    Status = prePaidTransaction.Status.ToString()
-                                };
-
-
-                                Transaction billTransManager = new Transaction()
-                                {
-                                    BookingId = prePaidTransaction.BookingId,
-                                    CreatedDate = DateTime.UtcNow.AddHours(7),
-                                    Description = "Hoàn tiền cho khách hàng",
-                                    Price = paidMoney,
-                                    WalletId = managerWallet.WalletId,
+                                    WalletId = customerWalletId,
                                     PaymentMethod = prePaidTransaction.PaymentMethod.ToString(),
                                     Status = prePaidTransaction.Status.ToString()
                                 };
 
                                 await transactionRepository.Insert(billTrans);
+
+                                Transaction billTransManager = new Transaction()
+                                {
+                                    BookingId = prePaidBookingId,
+                                    CreatedDate = DateTime.UtcNow.AddHours(7),
+                                    Description = "Hoàn tiền cho khách hàng",
+                                    Price = paidMoney,
+                                    WalletId = managerWalletId,
+                                    PaymentMethod = prePaidTransaction.PaymentMethod.ToString(),
+                                    Status = prePaidTransaction.Status.ToString()
+                                };
+
                                 await transactionRepository.Insert(billTransManager);
 
                                 await walletRepository.Save();
@@ -146,11 +151,45 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                             await timeSlotRepository.DisableTimeSlotByDisableDateTime(parkingSlots.ToList(), disableDate.AddHours(7));
                         }
 
-                        
+
                         await parkingRepository.DisableParkingById(parkingId);
                     }
 
-                    return new ServiceResponse<string> 
+                    List<DisableParkingAtCurrentTimeCommandResponse> histories = new List<DisableParkingAtCurrentTimeCommandResponse>();
+                    var newhistoryDisableParking = new DisableParkingAtCurrentTimeCommandResponse
+                    {
+                        ParkingId = parkingId,
+                        CreatedAt = DateTime.UtcNow.AddHours(7).ToString("dd/MM/yyyy"),
+                        DisableDate = disableDate.ToString("dd/MM/yyyy"),
+                        Reason = reason,
+                        State = ParkingHistoryStatus.Succeeded.ToString(),
+                    };
+                    histories.Add(newhistoryDisableParking);
+                    string file1 = "historydisableparking.json";
+                    if (!File.Exists(file1))
+                    {
+                        string json = JsonConvert.SerializeObject(histories, Formatting.Indented);
+                        File.WriteAllText(file1, json);
+                    }
+                    else
+                    {
+                        string jsonFromFile = File.ReadAllText("historydisableparking.json");
+                        if (string.IsNullOrWhiteSpace(jsonFromFile))
+                        {
+                            string json = JsonConvert.SerializeObject(histories, Formatting.Indented);
+                            File.WriteAllText(file1, json);
+                        }
+                        else 
+                        {
+                            List<DisableParkingAtCurrentTimeCommandResponse> disableParkingHistory = JsonConvert.DeserializeObject<List<DisableParkingAtCurrentTimeCommandResponse>>(jsonFromFile);
+                            disableParkingHistory.Add(newhistoryDisableParking);
+                            File.WriteAllText("historydisableparking.json", JsonConvert.SerializeObject(disableParkingHistory, Formatting.Indented));
+                        }
+
+                    }
+
+
+                    return new ServiceResponse<string>
                     {
                         Message = "Thành công",
                         StatusCode = 200,
