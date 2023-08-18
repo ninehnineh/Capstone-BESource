@@ -23,7 +23,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
             try
             {
                 var parkingId = request.ParkingId;
-                var disableDate = request.DisableDate.Date.ToString("dd/MM/yyyy");
+                var disableDate = request.DisableDate;
 
                 ArgumentNullException.ThrowIfNull(parkingId);
                 ArgumentNullException.ThrowIfNull(disableDate);
@@ -59,7 +59,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                     // List<JToken> parkings = array.Where(x => x["ParkingId"].Value<int>() == parkingId).ToList();
                     foreach (JToken token in array)
                     {
-                        if (token["ParkingId"].Value<int>() == 1 && token["DisableDate"].Value<DateTime>().Date == DateTime.Parse(disableDate))
+                        if (token["ParkingId"].Value<int>() == parkingId && token["DisableDate"].Value<string>() == disableDate.Date.ToString("dd/MM/yyyy"))
                         {
                             token["State"] = "Succeeded";
                         }
