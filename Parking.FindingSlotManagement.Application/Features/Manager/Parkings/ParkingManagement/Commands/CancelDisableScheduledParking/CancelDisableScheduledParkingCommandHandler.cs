@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 
 namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.ParkingManagement.Commands.CancelDisableScheduledParking
@@ -25,14 +27,33 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
                 ArgumentNullException.ThrowIfNull(parkingId);
                 ArgumentNullException.ThrowIfNull(disableDate);
 
-                var result = await hangfireRepository.DeleteScheduledJob(parkingId, disableDate);
-
-                if (!result.Equals("Xóa thành công"))
+                string file1 = "historydisableparking.json";
+                if (!File.Exists(file1))
                 {
                     return new ServiceResponse<string>
                     {
-                        Message = "Có lỗi xảy ra khi xóa lịch",
+                        Message = "Tệp không tồn tại",
+                        StatusCode = 200,
+                        Success = true,
                     };
+                }
+                else
+                {
+                    string jsonFromFile = File.ReadAllText("historydisableparking.json");
+                    JArray array = JArray.Parse(jsonFromFile);
+                    // List<JToken> parkings = array.Where(x => x["ParkingId"].Value<int>() == parkingId).ToList();
+                    foreach (JToken token in array)
+                    {
+                        if (token["ParkingId"].Value<int>() == parkingId && token["DisableDate"].Value<string>() == disableDate.Date.ToString("dd/MM/yyyy"))
+                        {
+                            token.Remove();
+                            break;
+                        }
+                    }
+
+                    string updatedJson = JsonConvert.SerializeObject(array, Formatting.Indented);
+                    File.WriteAllText("historydisableparking.json", updatedJson);
+
                 }
 
                 return new ServiceResponse<string>
@@ -44,7 +65,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Parkings.Pa
             }
             catch (System.Exception ex)
             {
-                
+
                 throw new Exception($"Error at CancelDisableScheduledParkingCommandHandler: Message {ex.Message}");
             }
         }
