@@ -415,9 +415,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             var customerIsCheckOut = bookedBooking.CheckoutTime != null;
             var customerIsCheckIn = bookedBooking.CheckinTime.HasValue;
 
-            var bookedTimeSlot = bookedBooking.BookingDetails.Last().TimeSlotId;
+            var now = DateTime.UtcNow.AddHours(7);
+            DateTime roundedTime = now.Date.AddHours(now.Hour);
 
-            var nextTimeSlot = _context.TimeSlots.Find(bookedTimeSlot + 1);
+            var nextTimeSlot = _context.TimeSlots.FirstOrDefault(x => x.ParkingSlotId == bookedBooking.BookingDetails.Last().TimeSlot.ParkingSlotId &&
+                                                                        x.StartTime == roundedTime);
             var methodName = "CheckIfBookingIsLateOrNot";
 
             //Delete job
