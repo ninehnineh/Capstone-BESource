@@ -104,8 +104,6 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                                 bookingDetail.TimeSlot.Status = TimeSlotStatus.Free.ToString();
                             }
 
-                        // bắn message, đơn của mày đã bị hủy + lý do
-                        PushNotiToCustomerWhenOverLateAllowedTime(bookedBooking);
                         _context.SaveChanges();
                     }
                     else
@@ -155,7 +153,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
         }
 
-        public async void AutoCancelBookingWhenOutOfEndTimeBooking(int bookingId)
+        public async void AutoCancelBookingWhenOutOfEndTimeBooking(int bookingId, string jobId)
         {
 
             var methodName = "AutoCancelBookingWhenOutOfEndTimeBooking";
@@ -167,8 +165,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                         .Include(x => x.Transactions)!.ThenInclude(x => x.Wallet)
                         .FirstOrDefault(x => x.BookingId == bookingId);
 
-                var guestArrived = bookedBooking.CheckinTime.Value != null;
-                var isOutOfEndTimeBooking = DateTime.UtcNow.AddHours(7) >= bookedBooking.EndTime.Value;
+                var isOutOfEndTimeBooking = DateTime.UtcNow.AddHours(7) >= bookedBooking.EndTime.Value.AddMinutes(-1);
+                var guestArrived = bookedBooking.CheckinTime.HasValue;
 
                 if (guestArrived)
                 {
@@ -190,7 +188,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     PushNotiToCustomerWhenCustomerNotArrive(bookedBooking);
                     _context.SaveChanges();
                 }
-                Console.WriteLine($"Exception");
+                BackgroundJob.Delete(jobId);
+                // Console.WriteLine($"Exception");
             }
             catch (Exception ex)
             {
@@ -408,9 +407,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             Console.WriteLine("Background Job CheckIfBookingIsLateOrNot Called");
 
             var newJobId = "";
-            var bookedBooking = _context.Bookings
+            var bookedBooking = await _context.Bookings
                                         .Include(x => x.BookingDetails!).ThenInclude(x => x.TimeSlot)
-                                        .FirstOrDefault(x => x.BookingId == bookingId);
+                                        .FirstOrDefaultAsync(x => x.BookingId == bookingId);
 
             var customerIsCheckOut = bookedBooking.CheckoutTime != null;
             var customerIsCheckIn = bookedBooking.CheckinTime.HasValue;
@@ -418,7 +417,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             var now = DateTime.UtcNow.AddHours(7);
             DateTime roundedTime = now.Date.AddHours(now.Hour);
 
-            var nextTimeSlot = _context.TimeSlots.FirstOrDefault(x => x.ParkingSlotId == bookedBooking.BookingDetails.Last().TimeSlot.ParkingSlotId &&
+            var nextTimeSlot = await _context.TimeSlots.FirstOrDefaultAsync(x => x.ParkingSlotId == bookedBooking.BookingDetails.Last().TimeSlot.ParkingSlotId &&
                                                                         x.StartTime == roundedTime);
             var methodName = "CheckIfBookingIsLateOrNot";
 
@@ -439,8 +438,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     TimeSlotId = nextTimeSlot.TimeSlotId
                 };
 
-                _context.BookingDetails.Add(newBookingDetail);
-                _context.SaveChanges();
+                await _context.BookingDetails.AddAsync(newBookingDetail);
+                await _context.SaveChangesAsync();
 
                 DateTime end = DateTime.Parse(nextTimeSlot.EndTime.ToString()).AddMinutes(1);
                 DateTimeOffset timeToCallMethod = new DateTimeOffset(end, new TimeSpan(7, 0, 0));
@@ -453,8 +452,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 Console.WriteLine("Background Job: co request can xu ly");
                 bookedBooking.Status = BookingStatus.OverTime.ToString();
 
-                var conflictBookingDetails = _context.BookingDetails
-                .FirstOrDefault(x => x.TimeSlotId == nextTimeSlot.TimeSlotId);
+                var conflictBookingDetails = await _context.BookingDetails
+                .FirstOrDefaultAsync(x => x.TimeSlotId == nextTimeSlot.TimeSlotId);
 
                 var newConflictRequest = new ConflictRequest
                 {
@@ -464,9 +463,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     Status = ConflictRequestStatus.InProcess.ToString(),
                 };
 
-                _context.ConflictRequests.Add(newConflictRequest);
+                await _context.ConflictRequests.AddAsync(newConflictRequest);
                 conflictBookingDetails.BookingId = bookingId;
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 DateTime end = DateTime.Parse(nextTimeSlot.EndTime.ToString()).AddMinutes(1);
                 DateTimeOffset timeToCallMethod = new DateTimeOffset(end, new TimeSpan(7, 0, 0));
@@ -489,7 +488,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 }
                 else
                 {
-                    var manager = _context.Users.Find(ManagerOfParking.UserId!);
+                    var manager = await _context.Users.FindAsync(ManagerOfParking.UserId!);
                     var pushNotificationModel = new PushNotificationWebModel
                     {
                         Title = "Đơn đặt xung đột, cần xử lý",
