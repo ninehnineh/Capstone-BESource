@@ -32,7 +32,6 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <remarks>
         /// SignalR: LoadFee
         /// </remarks>
-        [Authorize(Roles = "Admin")]
         [HttpPost(Name = "CreateNewFee")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.Created)]
@@ -64,7 +63,6 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Admin, Manager
         /// </summary>
-        [Authorize(Roles = "Admin,Manager")]
         [HttpGet(Name = "GetListFee")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -89,7 +87,6 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <remarks>
         /// SignalR: LoadFee
         /// </remarks>
-        [Authorize(Roles = "Admin")]
         [HttpDelete("{feeId}", Name = "DeleteFee")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -115,7 +112,6 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <summary>
         /// API For Manager, Admin
         /// </summary>
-        [Authorize(Roles = "Admin,Manager")]
         [HttpGet("{feeId}", Name = "GetFeeById")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -144,7 +140,6 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
         /// <remarks>
         /// SignalR: LoadFee
         /// </remarks>
-        [Authorize(Roles = "Admin")]
         [HttpPut(Name = "UpdateFee")]
         [Produces("application/json")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]

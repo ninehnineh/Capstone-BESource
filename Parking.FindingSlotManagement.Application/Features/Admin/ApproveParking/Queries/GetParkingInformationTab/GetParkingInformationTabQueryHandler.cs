@@ -1,5 +1,7 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
+using Parking.FindingSlotManagement.Application.Mapping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +19,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
         private readonly IParkingSlotRepository _parkingSlotRepository;
         private readonly IParkingHasPriceRepository _parkingHasPriceRepository;
         private readonly IParkingSpotImageRepository _parkingSpotImageRepository;
+        MapperConfiguration config = new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile(new MappingProfile());
+        });
 
         public GetParkingInformationTabQueryHandler(
             IParkingRepository parkingRepository, 
@@ -79,12 +85,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Admin.ApproveParkin
                     x => x.ParkingPrice
                 };
                 var lstParkingHasPrice = await _parkingHasPriceRepository.GetAllItemWithCondition(x => x.ParkingId == request.ParkingId, includes2, null, true);
-                List<string> lstParkingHasPriceOfParking = new();
+                List<ListParkingPrices> lstParkingHasPriceOfParking = new();
+                var _mapper = config.CreateMapper();
                 foreach (var item in lstParkingHasPrice)
                 {
-                    lstParkingHasPriceOfParking.Add(item.ParkingPrice.ParkingPriceName);
+                    var entityParkingPrice = _mapper.Map<ListParkingPrices>(item.ParkingPrice);
+                    
+                    lstParkingHasPriceOfParking.Add(entityParkingPrice);
                 }
-                entityRes.ParkingPrices = lstParkingHasPriceOfParking;
+                entityRes.ListParkingPrices = lstParkingHasPriceOfParking;
                 var includes3 = new List<Expression<Func<Domain.Entities.TimeSlot, object>>>
                 {
                    x => x.Parkingslot,
