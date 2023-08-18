@@ -331,6 +331,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
 
                 }
                 adminWallet.Balance += fee.Price;
+                billExist.Time = DateTime.UtcNow.AddHours(7);
                 billExist.WalletId = userWallet.WalletId;
                 billExist.Status = BillStatus.Đã_Thanh_Toán.ToString();
                 _context.SaveChanges();

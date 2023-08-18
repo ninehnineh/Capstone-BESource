@@ -9,5 +9,6 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Persistence
 {
     public interface IBillRepository : IGenericRepository<Bill>
     {
+        Task<decimal> GetRevenueOfBusinessByDateMethod(DateTime date);
     }
 }
