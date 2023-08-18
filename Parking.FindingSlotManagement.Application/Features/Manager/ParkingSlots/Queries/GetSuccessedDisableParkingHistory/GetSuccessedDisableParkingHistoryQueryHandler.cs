@@ -60,6 +60,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlot
                 else
                 {
                     string jsonFromFile = File.ReadAllText("historydisableparking.json");
+                    if (string.IsNullOrWhiteSpace(jsonFromFile))
+                    {
+                        return new ServiceResponse<IEnumerable<GetSuccessedDisableParkingHistoryQueryResponse>>
+                        {
+                            Message = "Tệp rỗng không có dữ liệu",
+                            StatusCode = 200,
+                            Success = true,
+                        };
+                    }
                     var succeededParkingHistoryStatus = ParkingHistoryStatus.Succeeded.ToString();
                     JArray array = JArray.Parse(jsonFromFile);
 
