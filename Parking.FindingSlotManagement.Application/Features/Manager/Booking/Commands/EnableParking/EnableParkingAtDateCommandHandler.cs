@@ -23,7 +23,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
             try
             {
                 var parkingId = request.ParkingId;
-                var disableDate = request.DisableDate.Date.ToString("MM/dd/yyyy");
+                var disableDate = request.DisableDate.Date.ToString("dd/MM/yyyy");
 
                 ArgumentNullException.ThrowIfNull(parkingId);
                 ArgumentNullException.ThrowIfNull(disableDate);
