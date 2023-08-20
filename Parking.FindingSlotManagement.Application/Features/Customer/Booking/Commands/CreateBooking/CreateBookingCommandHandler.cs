@@ -391,7 +391,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var managerExist = await _parkingRepository.GetItemWithCondition(x => x.ParkingId == parking.ParkingId, includesParking);
             var ManagerOfParking = managerExist.BusinessProfile.User;
             var managerToGetDeviceToken = await _userRepository.GetItemWithCondition(x => x.UserId == ManagerOfParking.UserId);
-            SetJobCheckIfBookingIsLateOrNot(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, managerToGetDeviceToken);
+            var idJob = SetJobCheckIfBookingIsLateOrNot(entity.BookingId, entity.EndTime, (int)parkingId, lstStaffToken, managerToGetDeviceToken);
 
             var notiManager = await PushNotiToManager(parkingSlot, floor, parking);
             if (notiManager == "error")
@@ -399,8 +399,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 var notiCustomer = await PushNoTiToCustomer(request, parkingSlot, floor);
                 if (notiCustomer == "error")
                 {
-                    var timeToCancel = entity.EndTime.Value - DateTime.UtcNow.AddHours(7);
-                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
+                    var timeToCancel = entity.EndTime.Value.AddMinutes(-1) - DateTime.UtcNow.AddHours(7);
+                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOutOfEndTimeBooking(entity.BookingId, idJob), timeToCancel);
                     return new ServiceResponse<int>
                     {
                         Data = entity.BookingId,
@@ -412,7 +412,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 else
                 {
                     var timeToCancel = entity.EndTime.Value - DateTime.UtcNow.AddHours(7);
-                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
+                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOutOfEndTimeBooking(entity.BookingId, idJob), timeToCancel);
                     return new ServiceResponse<int>
                     {
                         Data = entity.BookingId,
@@ -428,7 +428,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 if (notiCustomer == "error")
                 {
                     var timeToCancel = entity.EndTime.Value - DateTime.UtcNow.AddHours(7);
-                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
+                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOutOfEndTimeBooking(entity.BookingId, idJob), timeToCancel);
                     return new ServiceResponse<int>
                     {
                         Data = entity.BookingId,
@@ -440,7 +440,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 else
                 {
                     var timeToCancel = entity.EndTime.Value - DateTime.UtcNow.AddHours(7);
-                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOverAllowTimeBooking(entity.BookingId), timeToCancel);
+                    BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOutOfEndTimeBooking(entity.BookingId, idJob), timeToCancel);
                     return new ServiceResponse<int>
                     {
                         Data = entity.BookingId,
@@ -709,7 +709,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             };*/
         }
 
-        private void SetJobCheckIfBookingIsLateOrNot(int bookingId, DateTime? endTime, int parkingId, List<string> Token, User ManagerOfParking)
+        private string SetJobCheckIfBookingIsLateOrNot(int bookingId, DateTime? endTime, int parkingId, List<string> Token, User ManagerOfParking)
         {
             DateTime end = DateTime.Parse(endTime.ToString()).AddMinutes(1);
             // var timeToCa = DateTimeOffset.UtcNow.AddHours(7).AddMinutes(1); // 7 ngay + 1 phut chay tren server
@@ -718,6 +718,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var jobId = BackgroundJob.Schedule<IServiceManagement>(
                 x => x.CheckIfBookingIsLateOrNot(bookingId, parkingId, Token, ManagerOfParking),
                 timeToCallMethod);
+
+            return jobId;
         }
         private async Task<string> UploadQRImagess(int bookingId)
         {
