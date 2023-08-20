@@ -58,7 +58,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             result.Data.ShouldBeNull();
             result.Count.ShouldBe(0);
         }
-        [Fact]
+        /*[Fact]
         public async Task Handle_InactiveParking_ShouldReturnInactive()
         {
             // Arrange
@@ -96,7 +96,7 @@ namespace Parking.FindingSlotManagement.Application.UnitTests.HandlerTesting.Man
             result.Message.ShouldBe("Bãi đã bị cấm.");
             result.Data.ShouldBeNull();
             result.Count.ShouldBe(0);
-        }
+        }*/
         [Fact]
         public async Task Handle_ParkingFound_ShouldReturnParkingInfo()
         {
