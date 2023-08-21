@@ -2,10 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Ocsp;
 using Parking.FindingSlotManagement.Application.Contracts.Infrastructure;
 using Parking.FindingSlotManagement.Application.Contracts.Persistence;
 using Parking.FindingSlotManagement.Application.Features.Manager.Account.RegisterCensorshipBusinessAccount.Commands.RegisterBusinessAccount;
+using Parking.FindingSlotManagement.Application.Features.Manager.ParkingSlots.Queries.GetDisableParkingHistory;
 using Parking.FindingSlotManagement.Application.Models;
 using Parking.FindingSlotManagement.Application.Models.PushNotification;
 using Parking.FindingSlotManagement.Domain.Entities;
@@ -86,23 +89,21 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 }
                 else if (!guestArrived)
                 {
-                    if(bookedBooking.Transactions.FirstOrDefault().PaymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc.ToString()))
+                    if (bookedBooking.Transactions.FirstOrDefault().PaymentMethod.Equals(Domain.Enum.PaymentMethod.tra_truoc.ToString()))
                     {
                         bookedBooking.Status = BookingStatus.Cancel.ToString();
                         bookedBooking.Transactions.First().Status = BookingPaymentStatus.Huy.ToString();
                         bookedBooking.Transactions.First().Description = "Trễ quá giờ cho phép";
 
-                    // bắn message, đơn của mày đã bị hủy + lý do
-                    PushNotiToCustomerWhenOverLateAllowedTime(bookedBooking);
-                    bookedBooking.User.BanCount += 1;
-                    if (bookedBooking.User.BanCount >= 2)
-                        foreach (var bookingDetail in bookedBooking.BookingDetails)
-                        {
-                            bookingDetail.TimeSlot.Status = TimeSlotStatus.Free.ToString();
-                        }
-
                         // bắn message, đơn của mày đã bị hủy + lý do
                         PushNotiToCustomerWhenOverLateAllowedTime(bookedBooking);
+                        bookedBooking.User.BanCount += 1;
+                        if (bookedBooking.User.BanCount >= 2)
+                            foreach (var bookingDetail in bookedBooking.BookingDetails)
+                            {
+                                bookingDetail.TimeSlot.Status = TimeSlotStatus.Free.ToString();
+                            }
+
                         _context.SaveChanges();
                     }
                     else
@@ -152,7 +153,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
         }
 
-        public async void AutoCancelBookingWhenOutOfEndTimeBooking(int bookingId)
+        public async void AutoCancelBookingWhenOutOfEndTimeBooking(int bookingId, string jobId)
         {
 
             var methodName = "AutoCancelBookingWhenOutOfEndTimeBooking";
@@ -164,8 +165,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                         .Include(x => x.Transactions)!.ThenInclude(x => x.Wallet)
                         .FirstOrDefault(x => x.BookingId == bookingId);
 
-                var guestArrived = bookedBooking.CheckinTime.Value != null;
-                var isOutOfEndTimeBooking = DateTime.UtcNow.AddHours(7) >= bookedBooking.EndTime.Value;
+                var isOutOfEndTimeBooking = DateTime.UtcNow.AddHours(7) >= bookedBooking.EndTime.Value.AddMinutes(-1);
+                var guestArrived = bookedBooking.CheckinTime.HasValue;
 
                 if (guestArrived)
                 {
@@ -187,7 +188,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     PushNotiToCustomerWhenCustomerNotArrive(bookedBooking);
                     _context.SaveChanges();
                 }
-                Console.WriteLine($"Exception");
+                BackgroundJob.Delete(jobId);
+                // Console.WriteLine($"Exception");
             }
             catch (Exception ex)
             {
@@ -405,16 +407,18 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             Console.WriteLine("Background Job CheckIfBookingIsLateOrNot Called");
 
             var newJobId = "";
-            var bookedBooking = _context.Bookings
+            var bookedBooking = await _context.Bookings
                                         .Include(x => x.BookingDetails!).ThenInclude(x => x.TimeSlot)
-                                        .FirstOrDefault(x => x.BookingId == bookingId);
+                                        .FirstOrDefaultAsync(x => x.BookingId == bookingId);
 
             var customerIsCheckOut = bookedBooking.CheckoutTime != null;
             var customerIsCheckIn = bookedBooking.CheckinTime.HasValue;
 
-            var bookedTimeSlot = bookedBooking.BookingDetails.Last().TimeSlotId;
+            var now = DateTime.UtcNow.AddHours(7);
+            DateTime roundedTime = now.Date.AddHours(now.Hour);
 
-            var nextTimeSlot = _context.TimeSlots.Find(bookedTimeSlot + 1);
+            var nextTimeSlot = await _context.TimeSlots.FirstOrDefaultAsync(x => x.ParkingSlotId == bookedBooking.BookingDetails.Last().TimeSlot.ParkingSlotId &&
+                                                                        x.StartTime == roundedTime);
             var methodName = "CheckIfBookingIsLateOrNot";
 
             //Delete job
@@ -434,8 +438,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     TimeSlotId = nextTimeSlot.TimeSlotId
                 };
 
-                _context.BookingDetails.Add(newBookingDetail);
-                _context.SaveChanges();
+                await _context.BookingDetails.AddAsync(newBookingDetail);
+                await _context.SaveChangesAsync();
 
                 DateTime end = DateTime.Parse(nextTimeSlot.EndTime.ToString()).AddMinutes(1);
                 DateTimeOffset timeToCallMethod = new DateTimeOffset(end, new TimeSpan(7, 0, 0));
@@ -448,8 +452,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 Console.WriteLine("Background Job: co request can xu ly");
                 bookedBooking.Status = BookingStatus.OverTime.ToString();
 
-                var conflictBookingDetails = _context.BookingDetails
-                .FirstOrDefault(x => x.TimeSlotId == nextTimeSlot.TimeSlotId);
+                var conflictBookingDetails = await _context.BookingDetails
+                .FirstOrDefaultAsync(x => x.TimeSlotId == nextTimeSlot.TimeSlotId);
 
                 var newConflictRequest = new ConflictRequest
                 {
@@ -459,9 +463,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     Status = ConflictRequestStatus.InProcess.ToString(),
                 };
 
-                _context.ConflictRequests.Add(newConflictRequest);
+                await _context.ConflictRequests.AddAsync(newConflictRequest);
                 conflictBookingDetails.BookingId = bookingId;
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 DateTime end = DateTime.Parse(nextTimeSlot.EndTime.ToString()).AddMinutes(1);
                 DateTimeOffset timeToCallMethod = new DateTimeOffset(end, new TimeSpan(7, 0, 0));
@@ -484,7 +488,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 }
                 else
                 {
-                    var manager = _context.Users.Find(ManagerOfParking.UserId!);
+                    var manager = await _context.Users.FindAsync(ManagerOfParking.UserId!);
                     var pushNotificationModel = new PushNotificationWebModel
                     {
                         Title = "Đơn đặt xung đột, cần xử lý",
@@ -496,7 +500,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             }
         }
 
-        public async Task DisableParkingAtDate(int parkingId)
+        public async Task DisableParkingAtDate(int parkingId, DateTime disableDate)
         {
             var parkingIncludeTimeSlots = await _context.Parkings
                 .Include(x => x.Floors)!.ThenInclude(x => x.ParkingSlots)!.ThenInclude(x => x.TimeSlots)
@@ -504,6 +508,35 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
 
             var floors = parkingIncludeTimeSlots!.Floors!;
             parkingIncludeTimeSlots.IsAvailable = false;
+
+            string file1 = "historydisableparking.json";
+            if (!File.Exists(file1))
+            {
+                // return new ServiceResponse<string>
+                // {
+                //     Message = "Tệp không tồn tại",
+                //     StatusCode = 200,
+                //     Success = true,
+                // };
+                throw new Exception($"DisableParkingByDate job: Tệp không tồn tại");
+            }
+            else
+            {
+                string jsonFromFile = File.ReadAllText("historydisableparking.json");
+                JArray array = JArray.Parse(jsonFromFile);
+                // List<JToken> parkings = array.Where(x => x["ParkingId"].Value<int>() == parkingId).ToList();
+                foreach (JToken token in array)
+                {
+                    if (token["ParkingId"].Value<int>() == 1 && token["DisableDate"].Value<DateTime>().Date == DateTime.Parse(disableDate.ToString("MM/dd/yyyy")))
+                    {
+                        token["State"] = "Succeeded";
+                    }
+                }
+
+                string updatedJson = JsonConvert.SerializeObject(array, Formatting.Indented);
+                File.WriteAllText("historydisableparking.json", updatedJson);
+
+            }
         }
 
         public async Task DisableParkingByDate(int parkingId, DateTime disableDate, string reason)
@@ -519,7 +552,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
 
                 var parkingSlots = await parkingSlotRepository.GetParkingSlotsByParkingId(parkingId);
                 var bookedTimeSlotsAtDisableDate = await timeSlotRepository.GetBookedTimeSlotsByDateNew(parkingSlots.ToList(), disableDate);
-                if (bookedTimeSlotsAtDisableDate != null)
+                if (bookedTimeSlotsAtDisableDate.Count() != 0)
                 {
                     var tempbookingDetails = new List<BookingDetails>();
                     foreach (var item in bookedTimeSlotsAtDisableDate)
@@ -584,6 +617,43 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                         // await PushNotiForAllCustomer(tempbookingDetails, reasonChangeTransactionStatus);
                     }
                 }
+                else
+                {
+                    // var parkingSlots = await parkingSlotRepository.GetParkingSlotsByParkingId(parkingId);
+                    // cancel booking
+                    await timeSlotRepository.DisableTimeSlotByDisableDate(parkingSlots.ToList(), disableDate);
+                }
+
+                // method duoc goi khi den disable date, chi can update state thanh success
+                string file1 = "historydisableparking.json";
+                if (!File.Exists(file1))
+                {
+                    // return new ServiceResponse<string>
+                    // {
+                    //     Message = "Tệp không tồn tại",
+                    //     StatusCode = 200,
+                    //     Success = true,
+                    // };
+                    throw new Exception($"DisableParkingByDate job: Tệp không tồn tại");
+                }
+                else
+                {
+                    string jsonFromFile = File.ReadAllText("historydisableparking.json");
+                    JArray array = JArray.Parse(jsonFromFile);
+                    // List<JToken> parkings = array.Where(x => x["ParkingId"].Value<int>() == parkingId).ToList();
+                    foreach (JToken token in array)
+                    {
+                        if (token["ParkingId"].Value<int>() == 1 && token["DisableDate"].Value<DateTime>().Date == DateTime.Parse(disableDate.ToString("MM/dd/yyyy")))
+                        {
+                            token["State"] = "Succeeded";
+                        }
+                    }
+
+                    string updatedJson = JsonConvert.SerializeObject(array, Formatting.Indented);
+                    File.WriteAllText("historydisableparking.json", updatedJson);
+
+                }
+
             }
             catch (System.Exception ex)
             {

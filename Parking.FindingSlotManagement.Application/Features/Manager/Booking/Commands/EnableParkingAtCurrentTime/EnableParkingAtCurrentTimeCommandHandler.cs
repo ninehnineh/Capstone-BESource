@@ -22,6 +22,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Booking.Com
                 ArgumentNullException.ThrowIfNull(parkingId);
                 ArgumentNullException.ThrowIfNull(disableDate);
 
+                
+
                 return null;
             }
             catch (System.Exception ex)

@@ -89,36 +89,12 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Commands.Di
                 {
                     var timeToCallJob = disableDateTime - nowUTCDate.AddHours(7);
                     var jobId = BackgroundJob.Schedule<IServiceManagement>(x => x.DisableParkingByDate(parkingId, disableDate, reason), timeToCallJob);
-
-                    List<GetDisableParkingHistoryQueryResponse> histories = new List<GetDisableParkingHistoryQueryResponse>();
-                    var newhistoryDisableParking = new GetDisableParkingHistoryQueryResponse
-                    {
-                        ParkingId = parkingId,
-                        CreatedAt = DateTime.UtcNow.AddHours(7).ToString(),
-                        DisableDate = disableDate.ToString(),
-                        Reason = reason,
-                        State = ParkingHistoryStatus.Scheduled.ToString(),
-                    };
-                    histories.Add(newhistoryDisableParking);
-                    string file1 = "historydisableparking.json";
-                    if (!File.Exists(file1))
-                    {
-                        string json = JsonConvert.SerializeObject(histories, Formatting.Indented);
-                        File.WriteAllText(file1, json);
-                    }
-                    else
-                    {
-                        string jsonFromFile = File.ReadAllText("historydisableparking.json");
-                        List<GetDisableParkingHistoryQueryResponse> disableParkingHistory = JsonConvert.DeserializeObject<List<GetDisableParkingHistoryQueryResponse>>(jsonFromFile);
-                        disableParkingHistory.Add(newhistoryDisableParking);
-
-                        File.WriteAllText("historydisableparking.json", JsonConvert.SerializeObject(disableParkingHistory, Formatting.Indented));
-                    }
+                
                 }
                 else
-                {   
+                {
                     var timeToCallJob = disableDateTime - nowUTCDate.AddHours(7);
-                    var jobId = BackgroundJob.Schedule<IServiceManagement>(x => x.DisableParkingAtDate(parkingId), timeToCallJob);
+                    var jobId = BackgroundJob.Schedule<IServiceManagement>(x => x.DisableParkingAtDate(parkingId, disableDate), timeToCallJob);
 
                     var parkingSlots = await parkingSlotRepository.GetParkingSlotsByParkingId(parkingId);
                     var bookedTimeSlotsAtDisableDate = await timeSlotRepository.GetBookedTimeSlotsByDateNew(parkingSlots.ToList(), disableDate);
@@ -184,8 +160,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Commands.Di
                             await bookingRepository.CancelBookedBookingWhenDisableParking(tempbookingDetails.ToList());
                             await timeSlotRepository.DisableTimeSlotByDisableDate(parkingSlots.ToList(), disableDate);
 
-                            // new GetDisableParkingHistoryQueryResponse { State = state, DisableDate = disableDate, CreatedAt = createdAt }
-
                             // Bắn message chưa có token, lỗi, ko for típ dc nên comment
                             // await PushNotiForAllCustomer(tempbookingDetails, reasonChangeTransactionStatus);
                         }
@@ -194,35 +168,43 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.Commands.Di
                     {
                         // var parkingSlots = await parkingSlotRepository.GetParkingSlotsByParkingId(parkingId);
                         // cancel booking
-                        BackgroundJob.Schedule<IServiceManagement>(x => x.DisableParkingAtDate(parkingId), timeToCallJob);
+                        // BackgroundJob.Schedule<IServiceManagement>(x => x.DisableParkingAtDate(parkingId), timeToCallJob);
                         await timeSlotRepository.DisableTimeSlotByDisableDate(parkingSlots.ToList(), disableDate);
                     }
+
                 }
 
-
-                // var historyDisableParking = new GetDisableParkingHistoryQueryResponse
-                // {
-                //     ParkingId = parkingId,
-                //     CreatedAt = DateTime.UtcNow.AddHours(7),
-                //     DisableDate = disableDate,
-                //     Reason = reason,
-                //     State = "Scheduled"
-                // };
-
-                // string file = "historydisableparking.json";
-                // if (!File.Exists(file))
-                // {
-                //     string json = JsonConvert.SerializeObject(historyDisableParking);
-                //     File.WriteAllText(file, json);
-                // }
-                // else
-                // {
-                //     string jsonFromFile = File.ReadAllText("historydisableparking.json");
-                //     List<GetDisableParkingHistoryQueryResponse> disableParkingHistory = JsonConvert.DeserializeObject<List<GetDisableParkingHistoryQueryResponse>>(jsonFromFile);
-                //     disableParkingHistory.Add(historyDisableParking);
-
-                //     File.WriteAllText("historydisableparking.json", JsonConvert.SerializeObject(historyDisableParking));
-                // }
+                List<GetDisableParkingHistoryQueryResponse> histories = new List<GetDisableParkingHistoryQueryResponse>();
+                var newhistoryDisableParking = new GetDisableParkingHistoryQueryResponse
+                {
+                    ParkingId = parkingId,
+                    CreatedAt = DateTime.UtcNow.AddHours(7).ToString("dd/MM/yyyy"),
+                    DisableDate = disableDate.ToString("dd/MM/yyyy"),
+                    Reason = reason,
+                    State = ParkingHistoryStatus.Scheduled.ToString(),
+                };
+                histories.Add(newhistoryDisableParking);
+                string file1 = "historydisableparking.json";
+                if (!File.Exists(file1))
+                {
+                    string json = JsonConvert.SerializeObject(histories, Formatting.Indented);
+                    File.WriteAllText(file1, json);
+                }
+                else
+                {
+                    string jsonFromFile = File.ReadAllText("historydisableparking.json");
+                    if (string.IsNullOrWhiteSpace(jsonFromFile))
+                    {
+                        string json = JsonConvert.SerializeObject(histories, Formatting.Indented);
+                        File.WriteAllText(file1, json);
+                    }
+                    else
+                    {
+                        List<GetDisableParkingHistoryQueryResponse> disableParkingHistory = JsonConvert.DeserializeObject<List<GetDisableParkingHistoryQueryResponse>>(jsonFromFile);
+                        disableParkingHistory.Add(newhistoryDisableParking);
+                        File.WriteAllText("historydisableparking.json", JsonConvert.SerializeObject(disableParkingHistory, Formatting.Indented));
+                    }
+                }
 
                 return new ServiceResponse<string>
                 {
