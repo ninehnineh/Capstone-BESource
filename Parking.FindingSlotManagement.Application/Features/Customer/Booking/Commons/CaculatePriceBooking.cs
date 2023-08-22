@@ -60,7 +60,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                             {
                                 var ExtraFeeHours = BookedTime - startingTime;
                                 var so_step = (int)ExtraFeeHours / (int)extraTimeStep!;
-                                totalPrice = package.Price + (decimal)(so_step * package.ExtraFee) + (decimal)package.ExtraFee;
+                                totalPrice = package.Price + (decimal)(so_step * package.ExtraFee);
                             }
                             else
                             {
@@ -176,7 +176,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                             {
                                 var ExtraFeeHours = BookedTime - startingTime;
                                 var so_step = (int)ExtraFeeHours / (int)extraTimeStep!;
-                                totalPrice = package.Price + (decimal)(so_step * package.ExtraFee!) + (decimal)package.ExtraFee!;
+                                totalPrice = package.Price + (decimal)(so_step * package.ExtraFee!);
                             }
                             else
                             {
@@ -211,7 +211,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                                 startingPrice =
                                     (double)(startTimeBooking + startingTime)! == endTimePackage
                                     ? package.Price
-                                    : package.Price + (decimal)package.ExtraFee!;
+                                    : package.Price;
 
                                 var extraPrice = 0M;
                                 var bookedTime = (int)(endTimePackage - startTimeBooking);
