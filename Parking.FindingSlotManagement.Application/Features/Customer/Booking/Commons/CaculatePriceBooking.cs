@@ -24,6 +24,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
             var startingPoint = 0;
             var extraFeePoint = 0;
             var isPass = false;
+            var startPointIsFoundInFirstTimeLine = false;
 
             while (hitEndPoint == false)
             {
@@ -32,7 +33,22 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     var startTimePackage = package.StartTime?.TotalHours;
                     var endTimePackage = package.EndTime?.TotalHours;
 
-                    if (startTimePackage > endTimePackage)
+                    if (!foundStartPoint &&
+                        startTimePackage > endTimePackage &&
+                        startPointIsFoundInFirstTimeLine == false)
+                    {
+                        startPointIsFoundInFirstTimeLine = true;
+                        endTimePackage += 24;
+
+                        if (start.Date == end.Date && startTimeBooking < startTimePackage)
+                            startTimeBooking += 24;
+                        //if (endTimeBooking <= startTimePackage)
+                        //{
+                        //    endTimeBooking += 24;
+                        //}
+                    }
+
+                    if (startTimePackage > endTimePackage && foundStartPoint == true)
                     {
                         endTimePackage += 24;
                     }
@@ -40,14 +56,16 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                     if (startTimeDate == endTimeDate)
                     {
                         // một gói, trong ngày
+                        if (endTimeBooking < endTimePackage && endTimeBooking < startTimePackage)
+                            endTimeBooking += 24;
 
                         if (BookingTimeInOnePackage(startTimeBooking, endTimeBooking,
                             startTimePackage, endTimePackage))
                         {
                             if (package.StartTime > package.EndTime)
                             {
-                                if (Math.Abs(24 - startTimeBooking) >= 24 - startTimePackage &&
-                                    Math.Abs(24 - endTimeBooking) >= 24 - startTimePackage)
+                                if (Math.Abs(24 - startTimeBooking) >= (24 - startTimePackage) &&
+                                    Math.Abs(24 - endTimeBooking) >= (24 - startTimePackage))
                                 {
                                     startTimeBooking += 24;
                                     endTimeBooking += 24;
@@ -96,15 +114,15 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                                 startingPrice =
                                     (double)(startTimeBooking + startingTime)! == endTimePackage
                                     ? package.Price
-                                    : package.Price + (decimal)package.ExtraFee!;
+                                    : package.Price;
 
                                 var extraPrice = 0M;
                                 startingPoint = (int)(startTimeBooking + startingTime)!;
+                                extraFeePoint = (int)(startingPoint + extraTimeStep)!;
                                 if (startingPoint == endTimePackage)
                                 {
                                     isPass = true;
                                 }
-                                extraFeePoint = (int)(startingPoint + extraTimeStep)!;
                                 while (extraFeePoint <= endTimePackage)
                                 {
                                     step++;
@@ -119,29 +137,29 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                             if (foundStartPoint == true)
                             {
                                 var priceOfTimeLineTwo = 0M;
-                                if (startingPoint == startTimePackage ||
-                                    startingPoint == startTimePackage + 24)
-                                {
-                                    totalPrice += (decimal)package.ExtraFee!;
-                                }
+                                // if (startingPoint == startTimePackage ||
+                                //     startingPoint == startTimePackage + 24)
+                                // {
+                                //     totalPrice += (decimal)package.ExtraFee!;
+                                // }
                                 if (extraFeePoint > 24 && endTimeBooking < 24)
-                                {
                                     endTimeBooking += 24;
-                                }
+
+                                if (startPointIsFoundInFirstTimeLine)
+                                    endTimePackage += 24;
+
                                 while (extraFeePoint <= endTimePackage &&
                                     extraFeePoint <= endTimeBooking)
                                 {
                                     priceOfTimeLineTwo = (decimal)package.ExtraFee!;
                                     totalPrice += priceOfTimeLineTwo;
                                     extraFeePoint += (int)extraTimeStep!;
+
                                     if (endTimePackage < startTimePackage)
-                                    {
                                         endTimePackage += 24;
-                                    }
+
                                     if (extraFeePoint > 24 && endTimePackage < 24)
-                                    {
                                         endTimePackage += 24;
-                                    }
 
                                 }
                                 if (extraFeePoint <= endTimeBooking)
@@ -196,9 +214,11 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                         {
 
                             if (endTimePackage < startTimePackage)
-                            {
                                 package.EndTime += TimeSpan.FromHours(24);
-                            }
+
+                            if (startTimeBooking < startTimePackage && 
+                                startTimeBooking < endTimePackage)
+                                startTimeBooking += 24;
 
                             if (startTimeBooking >= startTimePackage &&
                                 startTimeBooking < endTimePackage &&
@@ -215,9 +235,10 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
 
                                 var extraPrice = 0M;
                                 var bookedTime = (int)(endTimePackage - startTimeBooking);
-                                startingPoint = (int)(startTimeBooking + startingTime!);
 
+                                startingPoint = (int)(startTimeBooking + startingTime!);
                                 extraFeePoint = (int)(startingPoint + extraTimeStep)!;
+
                                 while (extraFeePoint <= endTimePackage)
                                 {
                                     step++;
@@ -226,43 +247,44 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                                 };
                                 totalPrice = startingPrice + extraPrice;
 
-                                break;
+                                continue;
                             }
 
                             if (foundStartPoint)
                             {
-                                if (startingPoint == startTimePackage ||
-                                    startingPoint == (startTimePackage + 24))
-                                {
-                                    totalPrice += (decimal)package.ExtraFee!;
-                                }
-                                if (startTimeDate < endTimeDate)
-                                {
+
+                                endTimeBooking += 24;
+
+                                if (extraFeePoint > 24 && endTimeBooking < 24)
                                     endTimeBooking += 24;
-                                }
-                                while (extraFeePoint <= endTimeBooking &&
+
+                                if (startPointIsFoundInFirstTimeLine)
+                                    endTimePackage += 24;
+
+                                if (extraFeePoint > endTimePackage)
+                                    endTimePackage += 24;
+
+                                if (extraFeePoint > endTimeBooking)
+                                    endTimeBooking += 24;
+
+                                while (extraFeePoint <= endTimePackage &&
                                     extraFeePoint <= endTimeBooking)
                                 {
                                     totalPrice += (decimal)package.ExtraFee!;
                                     extraFeePoint += (int)extraTimeStep!;
+                                    
                                     if (endTimePackage < startTimePackage)
-                                    {
                                         endTimePackage += 24;
-                                    }
+
                                     if (extraFeePoint > 24 && endTimePackage < 24)
-                                    {
                                         endTimePackage += 24;
-                                    }
                                 }
                                 if (extraFeePoint <= endTimeBooking)
                                 {
+                                    endTimeBooking -= 24;
                                     continue;
                                 }
-                                //if (extraFeePoint >= endTimeBooking)
-                                //{
-                                //    isPass = false;
-                                //    break;
-                                //}
+
                                 hitEndPoint = true;
                                 break;
                             }
@@ -298,7 +320,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                                     endTimeBooking <= endTimePackage ||
                                     (startTimeBooking + 24) >= startTimePackage &&
                                     (startTimeBooking + 24) <= endTimePackage &&
-                                    (endTimeBooking + 24) > (startTimeBooking) &&
+                                    (endTimeBooking + 24) > startTimeBooking &&
                                     (endTimeBooking + 24) >= startTimePackage &&
                                     (endTimeBooking + 24) <= endTimePackage;
         }
