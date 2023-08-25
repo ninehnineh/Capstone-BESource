@@ -75,8 +75,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
                         {
                             GetListParkingNearestYouQueryResponse = item,
                             Distance = res,
-                            PriceCar = null,
-                            PriceMoto = null
+                            PriceCar = null
                         };
                         lst.Add(parkingWithDistance);
                         continue;
@@ -92,17 +91,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
                                 GetListParkingNearestYouQueryResponse = item,
                                 Distance = res,
                                 PriceCar = timelineCurrent.Price,
-                                PriceMoto = null
-                            };
-                        }
-                        else if (parkingPrice.TrafficId == 2)
-                        {
-                            parkingWithDistance = new ParkingWithDistance
-                            {
-                                GetListParkingNearestYouQueryResponse = item,
-                                Distance = res,
-                                PriceCar = null,
-                                PriceMoto = timelineCurrent.Price
                             };
                         }
                     }
