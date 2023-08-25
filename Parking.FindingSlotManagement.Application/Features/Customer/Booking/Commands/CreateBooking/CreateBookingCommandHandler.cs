@@ -140,7 +140,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 if (resCheckHasBookedYet.Count() == 0 || lstGuest.Count() == 0)
                 {*/
                 var checkHasBookedYet = await _bookingRepository.GetAllItemWithCondition(x => x.UserId == request.BookingDto.UserId && !x.Status.Equals(BookingStatus.Done.ToString()) && !x.Status.Equals(BookingStatus.Cancel.ToString()));
-                if(checkHasBookedYet.Count() > 5)
+                if(checkHasBookedYet.Count() >= 5)
                 {
                     return new ServiceResponse<int>
                     {
