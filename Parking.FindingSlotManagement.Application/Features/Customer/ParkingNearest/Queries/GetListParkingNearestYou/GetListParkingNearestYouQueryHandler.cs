@@ -123,7 +123,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
                 throw new Exception(ex.Message);
             }
         }
-        private async Task<double> GetDistanceMethod(double lat1, double lon1, double lat2, double lon2)
+        /*private async Task<double> GetDistanceMethod(double lat1, double lon1, double lat2, double lon2)
         {
             var url = $"https://api.tomtom.com/routing/1/calculateRoute/{lat1},{lon1}:{lat2},{lon2}/json";
             var queryString = $"?key={_apiKey}";
@@ -148,7 +148,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
             {
                 throw new ApplicationException("Error processing response.", ex);
             }
-        }
+        }*/
         /*private double GetDistanceMethod(double lat1, double lon1, double lat2, double lon2)
         {
             var request = new RestRequest($"/routing/1/calculateRoute/{lat1},{lon1}:{lat2},{lon2}/json", Method.Get);
@@ -164,7 +164,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
             var distanceInMeters = response.Data.Routes[0].Summary.LengthInMeters;
             return distanceInMeters / 1000.0; // convert to kilometers
         }*/
-        /*private async Task<double> GetDistanceMethod(double lat1, double lon1, double lat2, double lon2)
+        private async Task<double> GetDistanceMethod(double lat1, double lon1, double lat2, double lon2)
         {
             double distance = 0;
             var baseUri = new Uri("https://router.project-osrm.org");
@@ -179,7 +179,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
                 return (distance / 1000); // convert to kilometers
             }
             return distance;
-        }*/
+        }
         private async Task<TimeLine> GetTimeLine(ParkingHasPrice parkingHasPrice)
         {
             var a = TimeSpan.FromHours(DateTime.UtcNow.AddHours(7).Hour);
