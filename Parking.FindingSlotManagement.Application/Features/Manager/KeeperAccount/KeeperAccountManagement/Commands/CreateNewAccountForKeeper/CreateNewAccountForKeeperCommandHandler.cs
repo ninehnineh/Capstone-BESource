@@ -95,7 +95,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Manager.KeeperAccou
 
                 var _mapper = _config.CreateMapper();
                 var accEntity = _mapper.Map<User>(request);
-                var passwordGenerate = GenerateRandomString(6);
+                var passwordGenerate = "123@@";
                 CreatePasswordHash(passwordGenerate,
                     out byte[] passwordHash,
                     out byte[] passwordSalt);
