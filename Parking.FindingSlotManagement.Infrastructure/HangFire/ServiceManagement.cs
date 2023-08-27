@@ -153,7 +153,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             _fireBaseMessageServices.SendNotificationToMobileAsync(pushNotificationMobile);
         }
 
-        public async void AutoCancelBookingWhenOutOfEndTimeBooking(int bookingId, string jobId)
+        public async Task<string> AutoCancelBookingWhenOutOfEndTimeBooking(int bookingId, string jobId)
         {
 
             var methodName = "AutoCancelBookingWhenOutOfEndTimeBooking";
@@ -172,6 +172,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 {
                     await hangfireRepository.DeleteJob(bookingId, methodName);
                     Console.WriteLine($"Job deleted, because guest is arrived");
+                    return "Job deleted, because guest is arrived";
                 }
                 else if (!guestArrived && isOutOfEndTimeBooking)
                 {
@@ -186,10 +187,11 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                     }
                     // bắn message, đơn của mày đã bị hủy + lý do
                     PushNotiToCustomerWhenCustomerNotArrive(bookedBooking);
-                    _context.SaveChanges();
+                    BackgroundJob.Delete(jobId);
+                    _context.SaveChangesAsync();
                 }
-                BackgroundJob.Delete(jobId);
                 // Console.WriteLine($"Exception");
+                return "Cancel success";
             }
             catch (Exception ex)
             {
