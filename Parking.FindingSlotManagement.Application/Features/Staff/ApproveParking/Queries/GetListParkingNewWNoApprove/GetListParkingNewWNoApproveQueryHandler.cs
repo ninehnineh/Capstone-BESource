@@ -37,8 +37,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Staff.ApproveParkin
                 {
                     x => x.ApproveParkings
                 };
-                var lst = await _parkingRepository.GetAllItemWithPagination(x => x.ApproveParkings.Count() == 0 
-                || x.ApproveParkings.OrderByDescending(x => x.ApproveParkingId).FirstOrDefault().Status.Equals(ApproveParkingStatus.Tạo_mới.ToString()) || x.ApproveParkings.OrderByDescending(x => x.ApproveParkingId).FirstOrDefault().Status.Equals(ApproveParkingStatus.Từ_chối.ToString()), includes, x => x.ParkingId, true, request.PageNo, request.PageSize);
+                var lst = await _parkingRepository.GetAllItemWithPagination(x => x.ApproveParkings.Count() == 0 && x.IsActive == false
+                || x.ApproveParkings.OrderByDescending(x => x.ApproveParkingId).FirstOrDefault().Status.Equals(ApproveParkingStatus.Tạo_mới.ToString()) || x.ApproveParkings.OrderByDescending(x => x.ApproveParkingId).FirstOrDefault().Status.Equals(ApproveParkingStatus.Từ_chối.ToString()) && x.IsActive == false, includes, x => x.ParkingId, true, request.PageNo, request.PageSize);
                 if(!lst.Any())
                 {
                     return new ServiceResponse<IEnumerable<GetListParkingNewWNoApproveResponse>>

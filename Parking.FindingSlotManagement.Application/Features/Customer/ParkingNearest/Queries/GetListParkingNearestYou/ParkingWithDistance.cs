@@ -10,7 +10,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
     {
         public GetListParkingNearestYouQueryResponse GetListParkingNearestYouQueryResponse { get; set; }
         public decimal? PriceCar { get; set; }
-        public decimal? PriceMoto { get; set; }
         public double Distance { get; set; }
     }
 }

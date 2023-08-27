@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -64,7 +65,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
                 List<ParkingWithDistance> lst = new();
                 foreach (var item in lstDto)
                 {
-                    var res = GetDistanceMethod(request.CurrentLatitude, request.CurrentLongtitude, (double)item.Latitude, (double)item.Longitude);
+                    var res = await GetDistanceMethod(request.CurrentLatitude, request.CurrentLongtitude, (double)item.Latitude, (double)item.Longitude);
 
                     var parkingWithDistance = new ParkingWithDistance();
                     var lstParkingHasPrice = await _parkingHasPriceRepository.GetAllItemWithConditionByNoInclude(x => x.ParkingId == item.ParkingId);
@@ -75,8 +76,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
                         {
                             GetListParkingNearestYouQueryResponse = item,
                             Distance = res,
-                            PriceCar = null,
-                            PriceMoto = null
+                            PriceCar = null
                         };
                         lst.Add(parkingWithDistance);
                         continue;
@@ -92,17 +92,6 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
                                 GetListParkingNearestYouQueryResponse = item,
                                 Distance = res,
                                 PriceCar = timelineCurrent.Price,
-                                PriceMoto = null
-                            };
-                        }
-                        else if (parkingPrice.TrafficId == 2)
-                        {
-                            parkingWithDistance = new ParkingWithDistance
-                            {
-                                GetListParkingNearestYouQueryResponse = item,
-                                Distance = res,
-                                PriceCar = null,
-                                PriceMoto = timelineCurrent.Price
                             };
                         }
                     }
@@ -134,7 +123,33 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
                 throw new Exception(ex.Message);
             }
         }
-        private double GetDistanceMethod(double lat1, double lon1, double lat2, double lon2)
+        /*private async Task<double> GetDistanceMethod(double lat1, double lon1, double lat2, double lon2)
+        {
+            var url = $"https://api.tomtom.com/routing/1/calculateRoute/{lat1},{lon1}:{lat2},{lon2}/json";
+            var queryString = $"?key={_apiKey}";
+
+            var fullUrl = url + queryString;
+
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync(fullUrl);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new ApplicationException($"Error retrieving response. Status code: {response.StatusCode}");
+                }
+
+                var routeResponse = await response.Content.ReadFromJsonAsync<RouteResponse>();
+
+                var distanceInMeters = routeResponse.Routes[0].Summary.LengthInMeters;
+                return distanceInMeters / 1000.0; // convert to kilometers
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Error processing response.", ex);
+            }
+        }*/
+        /*private double GetDistanceMethod(double lat1, double lon1, double lat2, double lon2)
         {
             var request = new RestRequest($"/routing/1/calculateRoute/{lat1},{lon1}:{lat2},{lon2}/json", Method.Get);
             request.AddParameter("key", _apiKey);
@@ -148,8 +163,8 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
 
             var distanceInMeters = response.Data.Routes[0].Summary.LengthInMeters;
             return distanceInMeters / 1000.0; // convert to kilometers
-        }
-        /*private async Task<double> GetDistanceMethod(double lat1, double lon1, double lat2, double lon2)
+        }*/
+        private async Task<double> GetDistanceMethod(double lat1, double lon1, double lat2, double lon2)
         {
             double distance = 0;
             var baseUri = new Uri("https://router.project-osrm.org");
@@ -164,7 +179,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.ParkingNea
                 return (distance / 1000); // convert to kilometers
             }
             return distance;
-        }*/
+        }
         private async Task<TimeLine> GetTimeLine(ParkingHasPrice parkingHasPrice)
         {
             var a = TimeSpan.FromHours(DateTime.UtcNow.AddHours(7).Hour);

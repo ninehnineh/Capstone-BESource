@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Parking.FindingSlotManagement.Application;
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Commands.AcceptParkingRequest;
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Commands.DeclineParkingRequest;
@@ -8,6 +9,7 @@ using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Qu
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetFieldInforByParkingId;
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetListParkingWaitingToAccept;
 using Parking.FindingSlotManagement.Application.Features.Admin.ApproveParking.Queries.GetParkingInformationTab;
+using Parking.FindingSlotManagement.Infrastructure.Hubs;
 using System.Net;
 
 namespace Parking.FindingSlotManagement.Api.Controllers.Admin
@@ -17,10 +19,12 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
     public class ApproveParkingController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IHubContext<MessageHub> _messageHub;
 
-        public ApproveParkingController(IMediator mediator)
+        public ApproveParkingController(IMediator mediator, IHubContext<MessageHub> messageHub)
         {
             _mediator = mediator;
+            _messageHub = messageHub;
         }
         /// <summary>
         /// API For Admin
@@ -136,6 +140,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 {
                     return StatusCode((int)res.StatusCode, res);
                 }
+                await _messageHub.Clients.All.SendAsync("LoadParkingInAdmin");
                 return NoContent();
             }
             catch (Exception ex)
@@ -160,6 +165,7 @@ namespace Parking.FindingSlotManagement.Api.Controllers.Admin
                 {
                     return StatusCode((int)res.StatusCode, res);
                 }
+                await _messageHub.Clients.All.SendAsync("LoadParkingInAdmin");
                 return NoContent();
             }
             catch (Exception ex)
