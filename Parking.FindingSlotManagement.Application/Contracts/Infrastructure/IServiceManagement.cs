@@ -14,10 +14,10 @@ namespace Parking.FindingSlotManagement.Application.Contracts.Infrastructure
         void GenerateMerchandise();
         void SyncData();
         void AddTimeSlotInFuture(int floorId);
-        void AutoCancelBookingWhenOverAllowTimeBooking(int bookingId);
+        Task AutoCancelBookingWhenOverAllowTimeBooking(int bookingId);
         Task<string> AutoCancelBookingWhenOutOfEndTimeBooking(int bookingId, string jobId);
         void ChargeMoneyFor1MonthUsingSystem(Fee fee, int bussinesId, int billId, User user);
-        void CheckIfBookingIsLateOrNot(int bookingId, int parkingId, List<string> Token, User ManagerOfParking);
+        Task CheckIfBookingIsLateOrNot(int bookingId, int parkingId, List<string> Token, User ManagerOfParking);
         Task DisableParkingByDate(int parkingId, DateTime disableDate, string reason);
         Task DisableParkingAtDate(int parkingId, DateTime disableDate);
     }

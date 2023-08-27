@@ -25,27 +25,29 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
             try
             {
                 var result = "";
+                var connection = new SqlConnection(connectionString);
+                connection.Open();
+
                 var query = "DELETE FROM HangFire.Job WHERE HangFire.Job.Arguments LIKE '%' + @arguments + '%' AND HangFire.Job.InvocationData LIKE '%' + @methodName + '%'";
-                using (var connection = new SqlConnection(connectionString))
+                var command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@arguments", bookingId.ToString());
+                command.Parameters.AddWithValue("@methodName", methodName);
+
+                int rowsAffected = command.ExecuteNonQuery();
+
+                if (rowsAffected > 0)
                 {
-                    connection.Open();
-                    using (var command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@arguments", bookingId.ToString());
-                        command.Parameters.AddWithValue("@methodName", methodName);
-
-                        int rowsAffected = command.ExecuteNonQuery();
-
-                        if (rowsAffected > 0)
-                        {
-                            result = "Xóa thành công.";
-                        }
-                        else
-                        {
-                            result = "Không tìm thấy dữ liệu để xóa.";
-                        }
-                    }
+                    result = "Xóa thành công.";
                 }
+                else
+                {
+                    result = "Không tìm thấy dữ liệu để xóa.";
+                }
+
+                // Use the connection object for other queries
+
+                // Close the connection when you are done
+                connection.Close();
                 return result;
             }
             catch (System.Exception ex)
@@ -97,7 +99,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.Repositories
                 var result = "";
                 var query = "DELETE FROM HangFire.Job " +
                             "WHERE JSON_VALUE(HangFire.Job.InvocationData, '$.m') = @MethodName AND " +
-                                    "JSON_VALUE(HangFire.Job.Arguments, '$[0]') = @ParkingId AND " + 
+                                    "JSON_VALUE(HangFire.Job.Arguments, '$[0]') = @ParkingId AND " +
                                     "HangFire.Job.Arguments LIKE '%' + @DisableDate + '%'";
 
                 using (var connection = new SqlConnection(connectionString))

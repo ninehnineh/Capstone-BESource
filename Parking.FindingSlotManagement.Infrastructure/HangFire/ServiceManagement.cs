@@ -68,7 +68,7 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
         }
 
 
-        public async void AutoCancelBookingWhenOverAllowTimeBooking(int bookingId)
+        public async Task AutoCancelBookingWhenOverAllowTimeBooking(int bookingId)
         {
             var methodName = "AutoCancelBookingWhenOverAllowTimeBooking";
             try
@@ -404,9 +404,9 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
                 x => x.ChargeMoneyFor1MonthUsingSystem(fee, bussinesId, newBill.BillId, user), timeToCancel);
         }
 
-        public async void CheckIfBookingIsLateOrNot(int bookingId, int parkingId, List<string> token, User ManagerOfParking)
+        public async Task CheckIfBookingIsLateOrNot(int bookingId, int parkingId, List<string> token, User ManagerOfParking)
         {
-            Console.WriteLine("Background Job CheckIfBookingIsLateOrNot Called");
+            
 
             var newJobId = "";
             var bookedBooking = await _context.Bookings
@@ -419,7 +419,8 @@ namespace Parking.FindingSlotManagement.Infrastructure.HangFire
             var now = DateTime.UtcNow.AddHours(7);
             DateTime roundedTime = now.Date.AddHours(now.Hour);
 
-            var nextTimeSlot = await _context.TimeSlots.FirstOrDefaultAsync(x => x.ParkingSlotId == bookedBooking.BookingDetails.Last().TimeSlot.ParkingSlotId &&
+            var nextTimeSlot = await _context.TimeSlots
+                .FirstOrDefaultAsync(x => x.ParkingSlotId == bookedBooking.BookingDetails.Last().TimeSlot.ParkingSlotId &&
                                                                         x.StartTime == roundedTime);
             var methodName = "CheckIfBookingIsLateOrNot";
 
