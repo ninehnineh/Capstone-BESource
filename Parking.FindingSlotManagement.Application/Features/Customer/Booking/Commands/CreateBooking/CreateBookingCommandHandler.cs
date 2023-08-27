@@ -411,7 +411,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 }
                 else
                 {
-                    var timeToCancel = entity.EndTime.Value - DateTime.UtcNow.AddHours(7);
+                    var timeToCancel = entity.EndTime.Value.AddMinutes(-1) - DateTime.UtcNow.AddHours(7);
                     BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOutOfEndTimeBooking(entity.BookingId, idJob), timeToCancel);
                     return new ServiceResponse<int>
                     {
@@ -427,7 +427,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 var notiCustomer = await PushNoTiToCustomer(request, parkingSlot, floor);
                 if (notiCustomer == "error")
                 {
-                    var timeToCancel = entity.EndTime.Value - DateTime.UtcNow.AddHours(7);
+                    var timeToCancel = entity.EndTime.Value.AddMinutes(-1) - DateTime.UtcNow.AddHours(7);
                     BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOutOfEndTimeBooking(entity.BookingId, idJob), timeToCancel);
                     return new ServiceResponse<int>
                     {
@@ -439,7 +439,7 @@ namespace Parking.FindingSlotManagement.Application.Features.Customer.Booking.Co
                 }
                 else
                 {
-                    var timeToCancel = entity.EndTime.Value - DateTime.UtcNow.AddHours(7);
+                    var timeToCancel = entity.EndTime.Value.AddMinutes(-1) - DateTime.UtcNow.AddHours(7);
                     BackgroundJob.Schedule<IServiceManagement>(x => x.AutoCancelBookingWhenOutOfEndTimeBooking(entity.BookingId, idJob), timeToCancel);
                     return new ServiceResponse<int>
                     {
