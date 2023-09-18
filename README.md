@@ -55,4 +55,4 @@
 - [Full Project URL](https://github.com/orgs/ParkZ-CapstoneProject/repositories)
 - [Slide](https://www.canva.com/design/DAFj5jFOqNA/iux70mv-C_WX1w-vwzyyYA/edit?utm_content=DAFj5jFOqNA&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
-#### © 2022 ChinhTruong
+#### © 2023 ChinhTruong
