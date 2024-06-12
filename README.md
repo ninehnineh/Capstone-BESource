@@ -31,16 +31,12 @@
       - In this phase, we as a Manager or parking lot owners want to join and public these parking to our system
       - Fill parking information, set parking price, create a keeper (staff of parking)
       - Send request to Staff (staff of system)
-    - [Manager Website](https://park-z-manager-web.vercel.app/)
-    (Valid account: manager@gmail.com, password: 123)
     - [Source Repository](https://github.com/ParkZ-CapstoneProject/parkz-manager-website)
   - Phase 2: The staff of the system sends an approval request to the admin after confirming parking information and the admin decides request is valid or invalid for approval
     - Brief
       - In this phase, we as a Staff of the system will receive a request from parking lot owners (Managers), 
       - meeting with the Manager, validation provided information
       - Send approval request to Admin
-    - [Staff Website](https://parkz-admin-website-eight.vercel.app)
-    (Valid account: parkzstaff@gmail.com, password: 123)
     - [Source Repository](https://github.com/ParkZ-CapstoneProject/parkz-admin-website) We use the same source with admin and use Authozire to separate 2 roles
   - Phase 3: Customer booking process
     - Brief
@@ -49,7 +45,6 @@
 ## Additional
 - We have a [Admin Website](https://github.com/ParkZ-CapstoneProject/parkz-admin-website) for admin can manage system
   - For more information visit: [Source Repository](https://github.com/ParkZ-CapstoneProject/parkz-admin-website)  
-  - [Admin Website](https://parkz-admin-website-eight.vercel.app/) (Valid account: admin@parkz.com, password: admin@@)
 - We also have an application for Keeper (staff of parking) to manage parking slots (reason: our system needs to ensure the status (available or not) of parking slots in real life and in the system is synchronous)
   - For more information visit: [Source Repository](https://github.com/ParkZ-CapstoneProject/parkz_keeper_app)
 - [Full Project URL](https://github.com/orgs/ParkZ-CapstoneProject/repositories)
